@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pikmin Bloom 明信片記錄</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ── BASE & VARIABLES ── */
+:root {
+  --green: #4caf6e;
+  --green-light: #a8ddb8;
+  --green-dark: #2e7d4f;
+  --mushroom: #f5a623;
+  --mushroom-light: #fde0a0;
+  --mushroom-dark: #b8710a;
+  --flower: #e96fad;
+  --flower-light: #f9c8e3;
+  --flower-dark: #b0457e;
+  --bg: #f0f7f2;
+  --card: #ffffff;
+  --text: #1a2e22;
+  --sub: #6b8c76;
+  --border: #d4e8da;
+  --shadow: 0 4px 20px rgba(46,125,79,0.08);
+  --danger: #FF3B30; 
+  --star-gold: #FFCC00; 
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* ── HOME SCREEN ── */
+.home-header { background: linear-gradient(160deg, #1e5c36 0%, #3a9e60 55%, #6ecf8a 100%); padding: 48px 20px 40px; }
+.home-topbar { display: flex; justify-content: space-between; align-items: center; }
+.home-logo { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.2rem; color: #fff; display: flex; align-items: center; gap: 8px; }
+.home-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.4); }
+
+.home-body { padding: 24px 20px 100px; }
+.home-section-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; margin-top: 24px; }
+.home-section-title:first-child { margin-top: 0; }
+
+.category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.cat-btn { border-radius: 24px; padding: 24px 16px; border: none; cursor: pointer; text-align: left; transition: transform 0.15s; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+.cat-btn:active { transform: scale(0.97); }
+.cat-btn.flower-btn { background: linear-gradient(135deg, #f9c8e3, #f0a0cc); }
+.cat-btn.mushroom-btn { background: linear-gradient(135deg, #fde0a0, #f5c060); }
+.cat-btn .cat-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.cat-btn .cat-label { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #3a1a2e; }
+.cat-btn .cat-count { font-size: 0.78rem; font-weight: 700; color: rgba(0,0,0,0.4); margin-top: 2px; }
+
+.search-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
+.search-input { width: 100%; padding: 14px 16px 14px 44px; border-radius: 16px; border: 1.5px solid var(--border); background: #fff; font-size: 0.95rem; font-weight: 500; outline: none; box-shadow: var(--shadow); transition: all 0.2s; }
+.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); font-size: 1.1rem; }
+
+/* ── BOTTOM NAV & FAB ── */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1.5px solid var(--border); display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom); }
+.nav-item { flex: 1; padding: 12px 4px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.65rem; font-weight: 700; color: var(--sub); cursor: pointer; }
+.nav-item.active { color: var(--green-dark); }
+.nav-item .nav-icon { font-size: 1.5rem; }
+
+.fab { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--green-dark), var(--green)); color: #fff; font-size: 1.8rem; border: none; box-shadow: 0 8px 25px rgba(46,125,79,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 150; }
+
+/* ── CATEGORY LAYOUT & FILTERS ── */
+.cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); }
+.cat-topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--card); border-bottom: 1.5px solid var(--border); }
+.back-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 4px; }
+.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; }
+.toggle-hide-btn { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; color: var(--sub); cursor: pointer; }
+
+.sub-tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); }
+.sub-tab { flex: 1; padding: 14px 10px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; color: var(--sub); cursor: pointer; border-bottom: 3px solid transparent; }
+.sub-tab.active { color: var(--green-dark); border-bottom-color: var(--green); }
+
+.quick-filter-wrapper { display: flex; gap: 10px; padding: 14px 16px; background: var(--bg); overflow-x: auto; scrollbar-width: none; border-bottom: 1.5px solid var(--border); align-items: center; }
+.quick-filter-wrapper::-webkit-scrollbar { display: none; }
+.filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: 1.5px solid var(--border); background: #ffffff; color: var(--sub); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.filter-pill.active { background: #4a7c59; color: #ffffff; border-color: #4a7c59; }
+
+.add-theme-btn { display: flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: transparent; color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+
+.cat-body { padding: 16px 16px 120px; }
+.group-section { margin-bottom: 24px; }
+.group-header { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.group-count { background: var(--border); color: var(--sub); border-radius: 99px; padding: 2px 10px; font-size: 0.7rem; }
+
+/* ── POSTCARD CARDS ── */
+.postcard-wrapper { position: relative; margin-bottom: 14px; border-radius: 20px; background: var(--danger); overflow: hidden; }
+.delete-action { position: absolute; top: 0; right: 0; bottom: 0; width: 75px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; }
+
+.postcard { background: var(--card); border-radius: 20px; border: 1.5px solid var(--border); display: flex; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s, border-color 0.3s; position: relative; z-index: 2; user-select: none; }
+.postcard.swiped { transform: translateX(-75px); }
+.postcard.is-owned { background: #f2faf4 !important; border-color: var(--green) !important; }
+
+.postcard-thumb { width: 145px; min-width: 145px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1.5px solid var(--border); cursor: zoom-in; }
+.postcard-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center 75%; transform: scale(1.4); }
+
+.postcard-info { flex: 1; padding: 14px 14px; display: flex; flex-direction: column; gap: 6px; position: relative; }
+
+.mac-btns-container { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 6px; z-index: 10; }
+.mac-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(142, 142, 147, 0.1); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: all 0.2s; }
+.mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; margin: auto; pointer-events: none; }
+.mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
+
+.modal-action-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: rgba(142, 142, 147, 0.12); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: all 0.2s; flex-shrink: 0;}
+.modal-action-btn svg { width: 16px; height: 16px; stroke-width: 2.5; pointer-events: none; }
+.modal-action-btn.edit-btn:hover { background: #E5F1FF; color: #007AFF; }
+.modal-action-btn.del-btn:hover { background: #FFE5E5; color: #FF3B30; }
+
+.postcard-name-row { padding-right: 94px; } 
+.postcard-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; line-height: 1.3; color: var(--text); }
+
+.local-time-badge, .tag, .owned-badge, .coord-btn { height: 28px; box-sizing: border-box; border-radius: 99px; padding: 0 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; width: fit-content; font-family: 'Nunito', sans-serif; }
+.local-time-badge, .tag { background: #ffffff; color: var(--green-dark); font-size: 0.68rem; border: 1px solid #ffffff; box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08); }
+.tag { color: var(--sub); }
+.owned-badge { background: var(--green); color: #fff; font-size: 0.68rem; white-space: nowrap; }
+.coord-btn { background: #f0f7f2; border: 1.5px solid var(--green-light); font-size: 0.7rem; font-family: 'Courier New', Courier, monospace; color: var(--green-dark); cursor: pointer; }
+
+.postcard-loc-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; margin-bottom: 4px; flex-wrap: wrap; }
+.postcard-loc { font-size: 0.75rem; color: var(--sub); font-weight: 500; display: flex; align-items: center; gap: 4px;}
+.postcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; width: 100%; }
+
+/* ── LIGHTBOX ── */
+.lightbox-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; cursor: zoom-out; backdrop-filter: blur(15px); }
+.lightbox-overlay.open { display: flex; }
+.lightbox-frame { width: 92vw; max-width: 600px; aspect-ratio: 1.4 / 1; overflow: hidden; border-radius: 12px; box-shadow: 0 0 60px rgba(0,0,0,0.7); background: #000; }
+.lightbox-img { width: 100%; height: 100%; object-fit: cover; object-position: center 75%; transform: scale(1.45); }
+
+/* ── MODALS ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 20px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column;}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 45px; height: 5px; background: #ddd; border-radius: 99px; margin: 0 auto 20px; flex-shrink:0;}
+.modal-title { font-weight: 900; font-size: 1.2rem; text-align: center; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink:0;}
+
+.batch-results-container { display: none; max-height: 450px; overflow-y: auto; padding: 4px; margin-bottom: 20px; scrollbar-width: none; }
+.batch-item { margin-bottom: 14px; }
+.batch-confirm-box { background: #ffffff; border: 1.5px solid var(--green-light); border-radius: 20px; padding: 22px; text-align: center; }
+.confirm-label { font-size: 0.85rem; color: var(--sub); font-weight: 800; margin-bottom: 8px; }
+.confirm-coord { font-size: 1.3rem; font-family: monospace; font-weight: 900; color: var(--green-dark); margin-bottom: 16px; }
+.confirm-btns { display: flex; flex-direction: column; gap: 10px; }
+.btn-confirm-yes { background: var(--green); color: white; border: none; border-radius: 15px; padding: 14px; font-weight: 800; cursor: pointer; font-size: 1rem; }
+.btn-confirm-no { background: #f5fdf8; color: var(--sub); border: none; border-radius: 15px; padding: 10px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+.batch-preview-box { background: #f5fdf8; border: 1.5px solid var(--green-light); border-radius: 20px; padding: 20px; position: relative; }
+
+.res-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.res-main-title { font-size: 1.15rem; font-weight: 900; color: var(--text); flex: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.duplicate-badge { background: #ffe5e5; color: var(--danger); font-size: 0.7rem; font-weight: 900; padding: 3px 8px; border-radius: 99px; }
+.res-coord-sub { font-size: 0.95rem; font-family: 'Courier New', Courier, monospace; font-weight: 700; color: var(--sub); }
+
+.edit-label { font-size: 0.85rem; font-weight: 800; color: var(--sub); margin-bottom: 8px; margin-left: 4px; }
+.edit-input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; flex-shrink:0;}
+.edit-text-input { width: 100%; padding: 16px 54px 16px 16px; border: 1.5px solid var(--border); border-radius: 16px; font-family: 'Courier New', Courier, monospace; font-size: 1.05rem; color: var(--green-dark); font-weight: 800; background: #fff; outline: none; box-sizing: border-box; }
+
+.reset-input-btn { position: absolute; right: 10px; width: 36px; height: 36px; background: rgba(142, 142, 147, 0.15); border: none; border-radius: 10px; color: var(--sub); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; }
+.reset-input-btn:hover { background: rgba(142, 142, 147, 0.3); color: var(--text); }
+.reset-input-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; pointer-events: none; }
+
+.theme-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; max-height: 180px; overflow-y: auto; scrollbar-width: none; align-content: flex-start;}
+.theme-option { padding: 8px 16px; border-radius: 99px; border: 1.5px solid var(--border); font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; background: #fff; color: var(--sub); transition: all 0.2s; }
+.theme-option.selected { background: var(--green); color: #fff; border-color: var(--green); }
+
+.emoji-picker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; max-height: 200px; overflow-y: auto; padding: 10px; border: 1.5px solid var(--border); border-radius: 16px; margin-bottom: 16px; }
+.emoji-item { font-size: 1.6rem; text-align: center; cursor: pointer; padding: 8px; border-radius: 10px; transition: background 0.2s; }
+.emoji-item:hover { background: #f5fdf8; }
+.emoji-item.selected { background: var(--green-light); box-shadow: 0 0 0 2px var(--green); }
+
+.custom-theme-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 300px; margin-bottom: 20px; padding: 4px;}
+.custom-theme-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 16px; background: #fff; font-weight: 800; font-size: 0.95rem; }
+.theme-action-group { display: flex; gap: 8px; }
+
+.btn-primary { width: 100%; background: linear-gradient(135deg, var(--green-dark), var(--green)); color: #fff; border: none; border-radius: 16px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 4px 12px rgba(46,125,79,0.25); flex-shrink: 0;}
+.btn-danger { width: 100%; background: linear-gradient(135deg, #FF3B30, #D92B22); color: #fff; border: none; border-radius: 16px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; flex-shrink: 0;}
+
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1a2e22; color: #fff; padding: 12px 26px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body onclick="resetSwipes()">
+
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-frame"><img src="" class="lightbox-img" id="lightbox-img"></div>
+</div>
+
+<div class="screen active" id="screen-home">
+  <div class="home-header">
+    <div class="home-topbar"><div class="home-logo">🌱 Pikmin 明信片</div><div class="home-avatar">👤</div></div>
+  </div>
+  <div class="home-body">
+    <div class="home-section-title">瀏覽分類</div>
+    <div class="category-grid">
+      <button class="cat-btn flower-btn" onclick="goTo('flower')"><span class="cat-icon">🌸</span><div class="cat-label">花點</div><div class="cat-count" id="stat-f-total">1 張</div></button>
+      <button class="cat-btn mushroom-btn" onclick="goTo('mushroom')"><span class="cat-icon">🍄</span><div class="cat-label">菇點</div><div class="cat-count" id="stat-m-total">2 張</div></button>
+    </div>
+    <div class="home-section-title">快速搜尋</div>
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="global-search" placeholder="搜尋地點、主題或座標..." oninput="handleGlobalSearch()">
+    </div>
+    <div id="search-results-section" style="display:none;"></div>
+  </div>
+  <input type="file" id="file-input" multiple accept="image/*" style="display:none;" onchange="handleFiles(this.files)">
+  <button class="fab" onclick="document.getElementById('file-input').click()">＋</button>
+</div>
+
+<div class="screen" id="screen-flower">
+  <div class="cat-screen-header">
+    <div class="cat-topbar"><button class="back-btn" onclick="goTo('home')">←</button><div class="cat-topbar-title">🌸 花點明信片</div></div>
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="switchSubTab('flower','country', this)">🌍 國家</div>
+      <div class="sub-tab" onclick="switchSubTab('flower','theme', this)">🎨 主題</div>
+      <div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">⭐ 我的最愛</div>
+    </div>
+    <div class="quick-filter-wrapper" id="flower-filters"></div>
+  </div>
+  <div class="cat-body" id="flower-body"></div>
+  <button class="fab" onclick="document.getElementById('file-input').click()">＋</button>
+</div>
+
+<div class="screen" id="screen-mushroom">
+  <div class="cat-screen-header">
+    <div class="cat-topbar"><button class="back-btn" onclick="goTo('home')">←</button><div class="cat-topbar-title">🍄 菇點明信片</div></div>
+    <div class="sub-tabs">
+      <div class="sub-tab active mushroom-tab" onclick="switchSubTab('mushroom','country', this)">🌍 國家</div>
+      <div class="sub-tab mushroom-tab" onclick="switchSubTab('mushroom','theme', this)">🎨 主題</div>
+      <div class="sub-tab mushroom-tab" onclick="switchSubTab('mushroom','favorite', this)">⭐ 我的最愛</div>
+    </div>
+    <div class="quick-filter-wrapper" id="mushroom-filters"></div>
+  </div>
+  <div class="cat-body" id="mushroom-body"></div>
+  <button class="fab" onclick="document.getElementById('file-input').click()">＋</button>
+</div>
+
+<div class="screen" id="screen-owned">
+  <div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')">←</button><div class="cat-topbar-title">🎒 我的收藏</div></div></div>
+  <div class="cat-body" id="owned-body"></div>
+</div>
+
+<div class="bottom-nav" id="global-nav">
+  <div class="nav-item active" onclick="goTo('home')"><span class="nav-icon">🏠</span>首頁</div>
+  <div class="nav-item" onclick="goTo('flower')"><span class="nav-icon">🌸</span>花點</div>
+  <div class="nav-item" onclick="goTo('mushroom')"><span class="nav-icon">🍄</span>菇點</div>
+  <div class="nav-item" onclick="goTo('owned')"><span class="nav-icon">🎒</span>收藏</div>
+</div>
+
+<div class="modal-overlay" id="uploadModal" onclick="closeModalOutside(event, 'uploadModal')">
+  <div class="modal">
+    <div class="modal-handle"></div><div class="modal-title">📸 批次匯入確認</div>
+    <div class="batch-results-container" id="batch-container" style="display:block;"></div>
+    <button class="btn-primary" onclick="handleBatchSave()">✅ 全部儲存入庫</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')">
+  <div class="modal">
+    <div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">🎨 新增自訂主題</div>
+    <div class="emoji-picker-grid" id="emoji-grid"></div>
+    <div class="edit-input-wrapper">
+      <input type="text" id="new-theme-name" class="edit-text-input" placeholder="輸入主題名稱（如：夜景、美食）">
+    </div>
+    <button class="btn-primary" id="addThemeModalBtn" onclick="saveThemeAction()">確認新增</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')">
+  <div class="modal">
+    <div class="modal-handle"></div><div class="modal-title">⚙️ 管理自訂主題</div>
+    <div class="custom-theme-list" id="custom-theme-list"></div>
+    <button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
+  <div class="modal">
+    <div class="modal-handle"></div><div class="modal-title">✏️ 修改明信片資訊</div>
+    <div class="edit-label">座標：</div>
+    <div class="edit-input-wrapper">
+      <input type="text" id="edit-coord-input" class="edit-text-input" placeholder="0.000000, 0.000000">
+      <button class="reset-input-btn" onclick="resetEditInput()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10h10a5 5 0 0 1 0 10H11M3 10l4-4M3 10l4 4"/></svg></button>
+    </div>
+    <div class="edit-label">主題分類 (可多選)：</div>
+    <div class="theme-selector" id="edit-theme-selector"></div>
+    <button class="btn-primary" onclick="saveEdit()">儲存修改</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">⚠️ 取消收藏</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeCancelOwned()">確定移除</button></div></div>
+<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">🗑️ 刪除明信片</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeHardDelete()">確定刪除</button></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+let flowerCards = [
+  { id: 'f1', name: 'Casa Batlló', loc: '巴塞隆納，西班牙', country: '西班牙', themes: ['🏛️ 歷史古蹟'], coord: '41.391600, 2.165000', icon: '🏛️', tz: 'Europe/Madrid', owned: false, favorite: false, img: null },
+];
+let mushroomCards = [
+  { id: 'm1', name: 'Fushimi Inari Taisha', loc: '京都，日本', country: '日本', themes: ['⛩️ 神社'], coord: '34.967100, 135.772700', icon: '⛩️', tz: 'Asia/Tokyo', owned: false, favorite: true, img: null },
+  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa, 賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: false, img: null },
+];
+
+let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標'];
+let customThemes = ['🐱 貓咪'];
+let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵'];
+let currentNewThemeEmoji = '✨';
+
+let activeSubTabs = { flower: 'country', mushroom: 'country' };
+let activeFilters = { flower: '全部', mushroom: '全部' };
+let pendingRemoveCard = null; 
+let hideOwnedState = { flower: false, mushroom: false };
+let tempBatchList = []; 
+let currentEditCat = ''; let currentEditId = ''; let originalCoordBeforeEdit = ""; let tempEditThemes = [];
+let editingThemeIndex = -1;
+
+document.getElementById('edit-coord-input').addEventListener('input', function(e) { this.value = this.value.replace(/[^0-9.,\- ]/g, ''); });
+
+function getLocalTime(tz) { 
+  try { 
+    const now = new Date();
+    const locDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }).format(now);
+    const tgtDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(now);
+    const tgtTimeStr = new Intl.DateTimeFormat('zh-TW', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(now);
+    
+    let prefix = "";
+    if (locDateStr === tgtDateStr) { prefix = "今日 "; } 
+    else {
+      const lD = new Date(locDateStr); const tD = new Date(tgtDateStr);
+      const diff = (tD - lD) / 86400000;
+      if (diff === 1) prefix = "明日 "; else if (diff === -1) prefix = "昨日 "; else prefix = tgtDateStr.substring(5).replace('-','/') + " ";
+    }
+    return prefix + tgtTimeStr; 
+  } catch(e) { return '--:--'; } 
+}
+
+function handleFiles(files) {
+  if (files.length === 0) return;
+  tempBatchList = [];
+  Array.from(files).forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const nameL = file.name.toLowerCase();
+      const isNatural = nameL.includes('rock') || nameL.includes('bridge') || file.name.includes('8.37');
+      const isMila = nameL.includes('米勒') || nameL.includes('mila');
+      
+      tempBatchList.push({
+        name: isMila ? 'Casa Milà (米拉之家)' : (isNatural ? 'Natural Rock Bridge of Koraka' : (file.name.split('.')[0] || '未知地點')),
+        loc: isMila ? '巴塞隆納，西班牙' : (isNatural ? 'Ayia Napa, 賽普勒斯' : '所在地偵測中...'),
+        coord: isMila ? '41.392300, 2.162000' : (isNatural ? '34.971831, 34.075301' : '0.000000, 0.000000'),
+        favorite: false, status: 'detecting', img: e.target.result,
+        type: (isNatural || isMila) ? 'mushroom' : 'flower'
+      });
+      if (tempBatchList.length === files.length) { openModal('uploadModal'); renderBatchItems(); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderBatchItems() {
+  const container = document.getElementById('batch-container');
+  const allCards = [...flowerCards, ...mushroomCards];
+  
+  container.innerHTML = tempBatchList.map((item, index) => {
+    if (item.status === 'detecting') {
+      return `<div class="batch-item"><div class="batch-confirm-box"><div class="confirm-label">偵測到高精確座標</div><div class="confirm-coord">${item.coord}</div><div class="confirm-btns"><button class="btn-confirm-yes" onclick="confirmBatchItem(${index})">✅ 是的，直接帶入</button><button class="btn-confirm-no" onclick="searchBatchItem(${index})">🔍 不是，交叉查找</button></div></div></div>`;
+    }
+    
+    const isDup = allCards.some(c => c.name === item.name || c.coord === item.coord);
+    const dupBadge = isDup ? `<span class="duplicate-badge">⚠️ 已存在相同明信片</span>` : '';
+
+    return `<div class="batch-item">
+      <div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <div class="res-main-title">${item.name} ${dupBadge}</div>
+          <div class="res-coord-sub">${item.coord}</div>
+        </div>
+        <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:36px; height:36px; flex-shrink:0;" onclick="toggleBatchFav(${index})">
+          <svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:18px; height:18px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function confirmBatchItem(index) { tempBatchList[index].status = 'confirmed'; renderBatchItems(); }
+function searchBatchItem(index) { showToast('🤖 正在精確比對...'); setTimeout(() => { tempBatchList[index].status = 'confirmed'; renderBatchItems(); }, 800); }
+function toggleBatchFav(index) { tempBatchList[index].favorite = !tempBatchList[index].favorite; renderBatchItems(); }
+
+function handleBatchSave() {
+  tempBatchList.forEach(item => {
+    const n = item.name.toLowerCase();
+    let theme = '🏞️ 自然景觀';
+    if (n.includes('temple') || n.includes('shrine') || n.includes('palace') || n.includes('之家') || n.includes('mila')) theme = '🏛️ 歷史古蹟';
+    
+    const list = item.type === 'flower' ? flowerCards : mushroomCards;
+    list.push({ 
+      id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000), 
+      name: item.name, loc: item.loc, country: item.loc.split(',')[1]?.trim() || '西班牙', 
+      themes: [theme], coord: item.coord, icon: '🖼️', tz: 'Europe/Madrid', 
+      owned: false, favorite: item.favorite, img: item.img 
+    });
+  });
+  showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`);
+  closeModal('uploadModal'); refreshCurrentView();
+}
+
+function openAddThemeModal() {
+  editingThemeIndex = -1;
+  document.getElementById('addThemeModalTitle').innerHTML = '🎨 新增自訂主題';
+  document.getElementById('addThemeModalBtn').textContent = '確認新增';
+  document.getElementById('new-theme-name').value = '';
+  currentNewThemeEmoji = '✨';
+  
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e==='✨'?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join('');
+  openModal('addThemeModal');
+}
+
+function selectEmoji(el, e) {
+  document.querySelectorAll('.emoji-item').forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+  currentNewThemeEmoji = e;
+}
+
+function saveThemeAction() {
+  const name = document.getElementById('new-theme-name').value.trim();
+  if(!name) return;
+  const fullTheme = `${currentNewThemeEmoji} ${name}`;
+  
+  if (editingThemeIndex > -1) {
+    const oldTheme = customThemes[editingThemeIndex];
+    customThemes[editingThemeIndex] = fullTheme;
+    [...flowerCards, ...mushroomCards].forEach(c => {
+      const idx = c.themes.indexOf(oldTheme);
+      if (idx > -1) c.themes[idx] = fullTheme;
+    });
+    showToast('🎨 主題已更新');
+    closeModal('addThemeModal');
+    openManageThemeModal(); 
+    refreshCurrentView();
+  } else {
+    if (!defaultThemes.includes(fullTheme) && !customThemes.includes(fullTheme)) {
+      customThemes.push(fullTheme);
+    }
+    document.getElementById('new-theme-name').value = '';
+    closeModal('addThemeModal');
+    refreshCurrentView();
+    showToast('🎨 主題已新增');
+  }
+}
+
+function openManageThemeModal() {
+  const list = document.getElementById('custom-theme-list');
+  if (customThemes.length === 0) {
+    list.innerHTML = '<div style="text-align:center; color:var(--sub); font-size:0.9rem; padding: 20px;">尚無自訂主題</div>';
+  } else {
+    list.innerHTML = customThemes.map((t, i) => `
+      <div class="custom-theme-item">
+        <span>${t}</span>
+        <div class="theme-action-group">
+          <button class="modal-action-btn edit-btn" onclick="openEditCustomTheme(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button class="modal-action-btn del-btn" onclick="deleteCustomTheme(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+  openModal('manageThemeModal');
+}
+
+function openEditCustomTheme(idx) {
+  editingThemeIndex = idx;
+  const themeStr = customThemes[idx]; 
+  const spaceIdx = themeStr.indexOf(' ');
+  const emoji = spaceIdx > -1 ? themeStr.substring(0, spaceIdx) : '✨';
+  const name = spaceIdx > -1 ? themeStr.substring(spaceIdx + 1) : themeStr;
+
+  document.getElementById('addThemeModalTitle').innerHTML = '✏️ 修改自訂主題';
+  document.getElementById('addThemeModalBtn').textContent = '儲存修改';
+  document.getElementById('new-theme-name').value = name;
+  currentNewThemeEmoji = emoji;
+
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===emoji?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join('');
+
+  closeModal('manageThemeModal');
+  openModal('addThemeModal');
+}
+
+function deleteCustomTheme(idx) {
+  const t = customThemes[idx];
+  customThemes.splice(idx, 1);
+  [...flowerCards, ...mushroomCards].forEach(c => {
+    const i = c.themes.indexOf(t);
+    if (i > -1) c.themes.splice(i, 1);
+    if (c.themes.length === 0) c.themes = ['🏷️ 未分類'];
+  });
+  showToast(`🗑️ 已移除 ${t}`);
+  openManageThemeModal(); 
+  refreshCurrentView();
+}
+
+function promptEdit(e, cat, id) {
+  e.stopPropagation();
+  currentEditCat = cat; currentEditId = id;
+  const list = cat === 'flower' ? flowerCards : mushroomCards;
+  const c = list.find(x => x.id == id);
+  if(!c) return;
+  
+  originalCoordBeforeEdit = c.coord;
+  document.getElementById('edit-coord-input').value = c.coord;
+  tempEditThemes = [...c.themes];
+  
+  renderEditThemes();
+  openModal('editModal');
+}
+
+function renderEditThemes() {
+  const container = document.getElementById('edit-theme-selector');
+  const allCurrentThemes = [...defaultThemes, ...customThemes];
+  container.innerHTML = allCurrentThemes.map(t => {
+    const isSel = tempEditThemes.includes(t);
+    return `<div class="theme-option ${isSel?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`;
+  }).join('');
+}
+
+function toggleEditTheme(t) {
+  const i = tempEditThemes.indexOf(t);
+  if(i > -1) tempEditThemes.splice(i, 1);
+  else tempEditThemes.push(t);
+  renderEditThemes();
+}
+
+function saveEdit() {
+  const nc = document.getElementById('edit-coord-input').value;
+  if (!nc) return;
+  const list = currentEditCat === 'flower' ? flowerCards : mushroomCards;
+  const c = list.find(x => x.id == currentEditId);
+  if(c){
+    c.coord = nc;
+    c.themes = tempEditThemes.length > 0 ? [...tempEditThemes] : ['🏷️ 未分類'];
+    refreshCurrentView();
+  }
+  closeModal('editModal');
+  showToast('✅ 明信片已更新');
+}
+
+function showLightbox(imgSrc) {
+  if (!imgSrc) return;
+  document.getElementById('lightbox-img').src = imgSrc;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  const navItems = document.getElementById('global-nav').children;
+  Array.from(navItems).forEach(nav => nav.classList.remove('active'));
+  if(screen === 'home') navItems[0].classList.add('active');
+  else if(screen === 'flower') navItems[1].classList.add('active');
+  else if(screen === 'mushroom') navItems[2].classList.add('active');
+  else if(screen === 'owned') navItems[3].classList.add('active');
+  refreshCurrentView(); window.scrollTo(0, 0);
+}
+
+function refreshCurrentView() {
+  if (document.getElementById('screen-flower').classList.contains('active')) renderCat('flower', activeSubTabs.flower);
+  if (document.getElementById('screen-mushroom').classList.contains('active')) renderCat('mushroom', activeSubTabs.mushroom);
+  if (document.getElementById('screen-owned').classList.contains('active')) renderOwned();
+  if (document.getElementById('screen-home').classList.contains('active')) handleGlobalSearch();
+  document.getElementById('stat-f-total').textContent = flowerCards.length + ' 張';
+  document.getElementById('stat-m-total').textContent = mushroomCards.length + ' 張';
+}
+
+function cardHTML(c, thumbClass, cat) {
+  const starFill = c.favorite ? 'var(--star-gold)' : 'none';
+  const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : c.icon;
+  const isOwnedClass = c.owned ? 'is-owned' : '';
+  
+  return `
+    <div class="postcard-wrapper">
+      <div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除
+      </div>
+      <div class="postcard ${isOwnedClass}" onclick="toggleOwned('${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchend="handleDragEnd(event, this)">
+        <div class="postcard-thumb ${thumbClass}">${thumbContent}</div>
+        <div class="postcard-info">
+          
+          <div class="mac-btns-container">
+            <button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
+            <button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+            <button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+          </div>
+
+          <div class="postcard-name-row"><div class="postcard-name">${c.name}</div></div>
+          
+          <div class="postcard-loc-row">
+            <div class="postcard-loc">📍 ${c.loc}</div>
+            <div class="local-time-badge">${getLocalTime(c.tz)}</div>
+          </div>
+          
+          <div class="postcard-tags">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          
+          <div class="postcard-footer">
+            <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">📋 ${c.coord}</div>
+            ${c.owned ? '<div class="owned-badge">✅ 已擁有</div>' : ''}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function handleDragStart(e) { isSwiping = false; dragStartX = e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX; }
+function handleDragEnd(e, el) {
+  let dx = e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX;
+  if (Math.abs(dragStartX - dx) > 40) { isSwiping = true; if (dragStartX - dx > 40) { resetSwipes(); el.classList.add('swiped'); } }
+}
+
+function toggleOwned(cat, id) {
+  if(isSwiping) { isSwiping = false; return; }
+  const list = cat === 'flower' ? flowerCards : mushroomCards;
+  const c = list.find(x => x.id == id);
+  if(c){
+    if(c.owned){ 
+      pendingRemoveCard = c; 
+      openModal('confirmModal'); 
+    } else { 
+      c.owned = true; 
+      showToast('✅ 標記為已擁有'); 
+      refreshCurrentView(); 
+    }
+  }
+}
+
+function handleGlobalSearch() {
+  const q = document.getElementById('global-search').value.toLowerCase();
+  const res = document.getElementById('search-results-section');
+  if(!q){ res.style.display='none'; return; }
+  const all = [...flowerCards, ...mushroomCards];
+  const filter = all.filter(c => c.name.toLowerCase().includes(q) || c.loc.toLowerCase().includes(q) || c.themes.some(t => t.toLowerCase().includes(q)));
+  res.style.display='block';
+  res.innerHTML = filter.length > 0 
+    ? filter.map(c => cardHTML(c, flowerCards.includes(c)?'':'mushroom-thumb', flowerCards.includes(c)?'flower':'mushroom')).join('') 
+    : '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
+}
+
+function renderCat(cat, mode) {
+  const raw = cat === 'flower' ? flowerCards : mushroomCards;
+  const body = document.getElementById(cat + '-body');
+  const fw = document.getElementById(cat + '-filters');
+  let processed = hideOwnedState[cat] ? raw.filter(x => !x.owned) : [...raw];
+  
+  if (mode === 'favorite') { 
+    fw.style.display = 'none'; 
+    const favs = processed.filter(x => x.favorite); 
+    favs.sort((a,b) => a.owned - b.owned); 
+    body.innerHTML = favs.length > 0 
+      ? favs.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('') 
+      : '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏的最愛喔 ⭐</div>'; 
+    return; 
+  }
+  
+  fw.style.display = 'flex'; 
+  const gs = {};
+  const allCurrentThemes = [...defaultThemes, ...customThemes];
+  
+  if (mode === 'theme') {
+    allCurrentThemes.forEach(t => { gs[t] = []; });
+    processed.forEach(x => { x.themes.forEach(t => { if(!gs[t]) gs[t] = []; gs[t].push(x); }); });
+  } else {
+    processed.forEach(x => { const k = x.country; if(!gs[k]) gs[k] = []; gs[k].push(x); });
+  }
+  
+  const cf = activeFilters[cat] || '全部'; 
+  let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">🌍 全部</div>`;
+  
+  Object.keys(gs).forEach(n => {
+    fH += `<div class="filter-pill ${cf===n?'active':''}" onclick="applyFilter('${cat}','${mode}','${n}')">${n}</div>`;
+  });
+
+  if (mode === 'theme') { 
+    fH += `<button class="add-theme-btn" style="margin-left: 6px;" onclick="openAddThemeModal()">＋</button>`; 
+    fH += `<button class="add-theme-btn manage-theme-btn" style="margin-left: 6px;" onclick="openManageThemeModal()">⚙️</button>`; 
+  }
+  fw.innerHTML = fH;
+  
+  let bH = '';
+  Object.entries(gs).forEach(([l, items]) => { 
+    if(cf === '全部') {
+      if (items.length > 0) bH += `<div class="group-section"><div class="group-header">${l} <span class="group-count">${items.length}</span></div>${items.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('')}</div>`; 
+    } else if (cf === l) {
+      if (items.length > 0) bH += `<div class="group-section"><div class="group-header">${l} <span class="group-count">${items.length}</span></div>${items.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('')}</div>`;
+      else bH = '<div style="text-align:center; padding:40px; color:var(--sub);">此分類尚無明信片 📭</div>';
+    }
+  });
+  
+  if (cf === '全部' && bH === '') bH = '<div style="text-align:center; padding:40px; color:var(--sub);">收集完畢！🎉</div>';
+  body.innerHTML = bH;
+}
+
+function renderOwned() {
+  const body = document.getElementById('owned-body');
+  const f = flowerCards.filter(x => x.owned); const m = mushroomCards.filter(x => x.owned);
+  let h = '';
+  if(!f.length && !m.length){ body.innerHTML = '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏喔🎒</div>'; return; }
+  if(f.length) h += `<div class="group-section"><div class="group-header">🌸 花點收藏 <span class="group-count">${f.length}</span></div>${f.map(x => cardHTML(x, '', 'flower')).join('')}</div>`;
+  if(m.length) h += `<div class="group-section"><div class="group-header">🍄 菇點收藏 <span class="group-count">${m.length}</span></div>${m.map(x => cardHTML(x, 'mushroom-thumb', 'mushroom')).join('')}</div>`;
+  body.innerHTML = h;
+}
+
+// ── UTILS ──
+function toggleFavorite(e, cat, id) { e.stopPropagation(); const list = cat==='flower'?flowerCards:mushroomCards; const card = list.find(x => x.id == id); if(card){ card.favorite = !card.favorite; showToast(card.favorite?'⭐ 已加入最愛':'⚪ 已取消最愛'); refreshCurrentView(); } }
+function resetEditInput() { document.getElementById('edit-coord-input').value = originalCoordBeforeEdit; showToast('🔄 已還原'); }
+function switchSubTab(cat, tab, el) { 
+  const s = document.getElementById('screen-'+cat); 
+  s.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active')); 
+  el.classList.add('active'); 
+  activeSubTabs[cat] = tab; 
+  activeFilters[cat] = '全部'; 
+  refreshCurrentView(); 
+}
+function applyFilter(cat, mode, val) { activeFilters[cat] = val; refreshCurrentView(); }
+function toggleHideOwned(cat) { hideOwnedState[cat] = !hideOwnedState[cat]; refreshCurrentView(); }
+function executeCancelOwned() { if(pendingRemoveCard) { pendingRemoveCard.owned = false; refreshCurrentView(); } closeModal('confirmModal'); }
+function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
+function executeHardDelete() { if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); refreshCurrentView(); closeModal('deleteConfirmModal'); }
+function copyCoord(e, c) { e.stopPropagation(); const b = e.currentTarget; b.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { b.textContent = '📋 ' + c; }, 2000); }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); if(id==='confirmModal') pendingRemoveCard = null; }
+function closeModalOutside(e, id) { if(e.target.id === id) closeModal(id); }
+function resetSwipes() { document.querySelectorAll('.postcard.swiped').forEach(el => el.classList.remove('swiped')); }
+function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
+
+// Init
+refreshCurrentView();
+</script>
+</body>
+</html>
