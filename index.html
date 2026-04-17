@@ -65,8 +65,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 /* ── CATEGORY LAYOUT & FILTERS ── */
 .cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); }
 .cat-topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--card); border-bottom: 1.5px solid var(--border); }
-.back-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 4px; }
-.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; }
+.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; }
 .toggle-hide-btn { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; color: var(--sub); cursor: pointer; }
 
 .sub-tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); }
@@ -104,7 +103,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; margin: auto; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .postcard .mac-btn.del-btn { display: none !important; }
 }
 
@@ -140,10 +139,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .crop-header { display: flex; justify-content: space-between; padding: 24px 20px; align-items: center; flex-shrink: 0; }
 .crop-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
 .crop-btn.primary { background: var(--green); color: #fff; }
-.crop-container { flex: 1; position: relative; overflow: hidden; padding: 0 20px 40px; box-sizing: border-box; }
-.crop-container img { max-width: 100%; display: block; margin: 0 auto; }
-
-/* 🌟 修正 1：重新設計 Cropper 的抓取點，放大且換成顯眼的綠色 🌟 */
+.crop-container { flex: 1; position: relative; overflow: hidden; padding: 20px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.crop-container img { max-width: 100%; max-height: 100%; display: block; margin: 0 auto; }
 .cropper-view-box { outline: 3px solid var(--green); border-radius: 4px; }
 .cropper-line { background-color: transparent; }
 .cropper-point { background-color: var(--green); width: 26px; height: 26px; opacity: 1; border-radius: 50%; }
@@ -151,7 +148,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .cropper-point.point-sw { bottom: -13px; left: -13px; }
 .cropper-point.point-ne { top: -13px; right: -13px; }
 .cropper-point.point-nw { top: -13px; left: -13px; }
-/* 隱藏容易干擾操作的中間控制點 */
 .cropper-point.point-n, .cropper-point.point-s, .cropper-point.point-e, .cropper-point.point-w { display: none; }
 
 /* ── MODALS ── */
@@ -210,7 +206,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .btn-danger { width: 100%; background: linear-gradient(135deg, #FF3B30, #D92B22); color: #fff; border: none; border-radius: 16px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; flex-shrink: 0;}
 .btn-cancel { width: 100%; background: none; border: none; color: var(--sub); padding: 10px; font-weight: 700; font-size: 0.88rem; cursor: pointer; margin-top: 6px; }
 
-/* 🌟 修正 2：加入 white-space: nowrap 防止換行 🌟 */
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1a2e22; color: #fff; padding: 12px 26px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); white-space: nowrap; max-width: 90vw; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -246,7 +241,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .stack-card + .stack-card.expanded { margin-top: 24px; } 
 .stack-card.expanded + .stack-card { margin-top: 24px; }
 
-/* 抽卡/撥開視覺效果 */
 @media (hover: hover) {
   .stack-card:not(.expanded):hover {
     transform: translateY(-20px) scale(1.02);
@@ -309,13 +303,13 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   width: calc(100% - 48px);
   max-width: 420px;
   height: 64px;
-  background: var(--card); 
-  border-radius: 32px; 
+  background: var(--card); /* 純白底色 */
+  border-radius: 32px; /* 圓角 */
   display: flex;
   align-items: center;
-  justify-content: space-evenly; 
+  justify-content: space-evenly; /* 均勻分佈 */
   z-index: 300; 
-  box-shadow: 0 8px 30px rgba(0,0,0,0.06); 
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06); /* 柔和陰影 */
   transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -333,7 +327,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   cursor: pointer;
   position: relative;
   z-index: 10;
-  color: var(--dock-icon-inactive); 
+  color: var(--dock-icon-inactive); /* 未選取淺灰色 */
   -webkit-tap-highlight-color: transparent;
   gap: 2px; 
 }
@@ -444,7 +438,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="screen" id="screen-flower">
   <div class="cat-screen-header">
-    <div class="cat-topbar"><button class="back-btn" onclick="goTo('home')">←</button><div class="cat-topbar-title">🌸 花點明信片</div></div>
+    <div class="cat-topbar"><div class="cat-topbar-title">🌸 花點明信片</div></div>
     <div class="sub-tabs">
       <div class="sub-tab active" onclick="switchSubTab('flower','country', this)">🌍 國家</div>
       <div class="sub-tab" onclick="switchSubTab('flower','theme', this)">🎨 主題</div>
@@ -457,7 +451,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="screen" id="screen-mushroom">
   <div class="cat-screen-header">
-    <div class="cat-topbar"><button class="back-btn" onclick="goTo('home')">←</button><div class="cat-topbar-title">🍄 菇點明信片</div></div>
+    <div class="cat-topbar"><div class="cat-topbar-title">🍄 菇點明信片</div></div>
     <div class="sub-tabs">
       <div class="sub-tab active mushroom-tab" onclick="switchSubTab('mushroom','country', this)">🌍 國家</div>
       <div class="sub-tab mushroom-tab" onclick="switchSubTab('mushroom','theme', this)">🎨 主題</div>
@@ -469,7 +463,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 </div>
 
 <div class="screen" id="screen-owned">
-  <div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')">←</button><div class="cat-topbar-title">🎒 我的收藏</div></div></div>
+  <div class="cat-screen-header"><div class="cat-topbar"><div class="cat-topbar-title">🎒 我的收藏</div></div></div>
   <div class="cat-body" id="owned-body" style="padding-top: 24px;"></div>
 </div>
 
@@ -720,7 +714,6 @@ function startCropNext() {
     openModal('cropModal'); 
     
     imageTarget.onload = () => {
-      // 🌟 修正 1：加長等待時間，確保 Modal 全開後才讓 Cropper 計算坐標 🌟
       setTimeout(() => {
         if (cropperInstance) { cropperInstance.destroy(); }
         cropperInstance = new Cropper(imageTarget, {
@@ -731,7 +724,7 @@ function startCropNext() {
           guides: true, 
           center: true, 
           zoomable: true,
-          toggleDragModeOnDblclick: false // 避免在手機上不小心雙擊
+          toggleDragModeOnDblclick: false
         });
       }, 150); 
     };
@@ -813,14 +806,13 @@ function renderBatchItems() {
     }
     
     const isDup = allCards.some(c => c.name === item.name || c.coord === item.coord);
-    const dupBadge = isDup ? `<span class="duplicate-badge">⚠️ 已存在</span>` : '';
+    const dupBadge = isDup ? `<span class="duplicate-badge">⚠️ 已存在相同明信片</span>` : '';
 
     return `<div class="batch-item">
-      <div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px; overflow:hidden;">
-        <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0;">
-          <div class="res-main-title"><span class="res-main-title-text" title="${item.name}">${item.name}</span> ${dupBadge}</div>
+      <div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <div class="res-main-title">${item.name} ${dupBadge}</div>
           <div class="res-coord-sub">${item.coord}</div>
-          <span style="font-size:0.8rem; font-weight:bold; color:var(--sub);">${item.type==='flower'?'🌸 花點':'🍄 菇點'}</span>
         </div>
         <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:36px; height:36px; flex-shrink:0;" onclick="toggleBatchFav(${index})">
           <svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:18px; height:18px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg>
@@ -1024,17 +1016,15 @@ function showLightbox(imgSrc) {
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 
-// 🌟 修正 3：重新建立導覽列跳轉邏輯，忽略加號按鈕的 Index 計算錯誤 🌟
 function goTo(screen) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
   
-  // 導覽列內元素的陣列（0=Home, 1=Flower, 2=AddBtn, 3=Mushroom, 4=Owned）
   const screenToIndex = { 'home': 0, 'flower': 1, 'mushroom': 3, 'owned': 4 };
   const index = screenToIndex[screen];
   
   if (index !== undefined) {
-    const dockItems = document.querySelectorAll('.dock-nav > div'); // 選取所有子元素
+    const dockItems = document.querySelectorAll('.dock-nav > div'); 
     dockItems.forEach(nav => nav.classList.remove('active'));
     dockItems[index].classList.add('active');
   }
@@ -1078,11 +1068,11 @@ function cardHTML(c, thumbClass, cat) {
           
           <div class="postcard-loc-row">
             <div class="postcard-loc">📍 ${c.loc}</div>
+            <span class="local-time-badge" style="margin-left: auto;">🕒 ${getLocalTime(c.tz)}</span>
           </div>
           
           <div class="postcard-tags">
             ${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}
-            <span class="local-time-badge">🕒 ${getLocalTime(c.tz)}</span>
           </div>
           
           <div class="postcard-footer">
@@ -1115,7 +1105,8 @@ function stackCardHTML(c, cat) {
       <div class="stack-info">
         <div class="stack-info-inner" onclick="event.stopPropagation()">
           <div class="res-title-row" style="margin-bottom:12px;">
-            <div class="res-main-title" style="font-size:0.95rem; color:var(--sub);">📍 ${c.loc}</div>
+            <div class="res-main-title" style="font-size:0.95rem; color:var(--sub); flex:1;">📍 ${c.loc}</div>
+            <span class="local-time-badge" style="margin-right: 12px;">🕒 ${getLocalTime(c.tz)}</span>
             <div class="mac-btns-container" style="position:static; display:flex; gap:8px;">
               <button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
               <button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
@@ -1125,7 +1116,6 @@ function stackCardHTML(c, cat) {
           
           <div class="postcard-tags" style="margin-bottom:12px;">
             ${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}
-            <span class="local-time-badge">🕒 ${getLocalTime(c.tz)}</span>
           </div>
           
           <div class="postcard-footer" style="margin-top:20px; border-top: 1.5px dashed var(--border); padding-top:16px;">
@@ -1158,7 +1148,6 @@ function executeToggleOwnedBtn(e, cat, id) {
   toggleOwned(cat, id); 
 }
 
-// 🌟 修正 4：優化左滑刪除手勢的敏感度，解決容易觸發上一頁或整個畫面滑動的問題 🌟
 let dragStartX = 0;
 let dragStartY = 0;
 let isSwiping = false;
@@ -1174,13 +1163,12 @@ function handleDragEnd(e, el) {
   let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX;
   let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY;
   
-  // 必須是明顯的橫向滑動（X軸位移遠大於Y軸位移）且滑動距離超過 40px
   if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { 
     isSwiping = true; 
-    if (dx < -40) { // 左滑
+    if (dx < -40) { 
       resetSwipes(); 
       el.classList.add('swiped'); 
-    } else if (dx > 40) { // 右滑
+    } else if (dx > 40) { 
       el.classList.remove('swiped');
     }
   }
