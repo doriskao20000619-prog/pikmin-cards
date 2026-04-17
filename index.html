@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 /* ── BASE & VARIABLES ── */
@@ -335,7 +334,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .stack-card.expanded .stack-info { grid-template-rows: 1fr; }
 .stack-card.expanded .stack-info-inner { padding: 24px; opacity: 1; }
 
-/* 🌟 全新白色懸浮膠囊導覽列 🌟 */
+/* ── 全新白色懸浮膠囊導覽列 ── */
 .dock-nav {
   position: fixed;
   bottom: max(24px, env(safe-area-inset-bottom));
@@ -344,13 +343,13 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   width: calc(100% - 48px);
   max-width: 420px;
   height: 64px;
-  background: var(--card); /* 純白底色 */
-  border-radius: 32px; /* 圓角 */
+  background: var(--card);
+  border-radius: 32px;
   display: flex;
   align-items: center;
-  justify-content: space-evenly; /* 均勻分佈 */
+  justify-content: space-evenly;
   z-index: 300; 
-  box-shadow: 0 8px 30px rgba(0,0,0,0.06); /* 柔和陰影 */
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
   transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -368,7 +367,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   cursor: pointer;
   position: relative;
   z-index: 10;
-  color: var(--dock-icon-inactive); /* 未選取淺灰色 */
+  color: var(--dock-icon-inactive);
   -webkit-tap-highlight-color: transparent;
   gap: 2px; 
 }
@@ -619,6 +618,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 <div class="toast" id="toast"></div>
 
 <script>
+// 🌟 已整合你的 GAS 網址 🌟
+const GAS_CLOUD_OCR_URL = 'https://script.google.com/macros/s/AKfycbxoCUQ4V-xHV77p4WwB29o3jq8Di4ZGyGXXE9ob2DtZ-f7FwQZBYY9m6lQHwCcOIzHvvQ/exec';
+
 // ── DATA ──
 let flowerCards = [
   { id: 'f1', name: 'Casa Batlló', loc: '巴塞隆納，西班牙', country: '西班牙', themes: ['🏛️ 歷史古蹟'], coord: '41.391600, 2.165000', icon: '🏛️', tz: 'Europe/Madrid', owned: false, favorite: false, img: null, originalImg: null },
@@ -755,7 +757,7 @@ function handleFiles(files) {
   filesToCrop = Array.from(files);
   currentCropIndex = 0;
   tempBatchList = [];
-  ocrCache = {}; // 🌟 清除快取 🌟
+  ocrCache = {}; 
   startCropNext();
   document.getElementById('file-input').value = "";
 }
@@ -773,7 +775,7 @@ function startCropNext() {
   reader.onload = (e) => {
     const originalImgUrl = e.target.result;
     
-    // 🌟 在背景馬上開始 OCR 原圖 🌟
+    // 🌟 在背景開始雲端 OCR 🌟
     preloadOCR(currentCropIndex, originalImgUrl);
     
     const imageTarget = document.getElementById('crop-image-target');
@@ -802,22 +804,20 @@ function startCropNext() {
   reader.readAsDataURL(file);
 }
 
-// 🌟 背景執行 OCR，不影響使用者裁切 🌟
+// 🌟 修改後的雲端 OCR 辨識邏輯 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
-        const worker = await Tesseract.createWorker({
-            logger: m => {
-                if(m.status === 'recognizing text') {
-                    ocrCache[fileIndex].progress = m.progress;
-                    updateOcrProgressUI(fileIndex);
-                }
-            }
+        const base64Image = imgUrl.split(',')[1];
+        
+        // 呼叫你的 GAS 雲端 API
+        const response = await fetch(GAS_CLOUD_OCR_URL, {
+            method: 'POST',
+            body: JSON.stringify({ image: base64Image })
         });
-        await worker.loadLanguage('chi_tra+eng+jpn+por+spa');
-        await worker.initialize('chi_tra+eng+jpn+por+spa');
-        const { data: { text } } = await worker.recognize(imgUrl);
-        await worker.terminate();
+        
+        const data = await response.json();
+        const text = data.text || "";
 
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
         let foundCoord = '';
@@ -831,30 +831,27 @@ async function preloadOCR(fileIndex, imgUrl) {
             }
         }
 
-        // 過濾掉不可能是名稱的文字
         const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日'];
         const validLines = lines.filter(l => {
             const lower = l.toLowerCase();
             if (lower.length <= 1) return false;
-            if (lower.match(/^[0-9.,:\-\s]+$/)) return false; // 純數字(通常是座標)
+            if (lower.match(/^[0-9.,:\-\s]+$/)) return false; 
             if (ignoreList.some(ignore => lower.includes(ignore))) return false;
             return true;
         });
 
-        // 陣列中第一個乾淨的文字，極高機率就是大標題
         let foundName = validLines.length > 0 ? validLines[0] : '未命名明信片';
 
         ocrCache[fileIndex].done = true;
         ocrCache[fileIndex].name = foundName.substring(0, 40);
         ocrCache[fileIndex].coord = foundCoord;
         
-        // 嘗試寫入 (如果使用者已經按了確認裁切)
         applyOcrToBatch(fileIndex);
 
     } catch(e) {
-        console.error('OCR Preload Error:', e);
+        console.error('Cloud OCR Error:', e);
         ocrCache[fileIndex].done = true;
-        ocrCache[fileIndex].name = '無法辨識名稱';
+        ocrCache[fileIndex].name = '雲端辨識失敗';
         ocrCache[fileIndex].coord = '';
         applyOcrToBatch(fileIndex);
     }
@@ -865,7 +862,7 @@ function updateOcrProgressUI(fileIndex) {
     if (!cache || cache.batchIdx === undefined) return;
     const progressEl = document.getElementById(`batch-ocr-progress-${cache.batchIdx}`);
     if (progressEl) {
-        progressEl.innerText = `讀取原圖文字中... ${Math.round(cache.progress * 100)}%`;
+        progressEl.innerText = cache.done ? `辨識完成` : `雲端 AI 視覺分析中...`;
     }
 }
 
@@ -913,7 +910,6 @@ function confirmCrop() {
   closeModal('cropModal');
   cropperInstance.destroy(); cropperInstance = null;
   
-  // 🌟 將 OCR Cache 綁定到這個 Batch Item 上 🌟
   if(ocrCache[currentCropIndex]) {
       ocrCache[currentCropIndex].batchIdx = batchIdx;
       applyOcrToBatch(currentCropIndex);
@@ -953,7 +949,6 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
-// 🌟 獨立抽出的地點獲取邏輯 🌟
 async function fetchLocationForBatchItem(index, lat, lon) {
     const locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
@@ -1007,15 +1002,14 @@ function renderBatchItems() {
   
   container.innerHTML = tempBatchList.map((item, index) => {
     
-    // 🌟 OCR 辨識中的 UI 狀態 🌟
     if (item.status === 'ocr_detecting') {
       return `
       <div class="batch-item">
         <div class="batch-confirm-box" style="display:flex; align-items:center; gap:12px; padding: 16px;">
           <img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
           <div style="flex:1; text-align:left;">
-            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text);">🤖 AI 視覺辨識中...</div>
-            <div id="batch-ocr-progress-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700; margin-top:4px;">讀取原圖文字中...</div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text);">🤖 雲端 AI 視覺辨識中...</div>
+            <div id="batch-ocr-progress-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700; margin-top:4px;">請稍後...</div>
           </div>
         </div>
       </div>`;
