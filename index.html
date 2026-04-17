@@ -79,7 +79,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: 1.5px solid var(--border); background: #ffffff; color: var(--sub); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; user-select: none;}
 .filter-pill.active { background: #4a7c59; color: #ffffff; border-color: #4a7c59; }
 
-.add-theme-btn { display: flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 99px; border: 1px dashed var(--sub); background: transparent; color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+.add-theme-btn { display: flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: transparent; color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
 
 .cat-body { padding: 16px 16px 140px; }
 .group-section { margin-bottom: 24px; }
@@ -249,7 +249,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1a2e22; color: #fff; padding: 12px 26px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); white-space: nowrap; max-width: 90vw; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* 🌟 修改：拖曳區虛線變細 (1px) 🌟 */
 .global-dropzone { display: none; position: fixed; inset: 0; background: rgba(240, 247, 242, 0.95); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
 .global-dropzone.active { display: flex; }
 .dropzone-box { border: 1px dashed var(--green); border-radius: 24px; padding: 60px 40px; text-align: center; max-width: 400px; width: 80%; background: rgba(255,255,255,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -624,7 +623,7 @@ let flowerCards = [
   { id: 'f1', name: 'Casa Batlló', loc: '巴塞隆納，西班牙', country: '西班牙', themes: ['🏛️ 歷史古蹟'], coord: '41.391600, 2.165000', icon: '🏛️', tz: 'Europe/Madrid', owned: false, favorite: false, img: null, originalImg: null },
 ];
 let mushroomCards = [
-  { id: 'm1', name: 'Fushimi Inari Taisha', loc: '京都，日本', country: '日本', themes: ['⛩️ 神社'], coord: '34.967100, 135.772700', icon: '⛩️', tz: 'Asia/Tokyo', owned: false, favorite: true, img: null, originalImg: null },
+  { id: 'm1', name: 'Fushimi Inari Taisha', loc: '京都市，日本', country: '日本', themes: ['⛩️ 神社'], coord: '34.967100, 135.772700', icon: '⛩️', tz: 'Asia/Tokyo', owned: false, favorite: true, img: null, originalImg: null },
   { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa, 賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: false, img: null, originalImg: null },
 ];
 
@@ -651,6 +650,13 @@ let dragStartX = 0;
 let dragStartY = 0;
 let isSwiping = false;
 let swipeDirection = null; 
+
+// 🌟 新增：字串過濾工具，專門處理 "简;繁" 這種合併標籤
+function cleanLocText(text) {
+  if (!text) return '';
+  const parts = text.split(';');
+  return parts.pop().trim(); // 取最後一段，通常是繁體字
+}
 
 function showDropzone() {
   document.getElementById('global-dropzone').classList.add('active');
@@ -802,7 +808,7 @@ function confirmCrop() {
   
   tempBatchList.push({
     name: isMila ? 'Casa Milà (米拉之家)' : (isNatural ? 'Natural Rock Bridge of Koraka' : (file.name.split('.')[0] || '未知地點')),
-    loc: isMila ? '巴塞隆納，西班牙' : (isNatural ? 'Ayia Napa, 賽普勒斯' : ''),
+    loc: '',
     coord: isMila ? '41.392300, 2.162000' : (isNatural ? '34.971831, 34.075301' : ''),
     favorite: false, status: 'detecting', 
     img: croppedImgUrl, 
@@ -863,17 +869,21 @@ function handleBatchCoordInput(index, val, el) {
                 if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
                 try {
                     const [locRes, tz] = await Promise.all([
-                        fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh-tw`),
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW`),
                         fetchTimeZone(lat, lon)
                     ]);
                     
                     if (tz) tempBatchList[index].tz = tz; 
                     
                     const data = await locRes.json();
-                    if (data && data.countryName) {
-                        const country = data.countryName;
-                        const city = data.city || data.principalSubdivision || data.locality || '';
-                        tempBatchList[index].loc = city ? `${city}，${country}` : country;
+                    if (data && data.address) {
+                        const addr = data.address;
+                        // 🌟 套用文字過濾器，確保 "美国;美國" 變成 "美國" 🌟
+                        const country = cleanLocText(addr.country);
+                        const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || '';
+                        const city = cleanLocText(cityRaw);
+                        
+                        tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country;
                         if(locPreview) locPreview.innerText = `📍 ${tempBatchList[index].loc}`;
                     } else {
                         if(locPreview) locPreview.innerText = '⚠️ 無法辨識地點';
@@ -1119,17 +1129,22 @@ async function detectLocationFromCoords(lat, lon, targetInputId) {
     
     try {
         const [locRes, tz] = await Promise.all([
-            fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh-tw`),
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW`),
             fetchTimeZone(lat, lon)
         ]);
 
         if (tz) currentEditTz = tz; 
         
         const data = await locRes.json();
-        if (data && data.countryName) {
-            const country = data.countryName;
-            const city = data.city || data.principalSubdivision || data.locality || '';
-            const locStr = city ? `${city}，${country}` : country;
+        if (data && data.address) {
+            const addr = data.address;
+            
+            // 🌟 套用文字過濾器 🌟
+            const country = cleanLocText(addr.country);
+            const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || '';
+            const city = cleanLocText(cityRaw);
+            
+            const locStr = city && city !== country ? `${city}，${country}` : country;
             
             if(input) input.value = locStr;
             currentEditCountry = country; 
