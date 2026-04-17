@@ -79,7 +79,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: 1.5px solid var(--border); background: #ffffff; color: var(--sub); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; user-select: none;}
 .filter-pill.active { background: #4a7c59; color: #ffffff; border-color: #4a7c59; }
 
-.add-theme-btn { display: flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: transparent; color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+.add-theme-btn { display: flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 99px; border: 1px dashed var(--sub); background: transparent; color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
 
 .cat-body { padding: 16px 16px 140px; }
 .group-section { margin-bottom: 24px; }
@@ -170,7 +170,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .lightbox-img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
 
 /* ── 全黑裁切畫面樣式 ── */
-/* 🌟 修正：配合 Safe Area，將整體 Padding 墊高，防止 iOS 主畫面橫條誤觸 🌟 */
 .crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000000; z-index: 9999; flex-direction: column; }
 .crop-modal-overlay.open { display: flex; }
 .crop-header { display: flex; justify-content: space-between; padding: max(24px, env(safe-area-inset-top)) 20px 20px; align-items: center; flex-shrink: 0; }
@@ -178,7 +177,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .crop-btn.primary { background: var(--green); color: #fff; }
 .crop-container { 
   flex: 1; position: relative; overflow: hidden; 
-  padding: 0 20px calc(120px + env(safe-area-inset-bottom)); /* 巨量底部留白，完全避開Home bar */
+  padding: 0 20px calc(120px + env(safe-area-inset-bottom));
   box-sizing: border-box; display: flex; align-items: center; justify-content: center;
 }
 .crop-container img { max-width: 100%; max-height: 100%; display: block; margin: 0 auto; }
@@ -252,7 +251,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 .global-dropzone { display: none; position: fixed; inset: 0; background: rgba(240, 247, 242, 0.95); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
 .global-dropzone.active { display: flex; }
-.dropzone-box { border: 3px dashed var(--green); border-radius: 24px; padding: 60px 40px; text-align: center; max-width: 400px; width: 80%; background: rgba(255,255,255,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.dropzone-box { border: 1px dashed var(--green); border-radius: 24px; padding: 60px 40px; text-align: center; max-width: 400px; width: 80%; background: rgba(255,255,255,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .dropzone-icon { font-size: 4rem; margin-bottom: 16px; color: var(--green); }
 .dropzone-text { font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 900; color: var(--green-dark); margin-bottom: 8px; }
 .dropzone-sub { font-size: 0.9rem; font-weight: 700; color: var(--sub); }
@@ -428,6 +427,17 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+#addThemeModal { z-index: 450; }
+
+.theme-option.add-new-btn {
+  border: 1px dashed var(--sub);
+  background: transparent;
+  color: var(--sub);
+}
+.theme-option.add-new-btn:active {
+  background: #f0f0f0;
 }
 
 </style>
@@ -934,6 +944,8 @@ function saveThemeAction() {
     closeModal('addThemeModal');
     openManageThemeModal(); 
     refreshCurrentView();
+    // 如果編輯明信片的視窗還開著，就重新渲染裡面的主題列表
+    if(document.getElementById('editModal').classList.contains('open')) renderEditThemes();
   } else {
     if (!defaultThemes.includes(fullTheme) && !customThemes.includes(fullTheme)) {
       customThemes.push(fullTheme);
@@ -942,6 +954,8 @@ function saveThemeAction() {
     closeModal('addThemeModal');
     refreshCurrentView();
     showToast('🎨 主題已新增');
+    // 如果編輯明信片的視窗還開著，就重新渲染裡面的主題列表，讓使用者可以直接選取剛新增的類別
+    if(document.getElementById('editModal').classList.contains('open')) renderEditThemes();
   }
 }
 
@@ -1026,10 +1040,16 @@ function promptEdit(e, cat, id) {
 function renderEditThemes() {
   const container = document.getElementById('edit-theme-selector');
   const allCurrentThemes = [...defaultThemes, ...customThemes];
-  container.innerHTML = allCurrentThemes.map(t => {
+  
+  let html = allCurrentThemes.map(t => {
     const isSel = tempEditThemes.includes(t);
     return `<div class="theme-option ${isSel?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`;
   }).join('');
+  
+  // 在最後加上「＋ 新增」的按鈕，點擊時會呼叫原本的新增主題 Modal
+  html += `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`;
+  
+  container.innerHTML = html;
 }
 
 function toggleEditTheme(t) {
