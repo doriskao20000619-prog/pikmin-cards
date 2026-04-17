@@ -90,7 +90,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .postcard-wrapper { position: relative; margin-bottom: 14px; border-radius: 20px; background: var(--danger); overflow: hidden; }
 .delete-action { position: absolute; top: 0; right: 0; bottom: 0; width: 75px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; }
 
-/* 🌟 修正：加入 touch-action: pan-y 防止手機左右滑動時觸發瀏覽器上一頁 🌟 */
 .postcard { background: var(--card); border-radius: 20px; border: 1.5px solid var(--border); display: flex; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s, border-color 0.3s; position: relative; z-index: 2; user-select: none; touch-action: pan-y; }
 .postcard.swiped { transform: translateX(-75px); }
 .postcard.is-owned { background: #f2faf4 !important; border-color: var(--green) !important; }
@@ -105,7 +104,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; margin: auto; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
 
-/* 🌟 手機版隱藏明信片右上角的刪除按鈕 🌟 */
 @media (max-width: 768px) {
   .postcard .mac-btn.del-btn { display: none !important; }
 }
@@ -118,13 +116,11 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .postcard-name-row { padding-right: 94px; width: 100%; box-sizing: border-box; overflow: hidden; } 
 .postcard-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; line-height: 1.3; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 
-/* 🌟 精簡底部列：座標純數字、已擁有變成純圓形 🌟 */
 .local-time-badge, .tag, .coord-btn { height: 28px; box-sizing: border-box; border-radius: 99px; padding: 0 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; width: fit-content; font-family: 'Nunito', sans-serif; }
 .local-time-badge, .tag { background: #ffffff; color: var(--green-dark); font-size: 0.68rem; border: 1px solid #ffffff; box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08); }
 .tag { color: var(--sub); }
 .coord-btn { background: #f0f7f2; border: 1.5px solid var(--green-light); font-size: 0.7rem; font-family: 'Courier New', Courier, monospace; color: var(--green-dark); cursor: pointer; padding: 0 10px; }
 
-/* 精美的圓形勾勾圖示 */
 .owned-badge { background: var(--green); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(76, 175, 110, 0.3); }
 
 .postcard-loc-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; margin-bottom: 4px; flex-wrap: wrap; }
@@ -146,9 +142,17 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .crop-btn.primary { background: var(--green); color: #fff; }
 .crop-container { flex: 1; position: relative; overflow: hidden; padding: 0 20px 40px; box-sizing: border-box; }
 .crop-container img { max-width: 100%; display: block; margin: 0 auto; }
-.cropper-view-box, .cropper-face { outline: 2px solid #fff; }
-.cropper-line { background-color: #fff; }
-.cropper-point { background-color: #fff; width: 6px; height: 6px; }
+
+/* 🌟 修正 1：重新設計 Cropper 的抓取點，放大且換成顯眼的綠色 🌟 */
+.cropper-view-box { outline: 3px solid var(--green); border-radius: 4px; }
+.cropper-line { background-color: transparent; }
+.cropper-point { background-color: var(--green); width: 26px; height: 26px; opacity: 1; border-radius: 50%; }
+.cropper-point.point-se { bottom: -13px; right: -13px; }
+.cropper-point.point-sw { bottom: -13px; left: -13px; }
+.cropper-point.point-ne { top: -13px; right: -13px; }
+.cropper-point.point-nw { top: -13px; left: -13px; }
+/* 隱藏容易干擾操作的中間控制點 */
+.cropper-point.point-n, .cropper-point.point-s, .cropper-point.point-e, .cropper-point.point-w { display: none; }
 
 /* ── MODALS ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
@@ -206,7 +210,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .btn-danger { width: 100%; background: linear-gradient(135deg, #FF3B30, #D92B22); color: #fff; border: none; border-radius: 16px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; flex-shrink: 0;}
 .btn-cancel { width: 100%; background: none; border: none; color: var(--sub); padding: 10px; font-weight: 700; font-size: 0.88rem; cursor: pointer; margin-top: 6px; }
 
-.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1a2e22; color: #fff; padding: 12px 26px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+/* 🌟 修正 2：加入 white-space: nowrap 防止換行 🌟 */
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1a2e22; color: #fff; padding: 12px 26px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); white-space: nowrap; max-width: 90vw; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 .global-dropzone { display: none; position: fixed; inset: 0; background: rgba(240, 247, 242, 0.95); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
@@ -230,7 +235,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   cursor: pointer;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.05);
-  touch-action: pan-y; /* 避免手機上滑動展開時觸發換頁 */
+  touch-action: pan-y;
 }
 .stack-card + .stack-card { margin-top: -110px; } 
 .stack-card.expanded {
@@ -304,17 +309,16 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   width: calc(100% - 48px);
   max-width: 420px;
   height: 64px;
-  background: var(--card); /* 純白底色 */
-  border-radius: 32px; /* 圓角 */
+  background: var(--card); 
+  border-radius: 32px; 
   display: flex;
   align-items: center;
-  justify-content: space-evenly; /* 均勻分佈 */
+  justify-content: space-evenly; 
   z-index: 300; 
-  box-shadow: 0 8px 30px rgba(0,0,0,0.06); /* 柔和陰影 */
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06); 
   transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* Modal 打開時導覽列自動往下降藏起來 */
 .dock-nav.hidden-dock {
   transform: translate(-50%, 150%);
 }
@@ -329,12 +333,11 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   cursor: pointer;
   position: relative;
   z-index: 10;
-  color: var(--dock-icon-inactive); /* 未選取淺灰色 */
+  color: var(--dock-icon-inactive); 
   -webkit-tap-highlight-color: transparent;
-  gap: 2px; /* 圖示與文字間距 */
+  gap: 2px; 
 }
 
-/* 文字標籤 */
 .nav-label {
   font-size: 0.65rem;
   font-weight: 700;
@@ -348,15 +351,13 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   transition: color 0.3s, fill 0.3s;
 }
 
-/* 選取時的變色 (變黑色) */
 .dock-item.active {
   color: var(--dock-icon-active); 
 }
 .dock-item.active .nav-icon {
-  fill: currentColor; /* 選中時填滿黑色 */
+  fill: currentColor; 
 }
 
-/* 🌟 中央凸出的「＋」號按鈕 🌟 */
 .dock-add-wrapper {
   position: relative;
   width: 64px;
@@ -368,13 +369,13 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 .dock-add-btn {
   width: 52px;
-  height: 40px; /* 寬圓角矩形 (Squircle) */
-  background: var(--dock-add-bg); /* 漸層亮綠色 */
+  height: 40px; 
+  background: var(--dock-add-bg); 
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #000000; /* 黑色十字 */
+  color: #000000; 
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(168, 255, 74, 0.4);
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -719,26 +720,20 @@ function startCropNext() {
     openModal('cropModal'); 
     
     imageTarget.onload = () => {
+      // 🌟 修正 1：加長等待時間，確保 Modal 全開後才讓 Cropper 計算坐標 🌟
       setTimeout(() => {
         if (cropperInstance) { cropperInstance.destroy(); }
         cropperInstance = new Cropper(imageTarget, {
           viewMode: 1, 
           dragMode: 'move', 
-          autoCropArea: 0.9, 
+          autoCropArea: 0.95, 
           background: false, 
           guides: true, 
           center: true, 
           zoomable: true,
-          ready: function () {
-            const containerData = this.cropper.getContainerData();
-            const cropBoxData = this.cropper.getCropBoxData();
-            this.cropper.setCropBoxData({
-              left: (containerData.width - cropBoxData.width) / 2,
-              top: (containerData.height - cropBoxData.height) / 2
-            });
-          }
+          toggleDragModeOnDblclick: false // 避免在手機上不小心雙擊
         });
-      }, 50); 
+      }, 150); 
     };
     
     imageTarget.src = e.target.result;
@@ -1029,16 +1024,17 @@ function showLightbox(imgSrc) {
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 
+// 🌟 修正 3：重新建立導覽列跳轉邏輯，忽略加號按鈕的 Index 計算錯誤 🌟
 function goTo(screen) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
   
-  // 修正：去除中間的 add 按鈕佔用的 index，確保對應到正確的 dock-item
-  const screenToIndex = { 'home': 0, 'flower': 1, 'mushroom': 2, 'owned': 3 };
+  // 導覽列內元素的陣列（0=Home, 1=Flower, 2=AddBtn, 3=Mushroom, 4=Owned）
+  const screenToIndex = { 'home': 0, 'flower': 1, 'mushroom': 3, 'owned': 4 };
   const index = screenToIndex[screen];
   
   if (index !== undefined) {
-    const dockItems = document.querySelectorAll('.dock-item');
+    const dockItems = document.querySelectorAll('.dock-nav > div'); // 選取所有子元素
     dockItems.forEach(nav => nav.classList.remove('active'));
     dockItems[index].classList.add('active');
   }
@@ -1082,10 +1078,12 @@ function cardHTML(c, thumbClass, cat) {
           
           <div class="postcard-loc-row">
             <div class="postcard-loc">📍 ${c.loc}</div>
-            <div class="local-time-badge">${getLocalTime(c.tz)}</div>
           </div>
           
-          <div class="postcard-tags">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <div class="postcard-tags">
+            ${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}
+            <span class="local-time-badge">🕒 ${getLocalTime(c.tz)}</span>
+          </div>
           
           <div class="postcard-footer">
             <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">${c.coord}</div>
@@ -1125,8 +1123,10 @@ function stackCardHTML(c, cat) {
             </div>
           </div>
           
-          <div class="local-time-badge" style="margin-bottom:12px;">${getLocalTime(c.tz)}</div>
-          <div class="postcard-tags">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <div class="postcard-tags" style="margin-bottom:12px;">
+            ${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}
+            <span class="local-time-badge">🕒 ${getLocalTime(c.tz)}</span>
+          </div>
           
           <div class="postcard-footer" style="margin-top:20px; border-top: 1.5px dashed var(--border); padding-top:16px;">
             <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">${c.coord}</div>
@@ -1158,6 +1158,7 @@ function executeToggleOwnedBtn(e, cat, id) {
   toggleOwned(cat, id); 
 }
 
+// 🌟 修正 4：優化左滑刪除手勢的敏感度，解決容易觸發上一頁或整個畫面滑動的問題 🌟
 let dragStartX = 0;
 let dragStartY = 0;
 let isSwiping = false;
@@ -1173,7 +1174,7 @@ function handleDragEnd(e, el) {
   let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX;
   let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY;
   
-  // 必須是橫向滑動（X軸位移大於Y軸位移）且滑動距離超過 40px
+  // 必須是明顯的橫向滑動（X軸位移遠大於Y軸位移）且滑動距離超過 40px
   if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { 
     isSwiping = true; 
     if (dx < -40) { // 左滑
@@ -1310,7 +1311,6 @@ function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); curr
 function executeHardDelete() { if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); refreshCurrentView(); closeModal('deleteConfirmModal'); }
 function copyCoord(e, c) { e.stopPropagation(); const b = e.currentTarget; b.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { b.textContent = c; }, 2000); }
 
-/* 確保所有 Modal 打開時都會觸發導覽列隱藏 (自動加 class) */
 function openModal(id) { 
   document.getElementById(id).classList.add('open'); 
   document.getElementById('global-nav').classList.add('hidden-dock');
