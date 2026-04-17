@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 /* ── BASE & VARIABLES ── */
@@ -651,11 +652,13 @@ let dragStartY = 0;
 let isSwiping = false;
 let swipeDirection = null; 
 
-// 🌟 新增：字串過濾工具，專門處理 "简;繁" 這種合併標籤
+// 🌟 全域 OCR 暫存 🌟
+let ocrCache = {};
+
 function cleanLocText(text) {
   if (!text) return '';
   const parts = text.split(';');
-  return parts.pop().trim(); // 取最後一段，通常是繁體字
+  return parts.pop().trim(); 
 }
 
 function showDropzone() {
@@ -752,6 +755,7 @@ function handleFiles(files) {
   filesToCrop = Array.from(files);
   currentCropIndex = 0;
   tempBatchList = [];
+  ocrCache = {}; // 🌟 清除快取 🌟
   startCropNext();
   document.getElementById('file-input').value = "";
 }
@@ -767,9 +771,12 @@ function startCropNext() {
   const reader = new FileReader();
   
   reader.onload = (e) => {
-    const imageTarget = document.getElementById('crop-image-target');
-    const cropModal = document.getElementById('cropModal');
+    const originalImgUrl = e.target.result;
     
+    // 🌟 在背景馬上開始 OCR 原圖 🌟
+    preloadOCR(currentCropIndex, originalImgUrl);
+    
+    const imageTarget = document.getElementById('crop-image-target');
     openModal('cropModal'); 
     
     imageTarget.onload = () => {
@@ -790,10 +797,98 @@ function startCropNext() {
       }, 150); 
     };
     
-    imageTarget.src = e.target.result;
+    imageTarget.src = originalImgUrl;
   };
   reader.readAsDataURL(file);
 }
+
+// 🌟 背景執行 OCR，不影響使用者裁切 🌟
+async function preloadOCR(fileIndex, imgUrl) {
+    ocrCache[fileIndex] = { done: false, progress: 0 };
+    try {
+        const worker = await Tesseract.createWorker({
+            logger: m => {
+                if(m.status === 'recognizing text') {
+                    ocrCache[fileIndex].progress = m.progress;
+                    updateOcrProgressUI(fileIndex);
+                }
+            }
+        });
+        await worker.loadLanguage('chi_tra+eng+jpn+por+spa');
+        await worker.initialize('chi_tra+eng+jpn+por+spa');
+        const { data: { text } } = await worker.recognize(imgUrl);
+        await worker.terminate();
+
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+        let foundCoord = '';
+        const coordRegex = /-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+/;
+        
+        for(let i=0; i<lines.length; i++){
+            const match = lines[i].match(coordRegex);
+            if(match) {
+                foundCoord = match[0];
+                break;
+            }
+        }
+
+        // 過濾掉不可能是名稱的文字
+        const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日'];
+        const validLines = lines.filter(l => {
+            const lower = l.toLowerCase();
+            if (lower.length <= 1) return false;
+            if (lower.match(/^[0-9.,:\-\s]+$/)) return false; // 純數字(通常是座標)
+            if (ignoreList.some(ignore => lower.includes(ignore))) return false;
+            return true;
+        });
+
+        // 陣列中第一個乾淨的文字，極高機率就是大標題
+        let foundName = validLines.length > 0 ? validLines[0] : '未命名明信片';
+
+        ocrCache[fileIndex].done = true;
+        ocrCache[fileIndex].name = foundName.substring(0, 40);
+        ocrCache[fileIndex].coord = foundCoord;
+        
+        // 嘗試寫入 (如果使用者已經按了確認裁切)
+        applyOcrToBatch(fileIndex);
+
+    } catch(e) {
+        console.error('OCR Preload Error:', e);
+        ocrCache[fileIndex].done = true;
+        ocrCache[fileIndex].name = '無法辨識名稱';
+        ocrCache[fileIndex].coord = '';
+        applyOcrToBatch(fileIndex);
+    }
+}
+
+function updateOcrProgressUI(fileIndex) {
+    const cache = ocrCache[fileIndex];
+    if (!cache || cache.batchIdx === undefined) return;
+    const progressEl = document.getElementById(`batch-ocr-progress-${cache.batchIdx}`);
+    if (progressEl) {
+        progressEl.innerText = `讀取原圖文字中... ${Math.round(cache.progress * 100)}%`;
+    }
+}
+
+function applyOcrToBatch(fileIndex) {
+    const cache = ocrCache[fileIndex];
+    if (!cache || cache.batchIdx === undefined || !cache.done) return;
+
+    const batchIdx = cache.batchIdx;
+    tempBatchList[batchIdx].name = cache.name;
+    tempBatchList[batchIdx].coord = cache.coord;
+    tempBatchList[batchIdx].status = 'detecting';
+    renderBatchItems();
+
+    if (cache.coord) {
+        const parts = cache.coord.split(',').map(s => s.trim());
+        const lat = parseFloat(parts[0]);
+        const lon = parseFloat(parts[1]);
+        if (!isNaN(lat) && !isNaN(lon)) {
+            fetchLocationForBatchItem(batchIdx, lat, lon);
+        }
+    }
+}
+
 
 function confirmCrop() {
   if (!cropperInstance) return;
@@ -801,24 +896,29 @@ function confirmCrop() {
   const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.85);
   const originalImgUrl = document.getElementById('crop-image-target').src;
   
-  const file = filesToCrop[currentCropIndex];
-  const nameL = file.name.toLowerCase();
-  const isNatural = nameL.includes('rock') || nameL.includes('bridge') || file.name.includes('8.37');
-  const isMila = nameL.includes('米勒') || nameL.includes('mila');
+  const batchIdx = tempBatchList.length;
   
   tempBatchList.push({
-    name: isMila ? 'Casa Milà (米拉之家)' : (isNatural ? 'Natural Rock Bridge of Koraka' : (file.name.split('.')[0] || '未知地點')),
+    name: '辨識中...',
     loc: '',
-    coord: isMila ? '41.392300, 2.162000' : (isNatural ? '34.971831, 34.075301' : ''),
-    favorite: false, status: 'detecting', 
+    coord: '',
+    favorite: false, 
+    status: 'ocr_detecting', 
     img: croppedImgUrl, 
     originalImg: originalImgUrl, 
     tz: '', 
-    type: (isNatural || isMila) ? 'mushroom' : 'flower'
+    type: 'flower'
   });
 
   closeModal('cropModal');
   cropperInstance.destroy(); cropperInstance = null;
+  
+  // 🌟 將 OCR Cache 綁定到這個 Batch Item 上 🌟
+  if(ocrCache[currentCropIndex]) {
+      ocrCache[currentCropIndex].batchIdx = batchIdx;
+      applyOcrToBatch(currentCropIndex);
+  }
+
   currentCropIndex++;
   startCropNext();
 }
@@ -853,44 +953,49 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
+// 🌟 獨立抽出的地點獲取邏輯 🌟
+async function fetchLocationForBatchItem(index, lat, lon) {
+    const locPreview = document.getElementById(`batch-loc-preview-${index}`);
+    if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
+    try {
+        const [locRes, tz] = await Promise.all([
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW`),
+            fetchTimeZone(lat, lon)
+        ]);
+        
+        if (tz) tempBatchList[index].tz = tz; 
+        
+        const data = await locRes.json();
+        if (data && data.address) {
+            const addr = data.address;
+            const country = cleanLocText(addr.country);
+            const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || '';
+            const city = cleanLocText(cityRaw);
+            
+            tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country;
+            if(locPreview) locPreview.innerText = `📍 ${tempBatchList[index].loc}`;
+        } else {
+            if(locPreview) locPreview.innerText = '⚠️ 無法辨識地點';
+        }
+    } catch(e) {
+        if(locPreview) locPreview.innerText = '⚠️ 網路錯誤';
+    }
+}
+
+
 let batchDebounceTimers = {};
 function handleBatchCoordInput(index, val, el) {
     el.value = val.replace(/[^0-9.,\- ]/g, '');
     tempBatchList[index].coord = el.value;
     
     clearTimeout(batchDebounceTimers[index]);
-    batchDebounceTimers[index] = setTimeout(async () => {
+    batchDebounceTimers[index] = setTimeout(() => {
         const parts = el.value.split(',').map(s => s.trim());
         if (parts.length === 2 && parts[0] && parts[1]) {
             const lat = parseFloat(parts[0]);
             const lon = parseFloat(parts[1]);
             if (!isNaN(lat) && !isNaN(lon)) {
-                const locPreview = document.getElementById(`batch-loc-preview-${index}`);
-                if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
-                try {
-                    const [locRes, tz] = await Promise.all([
-                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW`),
-                        fetchTimeZone(lat, lon)
-                    ]);
-                    
-                    if (tz) tempBatchList[index].tz = tz; 
-                    
-                    const data = await locRes.json();
-                    if (data && data.address) {
-                        const addr = data.address;
-                        // 🌟 套用文字過濾器，確保 "美国;美國" 變成 "美國" 🌟
-                        const country = cleanLocText(addr.country);
-                        const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || '';
-                        const city = cleanLocText(cityRaw);
-                        
-                        tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country;
-                        if(locPreview) locPreview.innerText = `📍 ${tempBatchList[index].loc}`;
-                    } else {
-                        if(locPreview) locPreview.innerText = '⚠️ 無法辨識地點';
-                    }
-                } catch(e) {
-                    if(locPreview) locPreview.innerText = '⚠️ 網路錯誤';
-                }
+                fetchLocationForBatchItem(index, lat, lon);
             }
         }
     }, 800);
@@ -901,6 +1006,21 @@ function renderBatchItems() {
   const allCards = [...flowerCards, ...mushroomCards];
   
   container.innerHTML = tempBatchList.map((item, index) => {
+    
+    // 🌟 OCR 辨識中的 UI 狀態 🌟
+    if (item.status === 'ocr_detecting') {
+      return `
+      <div class="batch-item">
+        <div class="batch-confirm-box" style="display:flex; align-items:center; gap:12px; padding: 16px;">
+          <img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+          <div style="flex:1; text-align:left;">
+            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text);">🤖 AI 視覺辨識中...</div>
+            <div id="batch-ocr-progress-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700; margin-top:4px;">讀取原圖文字中...</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
     if (item.status === 'detecting') {
       return `
       <div class="batch-item">
@@ -910,7 +1030,7 @@ function renderBatchItems() {
             <img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
             <div style="flex:1; overflow:hidden;">
               <input type="text" value="${item.name}" oninput="tempBatchList[${index}].name = this.value" style="width: 100%; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); background: transparent; border: none; border-bottom: 1.5px dashed var(--green-light); outline: none; padding-bottom: 2px; margin-bottom: 4px; box-sizing: border-box;" placeholder="自訂明信片名稱">
-              <div id="batch-loc-preview-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700;">📍 ${item.loc || '請輸入座標以偵測地點'}</div>
+              <div id="batch-loc-preview-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700;">📍 ${item.loc || '請輸入座標以自動偵測地點'}</div>
             </div>
             <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:32px; height:32px; flex-shrink:0;" onclick="toggleBatchFav(${index})">
               <svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:16px; height:16px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg>
@@ -1139,7 +1259,6 @@ async function detectLocationFromCoords(lat, lon, targetInputId) {
         if (data && data.address) {
             const addr = data.address;
             
-            // 🌟 套用文字過濾器 🌟
             const country = cleanLocText(addr.country);
             const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || '';
             const city = cleanLocText(cityRaw);
