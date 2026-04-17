@@ -170,13 +170,18 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .lightbox-img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
 
 /* ── 全黑裁切畫面樣式 ── */
+/* 🌟 修正：配合 Safe Area，將整體 Padding 墊高，防止 iOS 主畫面橫條誤觸 🌟 */
 .crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000000; z-index: 9999; flex-direction: column; }
 .crop-modal-overlay.open { display: flex; }
-.crop-header { display: flex; justify-content: space-between; padding: 24px 20px; align-items: center; flex-shrink: 0; }
+.crop-header { display: flex; justify-content: space-between; padding: max(24px, env(safe-area-inset-top)) 20px 20px; align-items: center; flex-shrink: 0; }
 .crop-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
 .crop-btn.primary { background: var(--green); color: #fff; }
-.crop-container { flex: 1; position: relative; overflow: hidden; padding: 0 20px 40px; box-sizing: border-box; }
-.crop-container img { max-width: 100%; display: block; margin: 0 auto; }
+.crop-container { 
+  flex: 1; position: relative; overflow: hidden; 
+  padding: 0 20px calc(120px + env(safe-area-inset-bottom)); /* 巨量底部留白，完全避開Home bar */
+  box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+}
+.crop-container img { max-width: 100%; max-height: 100%; display: block; margin: 0 auto; }
 .cropper-view-box { outline: 3px solid var(--green); border-radius: 4px; }
 .cropper-line { background-color: transparent; }
 .cropper-point { background-color: var(--green); width: 26px; height: 26px; opacity: 1; border-radius: 50%; }
@@ -635,6 +640,11 @@ let filesToCrop = [];
 let currentCropIndex = 0;
 let cropperInstance = null;
 
+let dragStartX = 0;
+let dragStartY = 0;
+let isSwiping = false;
+let swipeDirection = null; // 🌟 新增滑動方向記錄
+
 document.getElementById('edit-coord-input').addEventListener('input', function(e) { this.value = this.value.replace(/[^0-9.,\- ]/g, ''); });
 
 function showDropzone() {
@@ -817,7 +827,6 @@ function renderBatchItems() {
   
   container.innerHTML = tempBatchList.map((item, index) => {
     if (item.status === 'detecting') {
-      /* 🌟 修正：加入預覽圖與名稱 🌟 */
       return `
       <div class="batch-item">
         <div class="batch-confirm-box" style="position:relative;">
@@ -864,7 +873,6 @@ function renderBatchItems() {
     </div>`;
   }).join('');
 
-  /* 🌟 判斷是否所有項目都已確認，以顯示「全部儲存入庫」按鈕 🌟 */
   const allConfirmed = tempBatchList.every(item => item.status === 'confirmed');
   document.getElementById('btn-batch-save').style.display = allConfirmed && tempBatchList.length > 0 ? 'block' : 'none';
 }
@@ -1091,6 +1099,72 @@ function refreshCurrentView() {
   enableDragScroll(); 
 }
 
+/* 🌟 核心修改：加入 handleDragMove 🌟 */
+function handleDragStart(e) { 
+  isSwiping = false; 
+  swipeDirection = null; // 重置滑動方向
+  dragStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].screenX; 
+  dragStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].screenY; 
+}
+
+function handleDragMove(e) {
+  if (!dragStartX || !e.touches) return;
+  
+  let dx = e.touches[0].screenX - dragStartX;
+  let dy = e.touches[0].screenY - dragStartY;
+
+  // 判定滑動方向 (容差 10px 防止誤判)
+  if (!swipeDirection) {
+    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+      swipeDirection = 'h'; // 確定是橫向滑動
+    } else if (Math.abs(dy) > 10) {
+      swipeDirection = 'v'; // 確定是直向滑動
+    }
+  }
+
+  // 如果確定是橫向滑動，就鎖定畫面，不允許上下捲動
+  if (swipeDirection === 'h') {
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+  }
+}
+
+function handleDragEnd(e, el) {
+  if (!dragStartX) return;
+  let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX;
+  let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY;
+  
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { 
+    isSwiping = true; 
+    if (dx < -40) { 
+      resetSwipes(); 
+      el.classList.add('swiped'); 
+    } else if (dx > 40) { 
+      el.classList.remove('swiped');
+    }
+  }
+  dragStartX = 0;
+  dragStartY = 0;
+}
+
+function toggleOwned(cat, id) {
+  if(isSwiping) { isSwiping = false; return; }
+  const list = cat === 'flower' ? flowerCards : mushroomCards;
+  const c = list.find(x => x.id == id);
+  if(c){
+    if(c.owned){ 
+      pendingRemoveCard = c; 
+      openModal('confirmModal'); 
+    } else { 
+      c.owned = true; 
+      showToast('✅ 標記為已擁有'); 
+      refreshCurrentView(); 
+    }
+  }
+}
+
+/* 🌟 在 HTML 卡片綁定 ontouchmove="handleDragMove(event)" 🌟 */
 function cardHTML(c, thumbClass, cat) {
   const starFill = c.favorite ? 'var(--star-gold)' : 'none';
   const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : c.icon;
@@ -1101,7 +1175,7 @@ function cardHTML(c, thumbClass, cat) {
       <div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除
       </div>
-      <div class="postcard ${isOwnedClass}" onclick="toggleOwned('${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchend="handleDragEnd(event, this)">
+      <div class="postcard ${isOwnedClass}" onclick="toggleOwned('${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)">
         
         <div class="postcard-thumb ${thumbClass}">
           ${thumbContent}
@@ -1178,69 +1252,6 @@ function stackCardHTML(c, cat) {
       
     </div>
   `;
-}
-
-function toggleStackCard(el) {
-  el.classList.toggle('expanded');
-}
-
-function handleStackThumbClick(e, img, el) {
-  const card = el.closest('.stack-card');
-  if (card.classList.contains('expanded')) {
-    if (img && img !== 'null') {
-      e.stopPropagation(); 
-      showLightbox(img);
-    }
-  }
-}
-
-function executeToggleOwnedBtn(e, cat, id) {
-  e.stopPropagation(); 
-  toggleOwned(cat, id); 
-}
-
-let dragStartX = 0;
-let dragStartY = 0;
-let isSwiping = false;
-
-function handleDragStart(e) { 
-  isSwiping = false; 
-  dragStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].screenX; 
-  dragStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].screenY; 
-}
-
-function handleDragEnd(e, el) {
-  if (!dragStartX) return;
-  let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX;
-  let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY;
-  
-  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { 
-    isSwiping = true; 
-    if (dx < -40) { 
-      resetSwipes(); 
-      el.classList.add('swiped'); 
-    } else if (dx > 40) { 
-      el.classList.remove('swiped');
-    }
-  }
-  dragStartX = 0;
-  dragStartY = 0;
-}
-
-function toggleOwned(cat, id) {
-  if(isSwiping) { isSwiping = false; return; }
-  const list = cat === 'flower' ? flowerCards : mushroomCards;
-  const c = list.find(x => x.id == id);
-  if(c){
-    if(c.owned){ 
-      pendingRemoveCard = c; 
-      openModal('confirmModal'); 
-    } else { 
-      c.owned = true; 
-      showToast('✅ 標記為已擁有'); 
-      refreshCurrentView(); 
-    }
-  }
 }
 
 function handleGlobalSearch() {
