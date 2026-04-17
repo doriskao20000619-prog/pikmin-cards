@@ -28,7 +28,6 @@
   --shadow: 0 4px 20px rgba(46,125,79,0.08);
   --danger: #FF3B30; 
   --star-gold: #FFCC00; 
-  /* 導覽列新變數 */
   --dock-icon-inactive: #a0a0a0;
   --dock-icon-active: #111111;
   --dock-add-bg: linear-gradient(135deg, #c4fc62, #a8ff4a);
@@ -91,7 +90,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .postcard-wrapper { position: relative; margin-bottom: 14px; border-radius: 20px; background: var(--danger); overflow: hidden; }
 .delete-action { position: absolute; top: 0; right: 0; bottom: 0; width: 75px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; }
 
-.postcard { background: var(--card); border-radius: 20px; border: 1.5px solid var(--border); display: flex; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s, border-color 0.3s; position: relative; z-index: 2; user-select: none; }
+/* 🌟 修正：加入 touch-action: pan-y 防止手機左右滑動時觸發瀏覽器上一頁 🌟 */
+.postcard { background: var(--card); border-radius: 20px; border: 1.5px solid var(--border); display: flex; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s, border-color 0.3s; position: relative; z-index: 2; user-select: none; touch-action: pan-y; }
 .postcard.swiped { transform: translateX(-75px); }
 .postcard.is-owned { background: #f2faf4 !important; border-color: var(--green) !important; }
 
@@ -105,24 +105,32 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; margin: auto; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
 
+/* 🌟 手機版隱藏明信片右上角的刪除按鈕 🌟 */
+@media (max-width: 768px) {
+  .postcard .mac-btn.del-btn { display: none !important; }
+}
+
 .modal-action-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: rgba(142, 142, 147, 0.12); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: all 0.2s; flex-shrink: 0;}
 .modal-action-btn svg { width: 16px; height: 16px; stroke-width: 2.5; pointer-events: none; }
 .modal-action-btn.edit-btn:hover { background: #E5F1FF; color: #007AFF; }
 .modal-action-btn.del-btn:hover { background: #FFE5E5; color: #FF3B30; }
 
-.postcard-name-row { padding-right: 120px; width: 100%; box-sizing: border-box; overflow: hidden; } 
+.postcard-name-row { padding-right: 94px; width: 100%; box-sizing: border-box; overflow: hidden; } 
 .postcard-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; line-height: 1.3; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 
-.local-time-badge, .tag, .owned-badge, .coord-btn { height: 28px; box-sizing: border-box; border-radius: 99px; padding: 0 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; width: fit-content; font-family: 'Nunito', sans-serif; }
+/* 🌟 精簡底部列：座標純數字、已擁有變成純圓形 🌟 */
+.local-time-badge, .tag, .coord-btn { height: 28px; box-sizing: border-box; border-radius: 99px; padding: 0 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; width: fit-content; font-family: 'Nunito', sans-serif; }
 .local-time-badge, .tag { background: #ffffff; color: var(--green-dark); font-size: 0.68rem; border: 1px solid #ffffff; box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08); }
 .tag { color: var(--sub); }
-.owned-badge { background: var(--green); color: #fff; font-size: 0.68rem; white-space: nowrap; }
-.coord-btn { background: #f0f7f2; border: 1.5px solid var(--green-light); font-size: 0.7rem; font-family: 'Courier New', Courier, monospace; color: var(--green-dark); cursor: pointer; }
+.coord-btn { background: #f0f7f2; border: 1.5px solid var(--green-light); font-size: 0.7rem; font-family: 'Courier New', Courier, monospace; color: var(--green-dark); cursor: pointer; padding: 0 10px; }
+
+/* 精美的圓形勾勾圖示 */
+.owned-badge { background: var(--green); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(76, 175, 110, 0.3); }
 
 .postcard-loc-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; margin-bottom: 4px; flex-wrap: wrap; }
 .postcard-loc { font-size: 0.75rem; color: var(--sub); font-weight: 500; display: flex; align-items: center; gap: 4px;}
 .postcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; width: 100%; }
+.postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; width: 100%; gap: 6px; }
 
 /* ── LIGHTBOX ── */
 .lightbox-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; cursor: zoom-out; backdrop-filter: blur(15px); }
@@ -222,6 +230,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   cursor: pointer;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.05);
+  touch-action: pan-y; /* 避免手機上滑動展開時觸發換頁 */
 }
 .stack-card + .stack-card { margin-top: -110px; } 
 .stack-card.expanded {
@@ -1020,7 +1029,6 @@ function showLightbox(imgSrc) {
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 
-/* 🌟 切換導覽列標籤並更新狀態 🌟 */
 function goTo(screen) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
@@ -1080,8 +1088,8 @@ function cardHTML(c, thumbClass, cat) {
           <div class="postcard-tags">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
           
           <div class="postcard-footer">
-            <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">📋 ${c.coord}</div>
-            ${c.owned ? '<div class="owned-badge">✅ 已擁有</div>' : ''}
+            <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">${c.coord}</div>
+            ${c.owned ? '<div class="owned-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : ''}
           </div>
 
         </div>
@@ -1121,7 +1129,7 @@ function stackCardHTML(c, cat) {
           <div class="postcard-tags">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
           
           <div class="postcard-footer" style="margin-top:20px; border-top: 1.5px dashed var(--border); padding-top:16px;">
-            <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">📋 ${c.coord}</div>
+            <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">${c.coord}</div>
             <button class="btn-danger" style="width:auto; padding:8px 24px; border-radius:99px; font-size:0.85rem;" onclick="executeToggleOwnedBtn(event, '${cat}', '${c.id}')">取消收藏</button>
           </div>
         </div>
@@ -1150,10 +1158,33 @@ function executeToggleOwnedBtn(e, cat, id) {
   toggleOwned(cat, id); 
 }
 
-function handleDragStart(e) { isSwiping = false; dragStartX = e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX; }
+let dragStartX = 0;
+let dragStartY = 0;
+let isSwiping = false;
+
+function handleDragStart(e) { 
+  isSwiping = false; 
+  dragStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].screenX; 
+  dragStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].screenY; 
+}
+
 function handleDragEnd(e, el) {
-  let dx = e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX;
-  if (Math.abs(dragStartX - dx) > 40) { isSwiping = true; if (dragStartX - dx > 40) { resetSwipes(); el.classList.add('swiped'); } }
+  if (!dragStartX) return;
+  let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX;
+  let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY;
+  
+  // 必須是橫向滑動（X軸位移大於Y軸位移）且滑動距離超過 40px
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { 
+    isSwiping = true; 
+    if (dx < -40) { // 左滑
+      resetSwipes(); 
+      el.classList.add('swiped'); 
+    } else if (dx > 40) { // 右滑
+      el.classList.remove('swiped');
+    }
+  }
+  dragStartX = 0;
+  dragStartY = 0;
 }
 
 function toggleOwned(cat, id) {
@@ -1277,7 +1308,7 @@ function toggleHideOwned(cat) { hideOwnedState[cat] = !hideOwnedState[cat]; refr
 function executeCancelOwned() { if(pendingRemoveCard) { pendingRemoveCard.owned = false; refreshCurrentView(); } closeModal('confirmModal'); }
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
 function executeHardDelete() { if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); refreshCurrentView(); closeModal('deleteConfirmModal'); }
-function copyCoord(e, c) { e.stopPropagation(); const b = e.currentTarget; b.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { b.textContent = '📋 ' + c; }, 2000); }
+function copyCoord(e, c) { e.stopPropagation(); const b = e.currentTarget; b.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { b.textContent = c; }, 2000); }
 
 /* 確保所有 Modal 打開時都會觸發導覽列隱藏 (自動加 class) */
 function openModal(id) { 
