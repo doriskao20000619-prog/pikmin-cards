@@ -774,10 +774,12 @@ function startCropNext() {
     imageTarget.onload = () => {
       setTimeout(() => {
         if (cropperInstance) { cropperInstance.destroy(); }
+        
         cropperInstance = new Cropper(imageTarget, {
+          aspectRatio: 3 / 2, // 🌟 強制預設為 3:2 橫式比例
           viewMode: 1, 
           dragMode: 'move', 
-          autoCropArea: 0.95, 
+          autoCropArea: 1, 
           background: false, 
           guides: true, 
           center: true, 
@@ -944,7 +946,6 @@ function saveThemeAction() {
     closeModal('addThemeModal');
     openManageThemeModal(); 
     refreshCurrentView();
-    // 如果編輯明信片的視窗還開著，就重新渲染裡面的主題列表
     if(document.getElementById('editModal').classList.contains('open')) renderEditThemes();
   } else {
     if (!defaultThemes.includes(fullTheme) && !customThemes.includes(fullTheme)) {
@@ -954,7 +955,6 @@ function saveThemeAction() {
     closeModal('addThemeModal');
     refreshCurrentView();
     showToast('🎨 主題已新增');
-    // 如果編輯明信片的視窗還開著，就重新渲染裡面的主題列表，讓使用者可以直接選取剛新增的類別
     if(document.getElementById('editModal').classList.contains('open')) renderEditThemes();
   }
 }
@@ -1046,7 +1046,7 @@ function renderEditThemes() {
     return `<div class="theme-option ${isSel?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`;
   }).join('');
   
-  // 在最後加上「＋ 新增」的按鈕，點擊時會呼叫原本的新增主題 Modal
+  // 🌟 加入「＋ 新增」的按鈕，點擊時會呼叫新增主題 Modal
   html += `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`;
   
   container.innerHTML = html;
