@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pikmin Bloom 明信片記錄</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <style>
 /* ── BASE & VARIABLES ── */
 :root {
@@ -95,8 +98,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .postcard.swiped { transform: translateX(-75px); }
 .postcard.is-owned { background: #f2faf4 !important; border-color: var(--green) !important; }
 
+/* 🌟 修正：取消強制放大，讓明信片完整置中顯示 🌟 */
 .postcard-thumb { width: 145px; min-width: 145px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1.5px solid var(--border); cursor: zoom-in; }
-.postcard-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center 75%; transform: scale(1.4); }
+.postcard-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
 .postcard-info { flex: 1; padding: 14px 14px; display: flex; flex-direction: column; gap: 6px; position: relative; }
 
@@ -128,7 +132,21 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .lightbox-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; cursor: zoom-out; backdrop-filter: blur(15px); }
 .lightbox-overlay.open { display: flex; }
 .lightbox-frame { width: 92vw; max-width: 600px; aspect-ratio: 1.4 / 1; overflow: hidden; border-radius: 12px; box-shadow: 0 0 60px rgba(0,0,0,0.7); background: #000; }
-.lightbox-img { width: 100%; height: 100%; object-fit: cover; object-position: center 75%; transform: scale(1.45); }
+
+/* 🌟 修正：燈箱大圖也取消放大，改用 contain 確保 100% 完整呈現 🌟 */
+.lightbox-img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
+
+/* ── 全黑裁切畫面樣式 ── */
+.crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000000; z-index: 9999; flex-direction: column; }
+.crop-modal-overlay.open { display: flex; }
+.crop-header { display: flex; justify-content: space-between; padding: 24px 20px; align-items: center; }
+.crop-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 8px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
+.crop-btn.primary { background: var(--green); color: #fff; }
+.crop-container { flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 0 20px 40px; }
+.crop-container img { max-width: 100%; max-height: 100%; display: block; }
+.cropper-view-box, .cropper-face { outline: 2px solid #fff; }
+.cropper-line { background-color: #fff; }
+.cropper-point { background-color: #fff; width: 6px; height: 6px; }
 
 /* ── MODALS ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
@@ -176,12 +194,23 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 .btn-primary { width: 100%; background: linear-gradient(135deg, var(--green-dark), var(--green)); color: #fff; border: none; border-radius: 16px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 4px 12px rgba(46,125,79,0.25); flex-shrink: 0;}
 .btn-danger { width: 100%; background: linear-gradient(135deg, #FF3B30, #D92B22); color: #fff; border: none; border-radius: 16px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; flex-shrink: 0;}
+.btn-cancel { width: 100%; background: none; border: none; color: var(--sub); padding: 10px; font-weight: 700; font-size: 0.88rem; cursor: pointer; margin-top: 6px; }
 
 .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px); background: #1a2e22; color: #fff; padding: 12px 26px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body onclick="resetSwipes()">
+
+<div class="crop-modal-overlay" id="cropModal">
+  <div class="crop-header">
+    <button class="crop-btn" onclick="cancelCrop()">取消</button>
+    <button class="crop-btn primary" onclick="confirmCrop()">確認修改</button>
+  </div>
+  <div class="crop-container">
+    <img id="crop-image-target" src="">
+  </div>
+</div>
 
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
   <div class="lightbox-frame"><img src="" class="lightbox-img" id="lightbox-img"></div>
@@ -297,11 +326,11 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 <script>
 // ── DATA ──
 let flowerCards = [
-  { id: 'f1', name: 'Casa Batlló', loc: '巴塞隆納，西班牙', country: '西班牙', themes: ['🏛️ 歷史古蹟'], coord: '41.391600, 2.165000', icon: '🏛️', tz: 'Europe/Madrid', owned: false, favorite: false, img: null },
+  { id: 'f1', name: 'Casa Batlló', loc: '巴塞隆納，西班牙', country: '西班牙', themes: ['🏛️ 歷史古蹟'], coord: '41.391600, 2.165000', icon: '🏛️', tz: 'Europe/Madrid', owned: false, favorite: false, img: null, originalImg: null },
 ];
 let mushroomCards = [
-  { id: 'm1', name: 'Fushimi Inari Taisha', loc: '京都，日本', country: '日本', themes: ['⛩️ 神社'], coord: '34.967100, 135.772700', icon: '⛩️', tz: 'Asia/Tokyo', owned: false, favorite: true, img: null },
-  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa, 賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: false, img: null },
+  { id: 'm1', name: 'Fushimi Inari Taisha', loc: '京都，日本', country: '日本', themes: ['⛩️ 神社'], coord: '34.967100, 135.772700', icon: '⛩️', tz: 'Asia/Tokyo', owned: false, favorite: true, img: null, originalImg: null },
+  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa, 賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: false, img: null, originalImg: null },
 ];
 
 let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標'];
@@ -316,6 +345,10 @@ let hideOwnedState = { flower: false, mushroom: false };
 let tempBatchList = []; 
 let currentEditCat = ''; let currentEditId = ''; let originalCoordBeforeEdit = ""; let tempEditThemes = [];
 let editingThemeIndex = -1;
+
+let filesToCrop = [];
+let currentCropIndex = 0;
+let cropperInstance = null;
 
 document.getElementById('edit-coord-input').addEventListener('input', function(e) { this.value = this.value.replace(/[^0-9.,\- ]/g, ''); });
 
@@ -339,25 +372,68 @@ function getLocalTime(tz) {
 
 function handleFiles(files) {
   if (files.length === 0) return;
+  filesToCrop = Array.from(files);
+  currentCropIndex = 0;
   tempBatchList = [];
-  Array.from(files).forEach((file, index) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const nameL = file.name.toLowerCase();
-      const isNatural = nameL.includes('rock') || nameL.includes('bridge') || file.name.includes('8.37');
-      const isMila = nameL.includes('米勒') || nameL.includes('mila');
-      
-      tempBatchList.push({
-        name: isMila ? 'Casa Milà (米拉之家)' : (isNatural ? 'Natural Rock Bridge of Koraka' : (file.name.split('.')[0] || '未知地點')),
-        loc: isMila ? '巴塞隆納，西班牙' : (isNatural ? 'Ayia Napa, 賽普勒斯' : '所在地偵測中...'),
-        coord: isMila ? '41.392300, 2.162000' : (isNatural ? '34.971831, 34.075301' : '0.000000, 0.000000'),
-        favorite: false, status: 'detecting', img: e.target.result,
-        type: (isNatural || isMila) ? 'mushroom' : 'flower'
-      });
-      if (tempBatchList.length === files.length) { openModal('uploadModal'); renderBatchItems(); }
-    };
-    reader.readAsDataURL(file);
+  startCropNext();
+  document.getElementById('file-input').value = "";
+}
+
+function startCropNext() {
+  if (currentCropIndex >= filesToCrop.length) {
+    openModal('uploadModal');
+    renderBatchItems();
+    return;
+  }
+  
+  const file = filesToCrop[currentCropIndex];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imageTarget = document.getElementById('crop-image-target');
+    imageTarget.src = e.target.result;
+    document.getElementById('cropModal').classList.add('open');
+    
+    if (cropperInstance) { cropperInstance.destroy(); }
+    cropperInstance = new Cropper(imageTarget, {
+      viewMode: 1, dragMode: 'move', autoCropArea: 0.95,
+      background: false, guides: true, center: true, zoomable: true
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function confirmCrop() {
+  if (!cropperInstance) return;
+  const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
+  const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.85);
+  const originalImgUrl = document.getElementById('crop-image-target').src;
+  
+  const file = filesToCrop[currentCropIndex];
+  const nameL = file.name.toLowerCase();
+  const isNatural = nameL.includes('rock') || nameL.includes('bridge') || file.name.includes('8.37');
+  const isMila = nameL.includes('米勒') || nameL.includes('mila');
+  
+  tempBatchList.push({
+    name: isMila ? 'Casa Milà (米拉之家)' : (isNatural ? 'Natural Rock Bridge of Koraka' : (file.name.split('.')[0] || '未知地點')),
+    loc: isMila ? '巴塞隆納，西班牙' : (isNatural ? 'Ayia Napa, 賽普勒斯' : '所在地偵測中...'),
+    coord: isMila ? '41.392300, 2.162000' : (isNatural ? '34.971831, 34.075301' : '0.000000, 0.000000'),
+    favorite: false, status: 'detecting', 
+    img: croppedImgUrl, 
+    originalImg: originalImgUrl, 
+    type: (isNatural || isMila) ? 'mushroom' : 'flower'
   });
+
+  document.getElementById('cropModal').classList.remove('open');
+  cropperInstance.destroy(); cropperInstance = null;
+  currentCropIndex++;
+  startCropNext();
+}
+
+function cancelCrop() {
+  document.getElementById('cropModal').classList.remove('open');
+  if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+  currentCropIndex++;
+  startCropNext();
 }
 
 function renderBatchItems() {
@@ -401,7 +477,8 @@ function handleBatchSave() {
       id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000), 
       name: item.name, loc: item.loc, country: item.loc.split(',')[1]?.trim() || '西班牙', 
       themes: [theme], coord: item.coord, icon: '🖼️', tz: 'Europe/Madrid', 
-      owned: false, favorite: item.favorite, img: item.img 
+      owned: false, favorite: item.favorite, 
+      img: item.img, originalImg: item.originalImg
     });
   });
   showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`);
@@ -681,6 +758,13 @@ function renderCat(cat, mode) {
     processed.forEach(x => { const k = x.country; if(!gs[k]) gs[k] = []; gs[k].push(x); });
   }
   
+  Object.keys(gs).forEach(key => {
+    gs[key].sort((a, b) => {
+      if (a.owned === b.owned) return 0;
+      return a.owned ? 1 : -1;
+    });
+  });
+
   const cf = activeFilters[cat] || '全部'; 
   let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">🌍 全部</div>`;
   
