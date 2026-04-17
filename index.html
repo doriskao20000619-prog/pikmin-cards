@@ -65,7 +65,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 /* ── CATEGORY LAYOUT & FILTERS ── */
 .cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); }
 .cat-topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--card); border-bottom: 1.5px solid var(--border); }
-.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; } /* 🌟 標題置中 🌟 */
+.back-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 4px; }
+.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; } 
 .toggle-hide-btn { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; color: var(--sub); cursor: pointer; }
 
 .sub-tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); }
@@ -96,7 +97,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .postcard-thumb { width: 145px; min-width: 145px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1.5px solid var(--border); cursor: zoom-in; position: relative; }
 .postcard-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
-/* 🌟 一般清單的圖片內時間標籤 🌟 */
 .image-time-badge {
   position: absolute;
   top: 8px;
@@ -116,7 +116,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   gap: 3px;
 }
 
-/* 🌟 收藏欄專屬：位於左下角的時間標籤 🌟 */
 .stack-time-badge {
   position: absolute;
   bottom: 16px;
@@ -551,15 +550,15 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="modal-overlay" id="uploadModal" onclick="closeModalOutside(event, 'uploadModal')">
   <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title">📸 批次匯入確認</div>
+    <div class="modal-handle"></div><div class="modal-title">批次匯入確認</div>
     <div class="batch-results-container" id="batch-container" style="display:block;"></div>
-    <button class="btn-primary" onclick="handleBatchSave()">✅ 全部儲存入庫</button>
+    <button id="btn-batch-save" class="btn-primary" style="display:none;" onclick="handleBatchSave()">全部儲存入庫</button>
   </div>
 </div>
 
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')">
   <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">🎨 新增自訂主題</div>
+    <div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增自訂主題</div>
     <div class="emoji-picker-grid" id="emoji-grid"></div>
     <div class="edit-input-wrapper">
       <input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="輸入主題名稱（如：夜景、美食）">
@@ -570,7 +569,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')">
   <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title">⚙️ 管理自訂主題</div>
+    <div class="modal-handle"></div><div class="modal-title">管理自訂主題</div>
     <div class="custom-theme-list" id="custom-theme-list"></div>
     <button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button>
   </div>
@@ -578,7 +577,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title">✏️ 修改明信片資訊</div>
+    <div class="modal-handle"></div><div class="modal-title">修改明信片資訊</div>
     
     <div class="edit-label">明信片名稱：</div>
     <div class="edit-input-wrapper">
@@ -604,8 +603,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   </div>
 </div>
 
-<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">⚠️ 取消收藏</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeCancelOwned()">確定移除</button></div></div>
-<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">🗑️ 刪除明信片</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeHardDelete()">確定刪除</button></div></div>
+<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">取消收藏</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeCancelOwned()">確定移除</button></div></div>
+<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">刪除明信片</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeHardDelete()">確定刪除</button></div></div>
 
 <div class="toast" id="toast"></div>
 
@@ -818,12 +817,17 @@ function renderBatchItems() {
   
   container.innerHTML = tempBatchList.map((item, index) => {
     if (item.status === 'detecting') {
+      /* 🌟 修正：加入預覽圖與名稱 🌟 */
       return `
       <div class="batch-item">
         <div class="batch-confirm-box" style="position:relative;">
           
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <div class="confirm-label" style="margin-bottom:0;">確認座標與點位類型</div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom: 16px; text-align: left;">
+            <img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <div style="flex:1; overflow:hidden;">
+              <div style="font-weight: 800; font-size: 0.95rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</div>
+              <div style="font-size: 0.75rem; color: var(--sub); font-weight: 700;">確認座標與點位類型</div>
+            </div>
             <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:32px; height:32px; flex-shrink:0;" onclick="toggleBatchFav(${index})">
               <svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:16px; height:16px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg>
             </button>
@@ -837,15 +841,15 @@ function renderBatchItems() {
           </div>
 
           <div class="confirm-btns">
-            <button class="btn-confirm-yes" onclick="confirmBatchItem(${index})">✅ 確認帶入</button>
-            <button class="btn-confirm-no" onclick="searchBatchItem(${index})">🔍 AI 重新比對</button>
+            <button class="btn-confirm-yes" onclick="confirmBatchItem(${index})">確認帶入</button>
+            <button class="btn-confirm-no" onclick="searchBatchItem(${index})">AI 重新比對</button>
           </div>
         </div>
       </div>`;
     }
     
     const isDup = allCards.some(c => c.name === item.name || c.coord === item.coord);
-    const dupBadge = isDup ? `<span class="duplicate-badge">⚠️ 已存在相同明信片</span>` : '';
+    const dupBadge = isDup ? `<span class="duplicate-badge">已存在相同明信片</span>` : '';
 
     return `<div class="batch-item">
       <div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
@@ -859,6 +863,10 @@ function renderBatchItems() {
       </div>
     </div>`;
   }).join('');
+
+  /* 🌟 判斷是否所有項目都已確認，以顯示「全部儲存入庫」按鈕 🌟 */
+  const allConfirmed = tempBatchList.every(item => item.status === 'confirmed');
+  document.getElementById('btn-batch-save').style.display = allConfirmed && tempBatchList.length > 0 ? 'block' : 'none';
 }
 
 function confirmBatchItem(index) { tempBatchList[index].status = 'confirmed'; renderBatchItems(); }
@@ -886,7 +894,7 @@ function handleBatchSave() {
 
 function openAddThemeModal() {
   editingThemeIndex = -1;
-  document.getElementById('addThemeModalTitle').innerHTML = '🎨 新增自訂主題';
+  document.getElementById('addThemeModalTitle').innerHTML = '新增自訂主題';
   document.getElementById('addThemeModalBtn').textContent = '確認新增';
   document.getElementById('new-theme-name').value = '';
   currentNewThemeEmoji = '✨';
@@ -958,7 +966,7 @@ function openEditCustomTheme(idx) {
   const emoji = spaceIdx > -1 ? themeStr.substring(0, spaceIdx) : '✨';
   const name = spaceIdx > -1 ? themeStr.substring(spaceIdx + 1) : themeStr;
 
-  document.getElementById('addThemeModalTitle').innerHTML = '✏️ 修改自訂主題';
+  document.getElementById('addThemeModalTitle').innerHTML = '修改自訂主題';
   document.getElementById('addThemeModalBtn').textContent = '儲存修改';
   document.getElementById('new-theme-name').value = name;
   currentNewThemeEmoji = emoji;
@@ -1088,7 +1096,6 @@ function cardHTML(c, thumbClass, cat) {
   const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : c.icon;
   const isOwnedClass = c.owned ? 'is-owned' : '';
   
-  /* 🌟 修正：確保時間標籤只會出現在圖片區域右上角，下方文字區的已刪除 🌟 */
   return `
     <div class="postcard-wrapper">
       <div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')">
