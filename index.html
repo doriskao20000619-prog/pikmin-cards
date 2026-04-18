@@ -190,13 +190,11 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .cropper-point.point-nw { top: -13px; left: -13px; }
 .cropper-point.point-n, .cropper-point.point-s, .cropper-point.point-e, .cropper-point.point-w { display: none; }
 
-/* ── MODALS (還原正常設定) ── */
+/* ── MODALS ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
 .modal-overlay.open { display: flex; }
-.modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 20px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-handle { width: 45px; height: 5px; background: #ddd; border-radius: 99px; margin: 0 auto 20px; flex-shrink:0;}
-.modal-title { font-weight: 900; font-size: 1.2rem; text-align: center; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink:0;}
+.modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 20px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto; scrollbar-width: none; }
+.modal::-webkit-scrollbar { display: none; }
 
 .batch-results-container { display: none; max-height: 450px; overflow-y: auto; padding: 4px; margin-bottom: 20px; scrollbar-width: none; }
 .batch-item { margin-bottom: 14px; }
@@ -588,12 +586,14 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
     
     <div style="overflow-y: auto; scrollbar-width: none; padding-bottom: 25px; flex: 1;">
       
-      <div id="edit-img-section" style="text-align:center; margin-bottom:16px;">
-        <img id="edit-img-preview" src="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 16px; border: 1.5px solid var(--border); margin-bottom: 8px;">
-        <div>
-          <button id="btn-recrop-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="startEditCrop()">✂️ 重新裁切原圖</button>
-          <button id="btn-add-edit-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="document.getElementById('edit-file-input').click()">🖼️ 加入照片</button>
+      <div id="edit-img-section" style="text-align:center; margin-bottom:24px; display:flex; flex-direction:column; align-items:center;">
+        <div style="position: relative; display: inline-block;">
+          <img id="edit-img-preview" src="" style="width: 120px; height: 120px; object-fit: cover; border-radius: 20px; border: 2px solid var(--border); display:none; box-shadow: var(--shadow);">
+          <button id="btn-recrop-img" onclick="startEditCrop()" style="position: absolute; top: -8px; right: -8px; width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 1.5px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: none; align-items: center; justify-content: center; color: var(--text); padding:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px; pointer-events:none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
         </div>
+        <button id="btn-add-edit-img" class="filter-pill" style="margin-top: 8px; display:none;" onclick="document.getElementById('edit-file-input').click()">🖼️ 加入照片</button>
         <input type="file" id="edit-file-input" accept="image/*" style="display:none;" onchange="handleEditFileUpload(this.files)">
       </div>
 
@@ -643,11 +643,11 @@ let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神
 let customThemes = [];
 
 let flowerCards = [
-  { id: 'f1', name: 'Sky Mural', loc: '坦帕，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '27.969331, -82.563688', icon: '🌸', tz: 'America/New_York', owned: false, favorite: false, img: null, originalImg: null }
+  { id: 'f1', name: 'Sky Mural', loc: '坦帕，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '27.969331, -82.563688', icon: '🌸', tz: 'America/New_York', owned: false, favorite: false, img: null, originalImg: null, cropData: null }
 ];
 let mushroomCards = [
-  { id: 'm1', name: 'Landscape Mural', loc: 'North Central Pensacola 彭薩科拉，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '30.460962, -87.304969', icon: '🍄', tz: 'America/Chicago', owned: false, favorite: false, img: null, originalImg: null },
-  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa，賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: true, img: null, originalImg: null }
+  { id: 'm1', name: 'Landscape Mural', loc: 'North Central Pensacola 彭薩科拉，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '30.460962, -87.304969', icon: '🍄', tz: 'America/Chicago', owned: false, favorite: false, img: null, originalImg: null, cropData: null },
+  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa，賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: true, img: null, originalImg: null, cropData: null }
 ];
 
 // 🌟 ── 本地儲存 (Local Storage) 功能區塊 ── 🌟
@@ -689,10 +689,11 @@ let filesToCrop = [];
 let currentCropIndex = 0;
 let cropperInstance = null;
 
-// 🌟 新增：用於判斷目前是在上傳裁切，還是編輯裁切
+// 🌟 新增：用於判斷目前是在上傳裁切，還是編輯裁切，以及儲存座標
 let cropMode = 'upload';
 let tempEditImg = null;
 let tempEditOriginalImg = null;
+let tempEditCropData = null; 
 
 let dragStartX = 0;
 let dragStartY = 0;
@@ -841,7 +842,7 @@ function startCropNext() {
     const smallImgForOcr = await resizeForOCR(originalImgUrl);
     preloadOCR(currentCropIndex, smallImgForOcr);
     
-    cropMode = 'upload'; // 🌟 確保為上傳模式
+    cropMode = 'upload'; 
     const imageTarget = document.getElementById('crop-image-target');
     openModal('cropModal'); 
     
@@ -858,7 +859,9 @@ function startCropNext() {
           guides: true, 
           center: true, 
           zoomable: true,
-          toggleDragModeOnDblclick: false
+          toggleDragModeOnDblclick: false,
+          checkCrossOrigin: false,
+          restore: true
         });
       }, 150); 
     };
@@ -875,6 +878,7 @@ function handleEditFileUpload(files) {
     const reader = new FileReader();
     reader.onload = (e) => {
         tempEditOriginalImg = e.target.result;
+        tempEditCropData = null; // 🌟 重新上傳照片時清空原本的裁切座標
         cropMode = 'edit';
         const imageTarget = document.getElementById('crop-image-target');
         openModal('cropModal');
@@ -890,7 +894,12 @@ function handleEditFileUpload(files) {
                     guides: true,
                     center: true,
                     zoomable: true,
-                    toggleDragModeOnDblclick: false
+                    toggleDragModeOnDblclick: false,
+                    checkCrossOrigin: false,
+                    restore: true,
+                    ready: function() {
+                        if (tempEditCropData) cropperInstance.setData(tempEditCropData);
+                    }
                 });
             }, 150);
         };
@@ -924,14 +933,19 @@ function startEditCrop() {
           guides: true, 
           center: true, 
           zoomable: true, 
-          toggleDragModeOnDblclick: false 
+          toggleDragModeOnDblclick: false,
+          checkCrossOrigin: false,
+          restore: true,
+          ready: function() {
+              if (tempEditCropData) cropperInstance.setData(tempEditCropData);
+          }
       });
     }, 150); 
   };
   imageTarget.src = targetOriginal;
 }
 
-// 雲端 OCR 辨識邏輯
+// 🌟 修改處 2：強化 OCR 辨識的排除名單過濾掉社群軟體雜訊 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -957,12 +971,14 @@ async function preloadOCR(fileIndex, imgUrl) {
             }
         }
 
-        const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日'];
+        const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日', '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽'];
         const validLines = lines.filter(l => {
             const lower = l.toLowerCase();
             if (lower.length <= 1) return false;
             if (lower.match(/^[0-9.,:\-\s]+$/)) return false; 
             if (ignoreList.some(ignore => lower.includes(ignore))) return false;
+            if (lower.match(/\d+\s*(小時|分鐘)/)) return false; 
+            if (lower.match(/\d+\s*次瀏覽/)) return false; 
             return true;
         });
 
@@ -1020,20 +1036,22 @@ function confirmCrop() {
   const originalImgUrl = document.getElementById('crop-image-target').src;
   
   if (cropMode === 'edit') {
+      tempEditCropData = cropperInstance.getData(); // 🌟 儲存座標資訊
       tempEditImg = croppedImgUrl;
       const imgPre = document.getElementById('edit-img-preview');
       imgPre.src = tempEditImg;
       imgPre.style.display = 'inline-block';
       
-      document.getElementById('btn-recrop-img').style.display = 'inline-flex';
+      document.getElementById('btn-recrop-img').style.display = 'flex';
       document.getElementById('btn-add-edit-img').style.display = 'none';
       
       closeModal('cropModal');
       cropperInstance.destroy(); cropperInstance = null;
-      cropMode = 'upload'; // 復原狀態
+      cropMode = 'upload'; 
       return;
   }
   
+  const cropData = cropperInstance.getData(); // 🌟 儲存上傳時的座標資訊
   const batchIdx = tempBatchList.length;
   
   tempBatchList.push({
@@ -1044,6 +1062,7 @@ function confirmCrop() {
     status: 'ocr_detecting', 
     img: croppedImgUrl, 
     originalImg: originalImgUrl, 
+    cropData: cropData, 
     tz: '', 
     type: 'flower'
   });
@@ -1096,8 +1115,9 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
+// 🌟 修改處 1：確保等待 fetch 結束後再重新抓取 DOM，避免被重新渲染洗掉 🌟
 async function fetchLocationForBatchItem(index, lat, lon) {
-    const locPreview = document.getElementById(`batch-loc-preview-${index}`);
+    let locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
     try {
         const [locRes, tz] = await Promise.all([
@@ -1115,11 +1135,16 @@ async function fetchLocationForBatchItem(index, lat, lon) {
             const city = cleanLocText(cityRaw);
             
             tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country;
+            
+            // 重新抓取 DOM，以防在等待期間畫面已重新渲染
+            locPreview = document.getElementById(`batch-loc-preview-${index}`);
             if(locPreview) locPreview.innerText = `📍 ${tempBatchList[index].loc}`;
         } else {
+            locPreview = document.getElementById(`batch-loc-preview-${index}`);
             if(locPreview) locPreview.innerText = '⚠️ 無法辨識地點';
         }
     } catch(e) {
+        locPreview = document.getElementById(`batch-loc-preview-${index}`);
         if(locPreview) locPreview.innerText = '⚠️ 網路錯誤';
     }
 }
@@ -1232,7 +1257,7 @@ function handleBatchSave() {
       themes: [theme], coord: item.coord, icon: '🖼️', 
       tz: item.tz || Intl.DateTimeFormat().resolvedOptions().timeZone, 
       owned: false, favorite: item.favorite, 
-      img: item.img, originalImg: item.originalImg
+      img: item.img, originalImg: item.originalImg, cropData: item.cropData
     });
   });
   showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`);
@@ -1360,9 +1385,10 @@ function promptEdit(e, cat, id) {
   const c = list.find(x => x.id == id);
   if(!c) return;
   
-  // 🌟 更新：編輯彈窗內的重新裁切縮圖顯示
+  // 🌟 更新：編輯彈窗內的重新裁切縮圖顯示與座標
   tempEditImg = c.img;
-  tempEditOriginalImg = null; // 重置這一次上傳的原圖暫存
+  tempEditOriginalImg = null; 
+  tempEditCropData = c.cropData || null; // 🌟 載入已存的座標資訊
   const imgSec = document.getElementById('edit-img-section');
   const imgPre = document.getElementById('edit-img-preview');
   const btnRecrop = document.getElementById('btn-recrop-img');
@@ -1377,7 +1403,7 @@ function promptEdit(e, cat, id) {
   }
   
   if (c.originalImg) { 
-      btnRecrop.style.display = 'inline-flex'; 
+      btnRecrop.style.display = 'flex'; 
       btnAddImg.style.display = 'none';
   } else { 
       btnRecrop.style.display = 'none'; 
@@ -1496,6 +1522,7 @@ function saveEdit() {
     
     if (tempEditImg) c.img = tempEditImg; 
     if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; // 儲存新上傳的原始圖片
+    if (tempEditCropData) c.cropData = tempEditCropData; // 🌟 儲存本次更新的座標
     
     const locParts = nl.split(/[,，]/);
     c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl);
