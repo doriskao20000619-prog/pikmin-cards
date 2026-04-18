@@ -190,7 +190,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .cropper-point.point-nw { top: -13px; left: -13px; }
 .cropper-point.point-n, .cropper-point.point-s, .cropper-point.point-e, .cropper-point.point-w { display: none; }
 
-/* ── MODALS (還原正常設定，修復標題置中跑掉的問題) ── */
+/* ── MODALS (還原全域置中樣式) ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
 .modal-overlay.open { display: flex; }
 .modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 20px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column; }
@@ -598,7 +598,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px; pointer-events:none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
           </button>
         </div>
-        <button id="btn-add-edit-img" class="filter-pill" style="margin-top: 8px; display:none;" onclick="document.getElementById('edit-file-input').click()">🖼️ 加入照片</button>
+        <div id="btn-add-edit-img" onclick="document.getElementById('edit-file-input').click()" style="width: 120px; height: 120px; border-radius: 20px; border: 2px dashed var(--border); background: #f9fbf9; display: none; align-items: center; justify-content: center; cursor: pointer; color: var(--sub); box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+        </div>
         <input type="file" id="edit-file-input" accept="image/*" style="display:none;" onchange="handleEditFileUpload(this.files)">
       </div>
 
@@ -830,13 +832,16 @@ async function resizeForOCR(imgUrl) {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const maxW = 1000; 
-            const scale = maxW / img.width;
-            canvas.width = maxW;
+            const maxDim = 800; // 限制雙邊最大尺寸
+            let scale = 1;
+            if (img.width > maxDim || img.height > maxDim) {
+                scale = Math.min(maxDim / img.width, maxDim / img.height);
+            }
+            canvas.width = img.width * scale;
             canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.8)); 
+            resolve(canvas.toDataURL('image/jpeg', 0.7)); // 加快壓縮速度
         };
         img.src = imgUrl;
     });
@@ -994,17 +999,20 @@ async function preloadOCR(fileIndex, imgUrl) {
 
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
         let foundCoord = '';
-        const coordRegex = /-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+/;
+        
+        // 🌟 修改處：相容了中文逗號 `，` 的座標寫法
+        const coordRegex = /-?\d{1,3}\.\d+\s*[,，]\s*-?\d{1,3}\.\d+/;
         
         for(let i=0; i<lines.length; i++){
             const match = lines[i].match(coordRegex);
             if(match) {
-                foundCoord = match[0];
+                foundCoord = match[0].replace('，', ',');
                 break;
             }
         }
 
-        const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日', '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽'];
+        // 🌟 修改處：加入了 IG / Threads 截圖常見的介面字眼
+        const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日', '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽', '明信片', '皮克敏', '最相關', '回覆', '送出'];
         const validLines = lines.filter(l => {
             const lower = l.toLowerCase();
             if (lower.length <= 1) return false;
@@ -1012,6 +1020,7 @@ async function preloadOCR(fileIndex, imgUrl) {
             if (ignoreList.some(ignore => lower.includes(ignore))) return false;
             if (lower.match(/\d+\s*(小時|分鐘)/)) return false; 
             if (lower.match(/\d+\s*次瀏覽/)) return false; 
+            if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; // 日期格式
             return true;
         });
 
@@ -1446,7 +1455,7 @@ function promptEdit(e, cat, id) {
       btnAddImg.style.display = 'none';
   } else { 
       btnRecrop.style.display = 'none'; 
-      btnAddImg.style.display = 'inline-flex';
+      btnAddImg.style.display = 'flex';
   }
 
   document.getElementById('edit-name-input').value = c.name;
@@ -1663,8 +1672,8 @@ function handleDragEnd(e, el) {
   dragStartY = 0;
 }
 
+// 🌟 修改處 2：加上彈出取消收藏確認視窗的邏輯
 function toggleOwned(e, cat, id) {
-  // 🌟 修改處：如果點擊的是按鈕區塊，直接中止，防止觸發「收藏功能」
   if (e && e.target && (e.target.closest('.mac-btns-container') || e.target.closest('.coord-btn'))) return;
   
   if(isSwiping) { isSwiping = false; return; }
@@ -1678,18 +1687,16 @@ function toggleOwned(e, cat, id) {
       c.owned = true; 
       showToast('✅ 標記為已擁有'); 
       refreshCurrentView(); 
-      // 🌟 加入儲存到本地
       saveDataToLocal();
     }
   }
 }
 
-// 供「取消收藏」時呼叫儲存
+// 🌟 取消收藏邏輯
 function executeCancelOwned() { 
   if(pendingRemoveCard) { 
     pendingRemoveCard.owned = false; 
     refreshCurrentView(); 
-    // 🌟 加入儲存到本地
     saveDataToLocal();
   } 
   closeModal('confirmModal'); 
@@ -1719,7 +1726,7 @@ function toggleFavorite(e, cat, id) {
   } 
 }
 
-// 🌟 修改處 3：加入「我的收藏」層疊卡片點擊展開與放大的處理函數 🌟
+// 🌟 加入「我的收藏」層疊卡片點擊展開與放大的處理函數 🌟
 function toggleStackCard(cardEl) {
   const isExpanded = cardEl.classList.contains('expanded');
   document.querySelectorAll('.stack-card.expanded').forEach(el => {
@@ -1829,16 +1836,14 @@ function stackCardHTML(c, cat) {
   `;
 }
 
-// 供「我的收藏」卡片內「取消收藏」按鈕使用
+// 🌟 修改處 2：加上彈出取消收藏確認視窗的邏輯
 function executeToggleOwnedBtn(e, cat, id) {
     e.stopPropagation();
     const list = cat === 'flower' ? flowerCards : mushroomCards;
     const c = list.find(x => x.id == id);
     if(c) {
-        c.owned = false;
-        refreshCurrentView();
-        // 🌟 加入儲存到本地
-        saveDataToLocal();
+        pendingRemoveCard = c;
+        openModal('confirmModal');
     }
 }
 
