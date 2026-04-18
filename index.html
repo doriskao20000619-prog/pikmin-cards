@@ -8,6 +8,9 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
+<script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
+
 <style>
 /* ── BASE & VARIABLES ── */
 :root {
@@ -43,7 +46,11 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .home-header { background: linear-gradient(160deg, #1e5c36 0%, #3a9e60 55%, #6ecf8a 100%); padding: 48px 20px 40px; }
 .home-topbar { display: flex; justify-content: space-between; align-items: center; }
 .home-logo { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.2rem; color: #fff; display: flex; align-items: center; gap: 8px; }
-.home-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.4); }
+
+/* 🌟 將頭像改為雲端同步按鈕 🌟 */
+.home-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; }
+.home-avatar:active { transform: scale(0.9); }
+.home-avatar.synced { background: #4caf6e; border-color: #fff; }
 
 .home-body { padding: 24px 20px 140px; } 
 .home-section-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; margin-top: 24px; }
@@ -154,7 +161,14 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .local-time-badge, .tag, .coord-btn { height: 28px; box-sizing: border-box; border-radius: 99px; padding: 0 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; width: fit-content; font-family: 'Nunito', sans-serif; }
 .local-time-badge, .tag { background: #ffffff; color: var(--green-dark); font-size: 0.68rem; border: 1px solid #ffffff; box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08); }
 .tag { color: var(--sub); }
-.coord-btn { background: #f0f7f2; border: 1.5px solid var(--green-light); font-size: 0.7rem; font-family: 'Courier New', Courier, monospace; color: var(--green-dark); cursor: pointer; padding: 0 10px; }
+
+.coord-btn { 
+  background: #f0f7f2; border: 1.5px solid var(--green-light); 
+  font-size: 0.7rem; font-family: 'Courier New', Courier, monospace; 
+  color: var(--green-dark); cursor: pointer; padding: 0 10px; 
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+  max-width: 100%; flex-shrink: 1; 
+}
 
 .owned-badge { background: var(--green); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(76, 175, 110, 0.3); }
 
@@ -190,16 +204,15 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .cropper-point.point-nw { top: -13px; left: -13px; }
 .cropper-point.point-n, .cropper-point.point-s, .cropper-point.point-e, .cropper-point.point-w { display: none; }
 
-/* ── MODALS (設定層級與樣式) ── */
+/* ── MODALS ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
 .modal-overlay.open { display: flex; }
-#manageThemeModal { z-index: 450; } /* 管理主題在編輯之上 */
-#addThemeModal { z-index: 500; }    /* 新增主題在最上層 */
+#manageThemeModal { z-index: 450; } 
+#addThemeModal { z-index: 500; }    
 
 .modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 24px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column; position: relative; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-/* 🌟 修改處 3：優化橫桿觸控範圍，支援下拉關閉 🌟 */
 .modal-handle { 
   width: 45px; height: 5px; background: #ddd; border-radius: 99px; margin: 0 auto 20px; flex-shrink:0; position: relative;
 }
@@ -229,7 +242,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .edit-label { font-size: 0.85rem; font-weight: 800; color: var(--sub); margin-bottom: 8px; margin-left: 4px; }
 .edit-input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; flex-shrink:0;}
 
-/* 🌟 修改處 4：輸入框改為白底無邊線、微內陰影 🌟 */
 .edit-text-input { 
   width: 100%; padding: 16px 54px 16px 16px; 
   border: none; border-radius: 16px; font-family: 'Courier New', Courier, monospace; 
@@ -478,7 +490,10 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="screen active" id="screen-home">
   <div class="home-header">
-    <div class="home-topbar"><div class="home-logo">🌱 Pikmin 明信片</div><div class="home-avatar">👤</div></div>
+    <div class="home-topbar">
+      <div class="home-logo">🌱 Pikmin 明信片</div>
+      <div class="home-avatar" id="cloud-sync-btn" onclick="handleAuthClick()" title="登入 Google Drive 備份">☁️</div>
+    </div>
   </div>
   <div class="home-body">
     <div class="home-section-title">瀏覽分類</div>
@@ -629,7 +644,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
       <div class="edit-label">地點 (城市，國家)：</div>
       <div class="edit-input-wrapper">
-        <input type="text" id="edit-loc-input" class="edit-text-input no-icon" placeholder="可自動偵測或手動輸入">
+        <input type="text" id="edit-loc-input" class="edit-text-input no-icon" placeholder="可自動偵測或手手動輸入">
       </div>
 
       <div class="edit-label">點位類型：</div>
@@ -659,24 +674,156 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 <div class="toast" id="toast"></div>
 
 <script>
+// 🌟 雲端同步設定 🌟
+const GOOGLE_CLIENT_ID = '860667269256-ndj7kvt7es64r5in4p5gm7cf6iact7m4.apps.googleusercontent.com'; 
+const GOOGLE_API_KEY = 'AIzaSyA6pVGOf9J7O0yt8X2_snLKoHrs9ZF4g8U'; 
+const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+const SCOPES = 'https://www.googleapis.com/auth/drive.appdata'; 
+
+let tokenClient;
+let gapiInited = false;
+let gisInited = false;
+let driveFileId = localStorage.getItem('pikmin_driveFileId') || null;
+
+// 初始化 Google API Client
+async function initializeGapiClient() {
+    await gapi.client.init({ apiKey: GOOGLE_API_KEY, discoveryDocs: [DISCOVERY_DOC] });
+    gapiInited = true;
+}
+function gapiLoaded() { gapi.load('client', initializeGapiClient); }
+
+// 初始化 Google 登入 (GIS)
+function gisLoaded() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: SCOPES,
+        callback: async (resp) => {
+            if (resp.error !== undefined) { throw (resp); }
+            document.getElementById('cloud-sync-btn').innerText = '🔄';
+            document.getElementById('cloud-sync-btn').classList.add('synced');
+            await checkAndSyncDriveFile();
+        },
+    });
+    gisInited = true;
+}
+
+// 點擊雲端按鈕
+function handleAuthClick() {
+    if (GOOGLE_CLIENT_ID.includes('你的_') || GOOGLE_API_KEY.includes('你的_')) {
+        showToast('⚠️ 請先在程式碼中填寫 Google API 金鑰');
+        return;
+    }
+    // 如果還沒取得 Token，要求登入授權
+    if (gapi.client.getToken() === null) {
+        tokenClient.requestAccessToken({prompt: 'consent'});
+    } else {
+        // 如果已經登入，直接同步
+        checkAndSyncDriveFile();
+    }
+}
+
+// 尋找雲端是否有存檔，有就下載，沒有就建立
+async function checkAndSyncDriveFile() {
+    try {
+        showToast('🔄 正在連接 Google Drive...');
+        const response = await gapi.client.drive.files.list({
+            spaces: 'appDataFolder',
+            q: "name='pikmin_data_v1.json'",
+            fields: 'files(id, name)'
+        });
+        const files = response.result.files;
+        if (files && files.length > 0) {
+            driveFileId = files[0].id;
+            localStorage.setItem('pikmin_driveFileId', driveFileId);
+            await downloadFromDrive();
+        } else {
+            await createInDrive();
+        }
+        document.getElementById('cloud-sync-btn').innerText = '☁️';
+        document.getElementById('cloud-sync-btn').style.background = '#4caf6e';
+        document.getElementById('cloud-sync-btn').style.borderColor = '#fff';
+        document.getElementById('cloud-sync-btn').style.color = '#fff';
+    } catch (err) {
+        console.error(err);
+        showToast('❌ 雲端連接失敗');
+    }
+}
+
+// 下載雲端資料並覆蓋本地
+async function downloadFromDrive() {
+    try {
+        const response = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
+        const dataObj = typeof response.result === 'string' ? JSON.parse(response.result) : response.result;
+        
+        if(dataObj.flowerCards) flowerCards = dataObj.flowerCards;
+        if(dataObj.mushroomCards) mushroomCards = dataObj.mushroomCards;
+        if(dataObj.customThemes) customThemes = dataObj.customThemes;
+        
+        saveDataToLocal(true); // 存入 localStorage 但不觸發再次上傳
+        refreshCurrentView();
+        showToast('✅ 已從雲端載入最新資料');
+    } catch (err) {
+        console.error('Download error', err);
+    }
+}
+
+// 將目前的資料寫入雲端硬碟
+async function uploadToCloud() {
+    if (!driveFileId || gapi.client.getToken() === null) return;
+    
+    const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: new Date().toISOString() });
+    const file = new Blob([fileContent], {type: 'application/json'});
+    
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify({mimeType: 'application/json'})], {type: 'application/json'}));
+    form.append('file', file);
+
+    try {
+        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`, {
+            method: 'PATCH',
+            headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }),
+            body: form
+        });
+        console.log('✅ 雲端同步完成');
+    } catch (err) {
+        console.error('Upload error', err);
+    }
+}
+
+// 初次建立雲端檔案
+async function createInDrive() {
+    const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: new Date().toISOString() });
+    const file = new Blob([fileContent], {type: 'application/json'});
+    const metadata = { name: 'pikmin_data_v1.json', parents: ['appDataFolder'], mimeType: 'application/json' };
+    
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+    form.append('file', file);
+
+    try {
+        const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }),
+            body: form
+        });
+        const data = await res.json();
+        driveFileId = data.id;
+        localStorage.setItem('pikmin_driveFileId', driveFileId);
+        showToast('✅ 已建立專屬雲端備份');
+    } catch (err) {
+        console.error('Create error', err);
+    }
+}
+
+
 // 🌟 你的 GAS 網址 🌟
 const GAS_CLOUD_OCR_URL = 'https://script.google.com/macros/s/AKfycbxoCUQ4V-xHV77p4WwB29o3jq8Di4ZGyGXXE9ob2DtZ-f7FwQZBYY9m6lQHwCcOIzHvvQ/exec';
 
-// ── DATA ──
-// 🌟 預設資料：加入「🖼️ 壁畫」主題，以及三張預設卡片
 let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
 let customThemes = [];
+let flowerCards = [];
+let mushroomCards = [];
 
-let flowerCards = [
-  { id: 'f1', name: 'Sky Mural', loc: '坦帕，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '27.969331, -82.563688', icon: '🌸', tz: 'America/New_York', owned: false, favorite: false, img: null, originalImg: null, cropData: null }
-];
-let mushroomCards = [
-  { id: 'm1', name: 'Landscape Mural', loc: 'North Central Pensacola 彭薩科拉，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '30.460962, -87.304969', icon: '🍄', tz: 'America/Chicago', owned: false, favorite: false, img: null, originalImg: null, cropData: null },
-  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa，賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: true, img: null, originalImg: null, cropData: null }
-];
-
-// 🌟 ── 本地儲存 (Local Storage) 功能區塊 ── 🌟
-// 加上防護機制，避免儲存失敗導致程式崩潰
 function loadDataFromLocal() {
     try {
         const localFlower = localStorage.getItem('pikmin_flowerCards');
@@ -692,20 +839,23 @@ function loadDataFromLocal() {
     }
 }
 
-function saveDataToLocal() {
+// 🌟 修改：儲存到本地的同時，背景上傳到雲端 🌟
+function saveDataToLocal(skipCloud = false) {
     try {
         localStorage.setItem('pikmin_flowerCards', JSON.stringify(flowerCards));
         localStorage.setItem('pikmin_mushroomCards', JSON.stringify(mushroomCards));
         localStorage.setItem('pikmin_customThemes', JSON.stringify(customThemes));
+        
+        if(!skipCloud) {
+            uploadToCloud();
+        }
     } catch (e) {
-        console.error('儲存本地資料失敗:', e);
-        if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-            showToast('⚠️ 瀏覽器儲存空間已滿，請清理不必要的照片');
+        if (e.name === 'QuotaExceededError') {
+            showToast('⚠️ 瀏覽器儲存空間已滿');
         }
     }
 }
 
-// 網頁一載入，就先從本地讀取資料
 loadDataFromLocal();
 
 
@@ -726,7 +876,6 @@ let filesToCrop = [];
 let currentCropIndex = 0;
 let cropperInstance = null;
 
-// 🌟 新增：用於判斷目前是在上傳裁切，還是編輯裁切，以及儲存座標
 let cropMode = 'upload';
 let tempEditImg = null;
 let tempEditOriginalImg = null;
@@ -844,13 +993,12 @@ function handleFiles(files) {
   document.getElementById('file-input').value = "";
 }
 
-// 縮圖以便雲端辨識
 async function resizeForOCR(imgUrl) {
     return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const maxDim = 800; // 限制雙邊最大尺寸
+            const maxDim = 800;
             let scale = 1;
             if (img.width > maxDim || img.height > maxDim) {
                 scale = Math.min(maxDim / img.width, maxDim / img.height);
@@ -859,7 +1007,7 @@ async function resizeForOCR(imgUrl) {
             canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.7)); // 加快壓縮速度
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
         };
         img.src = imgUrl;
     });
@@ -878,7 +1026,6 @@ function startCropNext() {
   reader.onload = async (e) => {
     const originalImgUrl = e.target.result;
     
-    // 背景預縮圖並啟動 OCR 辨識
     const smallImgForOcr = await resizeForOCR(originalImgUrl);
     preloadOCR(currentCropIndex, smallImgForOcr);
     
@@ -911,14 +1058,13 @@ function startCropNext() {
   reader.readAsDataURL(file);
 }
 
-// 處理編輯視窗的單張照片上傳
 function handleEditFileUpload(files) {
     if(files.length === 0) return;
     const file = files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
         tempEditOriginalImg = e.target.result;
-        tempEditCropData = null; // 🌟 重新上傳照片時清空原本的裁切座標
+        tempEditCropData = null; 
         cropMode = 'edit';
         const imageTarget = document.getElementById('crop-image-target');
         openModal('cropModal');
@@ -954,7 +1100,6 @@ function handleEditFileUpload(files) {
     document.getElementById('edit-file-input').value = "";
 }
 
-// 🌟 新增：由編輯面板觸發的重新裁切，包含還原原本位置
 function startEditCrop() {
   const list = currentEditCat === 'flower' ? flowerCards : mushroomCards;
   const c = list.find(x => x.id == currentEditId);
@@ -962,7 +1107,6 @@ function startEditCrop() {
   const targetOriginal = tempEditOriginalImg || c.originalImg;
   if (!targetOriginal) return;
   
-  // 確保沒上傳新照片時，能帶入既有的儲存座標
   if (!tempEditOriginalImg) {
       tempEditCropData = c.cropData || null;
   }
@@ -988,7 +1132,6 @@ function startEditCrop() {
           restore: true,
           ready: function() {
               if (tempEditCropData && tempEditCropData.canvasData) {
-                  // 🌟 加上微小延遲確保 Cropper 完全載入後才套用舊座標
                   setTimeout(() => {
                       cropperInstance.setCanvasData(tempEditCropData.canvasData);
                       cropperInstance.setCropBoxData(tempEditCropData.cropBoxData);
@@ -1001,7 +1144,6 @@ function startEditCrop() {
   imageTarget.src = targetOriginal;
 }
 
-// 🌟 修改處：強化 OCR 辨識的排除名單過濾掉社群軟體雜訊 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -1018,7 +1160,6 @@ async function preloadOCR(fileIndex, imgUrl) {
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
         let foundCoord = '';
         
-        // 🌟 修改處：相容了中文逗號 `，` 的座標寫法
         const coordRegex = /-?\d{1,3}\.\d+\s*[,，]\s*-?\d{1,3}\.\d+/;
         
         for(let i=0; i<lines.length; i++){
@@ -1029,7 +1170,6 @@ async function preloadOCR(fileIndex, imgUrl) {
             }
         }
 
-        // 🌟 修改處：加入了 IG / Threads 截圖常見的介面字眼
         const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日', '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽', '明信片', '皮克敏', '最相關', '回覆', '送出'];
         const validLines = lines.filter(l => {
             const lower = l.toLowerCase();
@@ -1088,7 +1228,6 @@ function applyOcrToBatch(fileIndex) {
     }
 }
 
-// 🌟 修改：共用 confirmCrop (判斷是上傳還是編輯，並儲存精準座標)
 function confirmCrop() {
   if (!cropperInstance) return;
   const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
@@ -1102,7 +1241,7 @@ function confirmCrop() {
   };
 
   if (cropMode === 'edit') {
-      tempEditCropData = currentCropData; // 🌟 儲存座標資訊
+      tempEditCropData = currentCropData; 
       tempEditImg = croppedImgUrl;
       const imgPre = document.getElementById('edit-img-preview');
       imgPre.src = tempEditImg;
@@ -1117,7 +1256,7 @@ function confirmCrop() {
       return;
   }
   
-  const cropData = cropperInstance.getData(); // 🌟 儲存上傳時的座標資訊
+  const cropData = cropperInstance.getData(); 
   const batchIdx = tempBatchList.length;
   
   tempBatchList.push({
@@ -1150,7 +1289,7 @@ function cancelCrop() {
   if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
   
   if (cropMode === 'edit') {
-      cropMode = 'upload'; // 復原狀態
+      cropMode = 'upload'; 
       return;
   }
 
@@ -1181,7 +1320,6 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
-// 確保等待 fetch 結束後再重新抓取 DOM，避免被重新渲染洗掉
 async function fetchLocationForBatchItem(index, lat, lon) {
     let locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
@@ -1202,7 +1340,6 @@ async function fetchLocationForBatchItem(index, lat, lon) {
             
             tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country;
             
-            // 重新抓取 DOM，以防在等待期間畫面已重新渲染
             locPreview = document.getElementById(`batch-loc-preview-${index}`);
             if(locPreview) locPreview.innerText = `📍 ${tempBatchList[index].loc}`;
         } else {
@@ -1329,7 +1466,6 @@ function handleBatchSave() {
   showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`);
   closeModal('uploadModal'); refreshCurrentView();
   
-  // 🌟 加入儲存到本地
   saveDataToLocal();
 }
 
@@ -1377,7 +1513,6 @@ function saveThemeAction() {
     showToast('🎨 主題已新增');
   }
   
-  // 🌟 加入儲存到本地
   saveDataToLocal();
 }
 
@@ -1434,7 +1569,6 @@ function deleteCustomTheme(idx) {
   openManageThemeModal(); 
   refreshCurrentView();
   
-  // 🌟 加入儲存到本地
   saveDataToLocal();
 }
 
@@ -1451,10 +1585,9 @@ function promptEdit(e, cat, id) {
   const c = list.find(x => x.id == id);
   if(!c) return;
   
-  // 🌟 更新：編輯彈窗內的重新裁切縮圖顯示與座標
   tempEditImg = c.img;
   tempEditOriginalImg = null; 
-  tempEditCropData = c.cropData || null; // 🌟 載入已存的座標資訊
+  tempEditCropData = c.cropData || null; 
   const imgSec = document.getElementById('edit-img-section');
   const imgPre = document.getElementById('edit-img-preview');
   const btnRecrop = document.getElementById('btn-recrop-img');
@@ -1587,8 +1720,8 @@ function saveEdit() {
     c.tz = currentEditTz; 
     
     if (tempEditImg) c.img = tempEditImg; 
-    if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; // 儲存新上傳的原始圖片
-    if (tempEditCropData) c.cropData = tempEditCropData; // 🌟 儲存本次更新的座標
+    if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; 
+    if (tempEditCropData) c.cropData = tempEditCropData; 
     
     const locParts = nl.split(/[,，]/);
     c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl);
@@ -1605,7 +1738,6 @@ function saveEdit() {
   closeModal('editModal');
   showToast('✅ 明信片已更新');
   
-  // 🌟 加入儲存到本地
   saveDataToLocal();
 }
 
@@ -1690,7 +1822,6 @@ function handleDragEnd(e, el) {
   dragStartY = 0;
 }
 
-// 🌟 修改處 2：加上彈出取消收藏確認視窗的邏輯
 function toggleOwned(e, cat, id) {
   if (e && e.target && (e.target.closest('.mac-btns-container') || e.target.closest('.coord-btn'))) return;
   
@@ -1710,7 +1841,6 @@ function toggleOwned(e, cat, id) {
   }
 }
 
-// 🌟 確保點擊收藏夾的按鈕也能正常叫出確認視窗
 function executeToggleOwnedBtn(e, cat, id) {
     e.stopPropagation();
     const list = cat === 'flower' ? flowerCards : mushroomCards;
@@ -1721,7 +1851,6 @@ function executeToggleOwnedBtn(e, cat, id) {
     }
 }
 
-// 🌟 取消收藏邏輯
 function executeCancelOwned() { 
   if(pendingRemoveCard) { 
     pendingRemoveCard.owned = false; 
@@ -1731,7 +1860,6 @@ function executeCancelOwned() {
   closeModal('confirmModal'); 
 }
 
-// 供「刪除明信片」時呼叫儲存
 function executeHardDelete() { 
   if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); 
   else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); 
@@ -1740,7 +1868,6 @@ function executeHardDelete() {
   saveDataToLocal();
 }
 
-// 供「最愛星號」切換時儲存
 function toggleFavorite(e, cat, id) { 
   e.stopPropagation(); 
   const list = cat==='flower'?flowerCards:mushroomCards; 
@@ -1753,7 +1880,6 @@ function toggleFavorite(e, cat, id) {
   } 
 }
 
-// 🌟 加入「我的收藏」層疊卡片點擊展開與放大的處理函數 🌟
 function toggleStackCard(cardEl) {
   const isExpanded = cardEl.classList.contains('expanded');
   document.querySelectorAll('.stack-card.expanded').forEach(el => {
@@ -1767,6 +1893,9 @@ function toggleStackCard(cardEl) {
 }
 
 function handleStackThumbClick(e, imgSrc, thumbEl) {
+  if (e.target.closest('.stack-indicator') || e.target.closest('.stack-title') || e.target.closest('.stack-time-badge')) {
+      return; 
+  }
   const card = thumbEl.closest('.stack-card');
   if (card.classList.contains('expanded') && imgSrc && imgSrc !== 'null' && imgSrc !== '') {
      e.stopPropagation();
@@ -1969,13 +2098,13 @@ function copyCoord(e, c) { e.stopPropagation(); const b = e.currentTarget; b.tex
 function openModal(id) { 
   document.getElementById(id).classList.add('open'); 
   document.getElementById('global-nav').classList.add('hidden-dock');
-  document.body.style.overflow = 'hidden'; // 🌟 加入防滑動鎖定
+  document.body.style.overflow = 'hidden'; 
 }
 function closeModal(id) { 
   document.getElementById(id).classList.remove('open'); 
   if (document.querySelectorAll('.modal-overlay.open').length === 0) {
       document.getElementById('global-nav').classList.remove('hidden-dock');
-      document.body.style.overflow = ''; // 🌟 解除防滑動鎖定
+      document.body.style.overflow = ''; 
   }
   if(id==='confirmModal') pendingRemoveCard = null; 
 }
@@ -2038,7 +2167,6 @@ function enableDragScroll() {
   });
 }
 
-// 🌟 初始化彈窗下拉關閉功能
 function initModalDrag() {
     document.querySelectorAll('.modal-handle').forEach(handle => {
         let startY = 0;
@@ -2074,10 +2202,9 @@ function initModalDrag() {
     });
 }
 
-// 執行初始渲染
 setTimeout(() => { 
   goTo('home'); 
-  initModalDrag(); // 🌟 啟動下拉關閉偵測
+  initModalDrag(); 
 }, 50);
 </script>
 </body>
