@@ -463,8 +463,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   <div class="home-body">
     <div class="home-section-title">瀏覽分類</div>
     <div class="category-grid">
-      <button class="cat-btn flower-btn" onclick="goTo('flower')"><span class="cat-icon">🌸</span><div class="cat-label">花點</div><div class="cat-count" id="stat-f-total">1 張</div></button>
-      <button class="cat-btn mushroom-btn" onclick="goTo('mushroom')"><span class="cat-icon">🍄</span><div class="cat-label">菇點</div><div class="cat-count" id="stat-m-total">2 張</div></button>
+      <button class="cat-btn flower-btn" onclick="goTo('flower')"><span class="cat-icon">🌸</span><div class="cat-label">花點</div><div class="cat-count" id="stat-f-total">0 張</div></button>
+      <button class="cat-btn mushroom-btn" onclick="goTo('mushroom')"><span class="cat-icon">🍄</span><div class="cat-label">菇點</div><div class="cat-count" id="stat-m-total">0 張</div></button>
     </div>
     <div class="home-section-title">快速搜尋</div>
     <div class="search-wrapper">
@@ -583,6 +583,13 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   <div class="modal">
     <div class="modal-handle"></div><div class="modal-title">修改明信片資訊</div>
     
+    <div id="edit-img-section" style="display:none; text-align:center; margin-bottom:16px;">
+      <img id="edit-img-preview" src="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 16px; border: 1.5px solid var(--border); margin-bottom: 8px;">
+      <div>
+        <button class="filter-pill" style="margin: 0 auto; display:inline-flex;" onclick="startEditCrop()">✂️ 重新裁切原圖</button>
+      </div>
+    </div>
+
     <div class="edit-label">明信片名稱：</div>
     <div class="edit-input-wrapper">
       <input type="text" id="edit-name-input" class="edit-text-input no-icon" placeholder="輸入明信片名稱">
@@ -618,20 +625,44 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 <div class="toast" id="toast"></div>
 
 <script>
-// ── 🌟 已整合你的 GAS 網址 ──
+// 🌟 你的 GAS 網址 🌟
 const GAS_CLOUD_OCR_URL = 'https://script.google.com/macros/s/AKfycbxoCUQ4V-xHV77p4WwB29o3jq8Di4ZGyGXXE9ob2DtZ-f7FwQZBYY9m6lQHwCcOIzHvvQ/exec';
 
 // ── DATA ──
+// 🌟 預設資料：加入「🖼️ 壁畫」主題，以及三張預設卡片
+let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
+let customThemes = [];
+
 let flowerCards = [
-  { id: 'f1', name: 'Casa Batlló', loc: '巴塞隆納，西班牙', country: '西班牙', themes: ['🏛️ 歷史古蹟'], coord: '41.391600, 2.165000', icon: '🏛️', tz: 'Europe/Madrid', owned: false, favorite: false, img: null, originalImg: null },
+  { id: 'f1', name: 'Sky Mural', loc: '坦帕，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '27.969331, -82.563688', icon: '🌸', tz: 'America/New_York', owned: false, favorite: false, img: null, originalImg: null }
 ];
 let mushroomCards = [
-  { id: 'm1', name: 'Fushimi Inari Taisha', loc: '京都市，日本', country: '日本', themes: ['⛩️ 神社'], coord: '34.967100, 135.772700', icon: '⛩️', tz: 'Asia/Tokyo', owned: false, favorite: true, img: null, originalImg: null },
-  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa, 賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: false, img: null, originalImg: null },
+  { id: 'm1', name: 'Landscape Mural', loc: 'North Central Pensacola 彭薩科拉，美國', country: '美國', themes: ['🖼️ 壁畫'], coord: '30.460962, -87.304969', icon: '🍄', tz: 'America/Chicago', owned: false, favorite: false, img: null, originalImg: null },
+  { id: 'm2', name: 'Natural Rock Bridge of Koraka', loc: 'Ayia Napa，賽普勒斯', country: '賽普勒斯', themes: ['🏞️ 自然景觀'], coord: '34.971831, 34.075301', icon: '🍄', tz: 'Asia/Nicosia', owned: true, favorite: true, img: null, originalImg: null }
 ];
 
-let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標'];
-let customThemes = ['🐱 貓咪'];
+// 🌟 ── 本地儲存 (Local Storage) 功能區塊 ── 🌟
+function loadDataFromLocal() {
+    const localFlower = localStorage.getItem('pikmin_flowerCards');
+    if (localFlower) flowerCards = JSON.parse(localFlower);
+
+    const localMushroom = localStorage.getItem('pikmin_mushroomCards');
+    if (localMushroom) mushroomCards = JSON.parse(localMushroom);
+
+    const localCustomThemes = localStorage.getItem('pikmin_customThemes');
+    if (localCustomThemes) customThemes = JSON.parse(localCustomThemes);
+}
+
+function saveDataToLocal() {
+    localStorage.setItem('pikmin_flowerCards', JSON.stringify(flowerCards));
+    localStorage.setItem('pikmin_mushroomCards', JSON.stringify(mushroomCards));
+    localStorage.setItem('pikmin_customThemes', JSON.stringify(customThemes));
+}
+
+// 網頁一載入，就先從本地讀取資料
+loadDataFromLocal();
+
+
 let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵'];
 let currentNewThemeEmoji = '✨';
 
@@ -648,6 +679,10 @@ let currentEditTz = '';
 let filesToCrop = [];
 let currentCropIndex = 0;
 let cropperInstance = null;
+
+// 🌟 新增：用於判斷目前是在上傳裁切，還是編輯裁切
+let cropMode = 'upload';
+let tempEditImg = null;
 
 let dragStartX = 0;
 let dragStartY = 0;
@@ -761,19 +796,19 @@ function handleFiles(files) {
   document.getElementById('file-input').value = "";
 }
 
-// ── 🌟 新增功能：縮圖以便雲端辨識 ──
+// 縮圖以便雲端辨識
 async function resizeForOCR(imgUrl) {
     return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const maxW = 1000; // 縮小到 1000px 寬度，對 OCR 來說足夠且檔案極小
+            const maxW = 1000; 
             const scale = maxW / img.width;
             canvas.width = maxW;
             canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.8)); // 壓縮為 jpeg 80% 品質
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); 
         };
         img.src = imgUrl;
     });
@@ -792,10 +827,11 @@ function startCropNext() {
   reader.onload = async (e) => {
     const originalImgUrl = e.target.result;
     
-    // 🌟 背景預縮圖並啟動 OCR 辨識 🌟
+    // 背景預縮圖並啟動 OCR 辨識
     const smallImgForOcr = await resizeForOCR(originalImgUrl);
     preloadOCR(currentCropIndex, smallImgForOcr);
     
+    cropMode = 'upload'; // 🌟 確保為上傳模式
     const imageTarget = document.getElementById('crop-image-target');
     openModal('cropModal'); 
     
@@ -822,13 +858,41 @@ function startCropNext() {
   reader.readAsDataURL(file);
 }
 
-// 🌟 修改後的雲端 OCR 辨識邏輯 🌟
+// 🌟 新增：由編輯面板觸發的重新裁切
+function startEditCrop() {
+  const list = currentEditCat === 'flower' ? flowerCards : mushroomCards;
+  const c = list.find(x => x.id == currentEditId);
+  if (!c || !c.originalImg) return;
+  
+  cropMode = 'edit';
+  const imageTarget = document.getElementById('crop-image-target');
+  openModal('cropModal'); 
+  
+  imageTarget.onload = () => {
+    setTimeout(() => {
+      if (cropperInstance) { cropperInstance.destroy(); }
+      cropperInstance = new Cropper(imageTarget, {
+          aspectRatio: 3 / 2, 
+          viewMode: 1, 
+          dragMode: 'move', 
+          autoCropArea: 1, 
+          background: false, 
+          guides: true, 
+          center: true, 
+          zoomable: true, 
+          toggleDragModeOnDblclick: false 
+      });
+    }, 150); 
+  };
+  imageTarget.src = c.originalImg;
+}
+
+// 雲端 OCR 辨識邏輯
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
         const base64Image = imgUrl.split(',')[1];
         
-        // 呼叫你的 GAS 雲端 API
         const response = await fetch(GAS_CLOUD_OCR_URL, {
             method: 'POST',
             body: JSON.stringify({ image: base64Image })
@@ -904,12 +968,23 @@ function applyOcrToBatch(fileIndex) {
     }
 }
 
-
+// 🌟 修改：共用 confirmCrop (判斷是上傳還是編輯)
 function confirmCrop() {
   if (!cropperInstance) return;
   const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
   const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.85);
   const originalImgUrl = document.getElementById('crop-image-target').src;
+  
+  if (cropMode === 'edit') {
+      tempEditImg = croppedImgUrl;
+      const imgPre = document.getElementById('edit-img-preview');
+      imgPre.src = tempEditImg;
+      imgPre.style.display = 'inline-block';
+      closeModal('cropModal');
+      cropperInstance.destroy(); cropperInstance = null;
+      cropMode = 'upload'; // 復原狀態
+      return;
+  }
   
   const batchIdx = tempBatchList.length;
   
@@ -940,6 +1015,12 @@ function confirmCrop() {
 function cancelCrop() {
   closeModal('cropModal');
   if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+  
+  if (cropMode === 'edit') {
+      cropMode = 'upload'; // 復原狀態
+      return;
+  }
+
   currentCropIndex++;
   startCropNext();
 }
@@ -1090,7 +1171,8 @@ function handleBatchSave() {
   tempBatchList.forEach(item => {
     const n = item.name.toLowerCase();
     let theme = '🏞️ 自然景觀';
-    if (n.includes('temple') || n.includes('shrine') || n.includes('palace') || n.includes('之家') || n.includes('mila')) theme = '🏛️ 歷史古蹟';
+    if (n.includes('temple') || n.includes('shrine') || n.includes('palace') || n.includes('之家') || n.includes('mila') || n.includes('mural')) theme = '🏛️ 歷史古蹟';
+    if (item.themes && item.themes.length) theme = item.themes[0];
     
     const locParts = (item.loc || '').split(/[,，]/);
     const country = locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc;
@@ -1107,6 +1189,9 @@ function handleBatchSave() {
   });
   showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`);
   closeModal('uploadModal'); refreshCurrentView();
+  
+  // 🌟 加入儲存到本地
+  saveDataToLocal();
 }
 
 function openAddThemeModal() {
@@ -1152,6 +1237,9 @@ function saveThemeAction() {
     refreshCurrentView();
     showToast('🎨 主題已新增');
   }
+  
+  // 🌟 加入儲存到本地
+  saveDataToLocal();
 }
 
 function openManageThemeModal() {
@@ -1206,6 +1294,9 @@ function deleteCustomTheme(idx) {
   showToast(`🗑️ 已移除 ${t}`);
   openManageThemeModal(); 
   refreshCurrentView();
+  
+  // 🌟 加入儲存到本地
+  saveDataToLocal();
 }
 
 function setEditType(type) {
@@ -1221,14 +1312,23 @@ function promptEdit(e, cat, id) {
   const c = list.find(x => x.id == id);
   if(!c) return;
   
+  // 🌟 更新：編輯彈窗內的重新裁切縮圖顯示
+  tempEditImg = c.img;
+  const imgSec = document.getElementById('edit-img-section');
+  const imgPre = document.getElementById('edit-img-preview');
+  const btnRecrop = imgSec.querySelector('button');
+  if (c.img || c.icon) {
+      imgSec.style.display = 'block';
+      if(c.img) { imgPre.style.display = 'inline-block'; imgPre.src = c.img; } else { imgPre.style.display = 'none'; }
+      if (c.originalImg) { btnRecrop.style.display = 'inline-flex'; } else { btnRecrop.style.display = 'none'; }
+  } else { imgSec.style.display = 'none'; }
+
   document.getElementById('edit-name-input').value = c.name;
-  
   document.getElementById('edit-loc-input').value = c.loc || '';
   currentEditCountry = c.country || '';
   currentEditTz = c.tz || Intl.DateTimeFormat().resolvedOptions().timeZone; 
 
   setEditType(cat);
-
   originalCoordBeforeEdit = c.coord;
   document.getElementById('edit-coord-input').value = c.coord;
   tempEditThemes = [...c.themes];
@@ -1333,6 +1433,8 @@ function saveEdit() {
     c.loc = nl; 
     c.tz = currentEditTz; 
     
+    c.img = tempEditImg; // 🌟 更新儲存重新裁切後的圖片
+    
     const locParts = nl.split(/[,，]/);
     c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl);
     
@@ -1347,6 +1449,9 @@ function saveEdit() {
   }
   closeModal('editModal');
   showToast('✅ 明信片已更新');
+  
+  // 🌟 加入儲存到本地
+  saveDataToLocal();
 }
 
 function showLightbox(imgSrc) {
@@ -1430,7 +1535,10 @@ function handleDragEnd(e, el) {
   dragStartY = 0;
 }
 
-function toggleOwned(cat, id) {
+function toggleOwned(e, cat, id) {
+  // 🌟 修改處：如果點擊的是按鈕區塊，直接中止，防止觸發「收藏功能」
+  if (e && e.target && (e.target.closest('.mac-btns-container') || e.target.closest('.coord-btn'))) return;
+  
   if(isSwiping) { isSwiping = false; return; }
   const list = cat === 'flower' ? flowerCards : mushroomCards;
   const c = list.find(x => x.id == id);
@@ -1442,8 +1550,45 @@ function toggleOwned(cat, id) {
       c.owned = true; 
       showToast('✅ 標記為已擁有'); 
       refreshCurrentView(); 
+      // 🌟 加入儲存到本地
+      saveDataToLocal();
     }
   }
+}
+
+// 供「取消收藏」時呼叫儲存
+function executeCancelOwned() { 
+  if(pendingRemoveCard) { 
+    pendingRemoveCard.owned = false; 
+    refreshCurrentView(); 
+    // 🌟 加入儲存到本地
+    saveDataToLocal();
+  } 
+  closeModal('confirmModal'); 
+}
+
+// 供「刪除明信片」時呼叫儲存
+function executeHardDelete() { 
+  if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); 
+  else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); 
+  refreshCurrentView(); 
+  closeModal('deleteConfirmModal'); 
+  // 🌟 加入儲存到本地
+  saveDataToLocal();
+}
+
+// 供「最愛星號」切換時儲存
+function toggleFavorite(e, cat, id) { 
+  e.stopPropagation(); 
+  const list = cat==='flower'?flowerCards:mushroomCards; 
+  const card = list.find(x => x.id == id); 
+  if(card){ 
+    card.favorite = !card.favorite; 
+    showToast(card.favorite?'⭐ 已加入最愛':'⚪ 已取消最愛'); 
+    refreshCurrentView(); 
+    // 🌟 加入儲存到本地
+    saveDataToLocal();
+  } 
 }
 
 function cardHTML(c, thumbClass, cat) {
@@ -1456,7 +1601,7 @@ function cardHTML(c, thumbClass, cat) {
       <div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除
       </div>
-      <div class="postcard ${isOwnedClass}" onclick="toggleOwned('${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)">
+      <div class="postcard ${isOwnedClass}" onclick="toggleOwned(event, '${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)">
         
         <div class="postcard-thumb ${thumbClass}">
           ${thumbContent}
@@ -1535,6 +1680,19 @@ function stackCardHTML(c, cat) {
   `;
 }
 
+// 供「我的收藏」卡片內「取消收藏」按鈕使用
+function executeToggleOwnedBtn(e, cat, id) {
+    e.stopPropagation();
+    const list = cat === 'flower' ? flowerCards : mushroomCards;
+    const c = list.find(x => x.id == id);
+    if(c) {
+        c.owned = false;
+        refreshCurrentView();
+        // 🌟 加入儲存到本地
+        saveDataToLocal();
+    }
+}
+
 function handleGlobalSearch() {
   const q = document.getElementById('global-search').value.toLowerCase();
   const res = document.getElementById('search-results-section');
@@ -1604,7 +1762,7 @@ function renderCat(cat, mode) {
     }
   });
   
-  if (cf === '全部' && bH === '') bH = '<div style="text-align:center; padding:40px; color:var(--sub);">收集完畢！🎉</div>';
+  if (cf === '全部' && bH === '') bH = '<div style="text-align:center; padding:40px; color:var(--sub);">快去收集明信片吧！</div>';
   body.innerHTML = bH;
 }
 
@@ -1624,8 +1782,6 @@ function renderOwned() {
   body.innerHTML = h;
 }
 
-// ── UTILS ──
-function toggleFavorite(e, cat, id) { e.stopPropagation(); const list = cat==='flower'?flowerCards:mushroomCards; const card = list.find(x => x.id == id); if(card){ card.favorite = !card.favorite; showToast(card.favorite?'⭐ 已加入最愛':'⚪ 已取消最愛'); refreshCurrentView(); } }
 function resetEditInput() { document.getElementById('edit-coord-input').value = originalCoordBeforeEdit; showToast('🔄 已還原'); }
 function switchSubTab(cat, tab, el) { 
   const s = document.getElementById('screen-'+cat); 
@@ -1637,9 +1793,7 @@ function switchSubTab(cat, tab, el) {
 }
 function applyFilter(cat, mode, val) { activeFilters[cat] = val; refreshCurrentView(); }
 function toggleHideOwned(cat) { hideOwnedState[cat] = !hideOwnedState[cat]; refreshCurrentView(); }
-function executeCancelOwned() { if(pendingRemoveCard) { pendingRemoveCard.owned = false; refreshCurrentView(); } closeModal('confirmModal'); }
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
-function executeHardDelete() { if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); refreshCurrentView(); closeModal('deleteConfirmModal'); }
 function copyCoord(e, c) { e.stopPropagation(); const b = e.currentTarget; b.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { b.textContent = c; }, 2000); }
 
 function openModal(id) { 
