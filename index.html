@@ -618,14 +618,14 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
     
     <div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px; width: 100%; -webkit-overflow-scrolling: touch;">
       
-      <div id="edit-img-section" style="text-align:center; margin-bottom:24px; display:flex; flex-direction:column; align-items:center; margin-top: 10px;">
+      <div id="edit-img-section" style="text-align:center; margin-bottom:24px; display:flex; flex-direction:column; align-items:center; margin-top: 10px; cursor: pointer;" onclick="startEditCrop()">
         <div style="position: relative; display: inline-block;">
           <img id="edit-img-preview" src="" style="width: 120px; height: 120px; object-fit: cover; border-radius: 20px; border: 2px solid var(--border); display:none; box-shadow: var(--shadow);">
-          <button id="btn-recrop-img" onclick="startEditCrop()" style="position: absolute; top: -8px; right: -8px; width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 1.5px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: none; align-items: center; justify-content: center; color: var(--text); padding:0;">
+          <button id="btn-recrop-img" style="position: absolute; top: -8px; right: -8px; width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 1.5px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: none; align-items: center; justify-content: center; color: var(--text); padding:0; pointer-events: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px; pointer-events:none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
           </button>
         </div>
-        <div id="btn-add-edit-img" onclick="document.getElementById('edit-file-input').click()" style="width: 120px; height: 120px; border-radius: 20px; border: 2px dashed var(--border); background: #f9fbf9; display: none; align-items: center; justify-content: center; cursor: pointer; color: var(--sub); box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
+        <div id="btn-add-edit-img" onclick="event.stopPropagation(); document.getElementById('edit-file-input').click()" style="width: 120px; height: 120px; border-radius: 20px; border: 2px dashed var(--border); background: #f9fbf9; display: none; align-items: center; justify-content: center; cursor: pointer; color: var(--sub); box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
         </div>
         <input type="file" id="edit-file-input" accept="image/*" style="display:none;" onchange="handleEditFileUpload(this.files)">
@@ -674,13 +674,10 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
 
 let tokenClient;
 let gisInited = false;
-
-// 🌟 新增：改從 LocalStorage 讀取記憶的 Token 和過期時間，關閉分頁也不會消失 🌟
 let currentAccessToken = localStorage.getItem('pikmin_access_token') || null; 
 let tokenExpiry = localStorage.getItem('pikmin_token_expiry') || null;
 let driveFileId = localStorage.getItem('pikmin_driveFileId') || null;
 
-// 🌟 初始化 Google 登入 (GIS) 🌟
 function gisLoaded() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
@@ -691,7 +688,6 @@ function gisLoaded() {
                 return; 
             }
             currentAccessToken = resp.access_token;
-            // 🌟 存入 localStorage (大約 1 小時過期，我們設 50 分鐘策安全)
             localStorage.setItem('pikmin_access_token', currentAccessToken);
             localStorage.setItem('pikmin_token_expiry', Date.now() + 50 * 60 * 1000);
             
@@ -701,9 +697,7 @@ function gisLoaded() {
         },
     });
     gisInited = true;
-    console.log("✅ Google 登入套件載入成功");
-
-    // 🌟 網頁一打開，如果鑰匙還沒過期，就自動背景連線同步！
+    
     if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
         document.getElementById('cloud-sync-btn').innerText = '🔄';
         document.getElementById('cloud-sync-btn').classList.add('synced');
@@ -711,44 +705,32 @@ function gisLoaded() {
     }
 }
 
-// 點擊雲端按鈕
 function handleAuthClick() {
     if (GOOGLE_CLIENT_ID.includes('你的_')) {
         showToast('⚠️ 請先填寫 Client ID');
         return;
     }
-    
     if (!gisInited) {
         showToast('⏳ 系統準備中，請稍後再試');
         return;
     }
-
-    // 🌟 檢查是否已經有記憶的 Token 且還沒過期
     if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
-        // 如果還活著，手動點擊就當作強制同步
         document.getElementById('cloud-sync-btn').innerText = '🔄';
         checkAndSyncDriveFile();
     } else {
-        // 🌟 如果過期了，向 Google 要新鑰匙 (因為之前同意過，視窗會閃退，不需再次授權)
         tokenClient.requestAccessToken();
     }
 }
 
-// 尋找雲端是否有存檔，有就下載，沒有就建立 (純 fetch 版)
 async function checkAndSyncDriveFile() {
     try {
         showToast('🔄 正在連接 Google Drive...');
-        
-        // 呼叫 Drive API (List)
         const response = await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='pikmin_data_v1.json'&fields=files(id,name)`, {
             headers: { 'Authorization': 'Bearer ' + currentAccessToken }
         });
-        
         if (!response.ok) throw new Error('Network response was not ok');
-        
         const data = await response.json();
         const files = data.files;
-        
         if (files && files.length > 0) {
             driveFileId = files[0].id;
             localStorage.setItem('pikmin_driveFileId', driveFileId);
@@ -756,7 +738,6 @@ async function checkAndSyncDriveFile() {
         } else {
             await createInDrive();
         }
-        
         document.getElementById('cloud-sync-btn').innerText = '☁️';
         document.getElementById('cloud-sync-btn').style.background = '#4caf6e';
         document.getElementById('cloud-sync-btn').style.borderColor = '#fff';
@@ -769,22 +750,19 @@ async function checkAndSyncDriveFile() {
     }
 }
 
-// 下載雲端資料並覆蓋本地 (純 fetch 版)
 async function downloadFromDrive() {
     try {
         const response = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
             headers: { 'Authorization': 'Bearer ' + currentAccessToken }
         });
-        
         if (!response.ok) throw new Error('Download failed');
-        
         const dataObj = await response.json();
         
         if(dataObj.flowerCards) flowerCards = dataObj.flowerCards;
         if(dataObj.mushroomCards) mushroomCards = dataObj.mushroomCards;
         if(dataObj.customThemes) customThemes = dataObj.customThemes;
         
-        saveDataToLocal(true); // 存入 localStorage 但不觸發再次上傳
+        saveDataToLocal(true); 
         refreshCurrentView();
         showToast('✅ 已從雲端載入最新資料');
     } catch (err) {
@@ -792,13 +770,10 @@ async function downloadFromDrive() {
     }
 }
 
-// 將目前的資料寫入雲端硬碟 (純 fetch 版)
 async function uploadToCloud() {
     if (!driveFileId || !currentAccessToken) return;
-    
     const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: new Date().toISOString() });
     const file = new Blob([fileContent], {type: 'application/json'});
-    
     const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify({mimeType: 'application/json'})], {type: 'application/json'}));
     form.append('file', file);
@@ -815,14 +790,11 @@ async function uploadToCloud() {
     }
 }
 
-// 初次建立雲端檔案 (純 fetch 版)
 async function createInDrive() {
     if (!currentAccessToken) return;
-
     const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: new Date().toISOString() });
     const file = new Blob([fileContent], {type: 'application/json'});
     const metadata = { name: 'pikmin_data_v1.json', parents: ['appDataFolder'], mimeType: 'application/json' };
-    
     const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
     form.append('file', file);
@@ -866,18 +838,23 @@ function loadDataFromLocal() {
     }
 }
 
+// 🌟 修改處 1：智慧瘦身存檔機制 🌟
 function saveDataToLocal(skipCloud = false) {
     try {
-        localStorage.setItem('pikmin_flowerCards', JSON.stringify(flowerCards));
-        localStorage.setItem('pikmin_mushroomCards', JSON.stringify(mushroomCards));
+        // 將耗空間的 originalImg 從本機快取剔除，避免 5MB 限制爆滿
+        const localFlower = flowerCards.map(c => ({...c, originalImg: null}));
+        const localMushroom = mushroomCards.map(c => ({...c, originalImg: null}));
+
+        localStorage.setItem('pikmin_flowerCards', JSON.stringify(localFlower));
+        localStorage.setItem('pikmin_mushroomCards', JSON.stringify(localMushroom));
         localStorage.setItem('pikmin_customThemes', JSON.stringify(customThemes));
         
         if(!skipCloud) {
             uploadToCloud();
         }
     } catch (e) {
-        if (e.name === 'QuotaExceededError') {
-            showToast('⚠️ 瀏覽器儲存空間已滿');
+        if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+            showToast('⚠️ 瀏覽器儲存空間已滿，請確保已連接 Google Drive 備份');
         }
     }
 }
@@ -1170,7 +1147,7 @@ function startEditCrop() {
   imageTarget.src = targetOriginal;
 }
 
-// 🌟 你的 GAS 腳本呼叫邏輯 🌟
+// 🌟 修改處 3：大幅增強社群平台截圖的雜訊過濾邏輯 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -1197,15 +1174,35 @@ async function preloadOCR(fileIndex, imgUrl) {
             }
         }
 
-        const ignoreList = ['pikmin', 'bloom', '一般', '蘑菇', 'cleared', '點', '今日', '昨日', '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽', '明信片', '皮克敏', '最相關', '回覆', '送出'];
+        // 強大的黑名單字庫，包含 IG, Threads, 遊戲內建雜訊
+        const ignoreList = [
+            'pikmin', 'bloom', '一般', '巨大', '蘑菇', 'cleared', '點', '今日', '昨日',
+            '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽',
+            '明信片', '皮克敏', '最相關', '回覆', '送出', '翻譯年糕', '讚', 
+            '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏'
+        ];
+        
         const validLines = lines.filter(l => {
             const lower = l.toLowerCase();
             if (lower.length <= 1) return false;
+            
+            // 忽略純數字與座標
             if (lower.match(/^[0-9.,:\-\s]+$/)) return false; 
-            if (ignoreList.some(ignore => lower.includes(ignore))) return false;
-            if (lower.match(/\d+\s*(小時|分鐘)/)) return false; 
+            
+            // 忽略 Threads 的圖集標記 (例如 1/2, 3/4)
+            if (lower.match(/^\d+\/\d+$/)) return false;
+            
+            // 忽略社群時間戳記 (例如 12小時前)
+            if (lower.match(/\d+\s*(小時|分鐘|天|週|月|年)前/)) return false; 
+            
+            // 忽略瀏覽次數
             if (lower.match(/\d+\s*次瀏覽/)) return false; 
-            if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; // 日期格式
+            
+            // 忽略純日期格式
+            if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; 
+            
+            // 忽略黑名單內的單字 (包含原作者帳號)
+            if (ignoreList.some(ignore => lower.includes(ignore))) return false;
             return true;
         });
 
@@ -1255,10 +1252,12 @@ function applyOcrToBatch(fileIndex) {
     }
 }
 
+// 🌟 修改處 1.5：進一步壓縮裁切後的預覽圖以節省空間 🌟
 function confirmCrop() {
   if (!cropperInstance) return;
-  const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
-  const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.85);
+  // 限制最大寬高與畫質，以保護使用者的 LocalStorage
+  const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 800, maxHeight: 800 });
+  const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.7);
   const originalImgUrl = document.getElementById('crop-image-target').src;
   
   const currentCropData = {
@@ -1347,12 +1346,13 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
+// 🌟 修改處 2：將 Nominatim API 請求加上繁體中文優先的參數 🌟
 async function fetchLocationForBatchItem(index, lat, lon) {
     let locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
     try {
         const [locRes, tz] = await Promise.all([
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW`),
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,zh-HK,zh`),
             fetchTimeZone(lat, lon)
         ]);
         
@@ -1668,13 +1668,14 @@ document.getElementById('edit-coord-input').addEventListener('input', function(e
     }, 800);
 });
 
+// 🌟 修改處 2：加上 zh-Hant 優先參數 🌟
 async function detectLocationFromCoords(lat, lon, targetInputId) {
     const input = document.getElementById(targetInputId);
     if(input) input.value = '🔍 偵測地點與時區中...';
     
     try {
         const [locRes, tz] = await Promise.all([
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW`),
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,zh-HK,zh`),
             fetchTimeZone(lat, lon)
         ]);
 
@@ -2233,7 +2234,7 @@ function initModalDrag() {
 // 執行初始渲染
 setTimeout(() => { 
   goTo('home'); 
-  initModalDrag(); // 🌟 啟落關閉偵測
+  initModalDrag(); // 🌟 啟動下拉關閉偵測
 }, 50);
 </script>
 </body>
