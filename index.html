@@ -1186,11 +1186,12 @@ async function preloadOCR(fileIndex, imgUrl) {
             const lower = l.toLowerCase();
             if (lower.length <= 1) return false;
             
-            // 忽略純數字與座標
-            if (lower.match(/^[0-9.,:\-\s]+$/)) return false; 
+            // 🌟 終極排除 1：如果這行文字裡面包含我們剛剛抓到的「座標」，那它絕對不是名稱！
+            if (foundCoord && l.includes(foundCoord)) return false;
             
-            // 忽略 Threads 的圖集標記 (例如 1/2, 3/4)
-            if (lower.match(/^\d+\/\d+$/)) return false;
+            // 🌟 終極排除 2：把 Emoji 拔掉後，如果只剩下數字和符號 (例如 "🍄 1/2")，也直接殺掉
+            const noEmoji = lower.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+            if (noEmoji.match(/^[0-9.,:\-\s/|()]+$/)) return false; 
             
             // 忽略社群時間戳記 (例如 12小時前)
             if (lower.match(/\d+\s*(小時|分鐘|天|週|月|年)前/)) return false; 
@@ -1201,7 +1202,7 @@ async function preloadOCR(fileIndex, imgUrl) {
             // 忽略純日期格式
             if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; 
             
-            // 忽略黑名單內的單字 (包含原作者帳號)
+            // 忽略黑名單內的單字
             if (ignoreList.some(ignore => lower.includes(ignore))) return false;
             return true;
         });
