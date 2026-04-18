@@ -190,10 +190,10 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .cropper-point.point-nw { top: -13px; left: -13px; }
 .cropper-point.point-n, .cropper-point.point-s, .cropper-point.point-e, .cropper-point.point-w { display: none; }
 
-/* ── MODALS ── */
+/* ── MODALS (還原正常設定) ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
 .modal-overlay.open { display: flex; }
-.modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 20px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column;}
+.modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 20px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .modal-handle { width: 45px; height: 5px; background: #ddd; border-radius: 99px; margin: 0 auto 20px; flex-shrink:0;}
 .modal-title { font-weight: 900; font-size: 1.2rem; text-align: center; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink:0;}
@@ -580,44 +580,51 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 </div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
-  <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title">修改明信片資訊</div>
+  <div class="modal" style="max-height: 85vh; padding-bottom: 20px;">
     
-    <div id="edit-img-section" style="text-align:center; margin-bottom:16px;">
-      <img id="edit-img-preview" src="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 16px; border: 1.5px solid var(--border); margin-bottom: 8px;">
-      <div>
-        <button id="btn-recrop-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="startEditCrop()">✂️ 重新裁切原圖</button>
-        <button id="btn-add-edit-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="document.getElementById('edit-file-input').click()">🖼️ 加入照片</button>
+    <div style="flex-shrink:0;">
+      <div class="modal-handle"></div><div class="modal-title">修改明信片資訊</div>
+    </div>
+    
+    <div style="overflow-y: auto; scrollbar-width: none; padding-bottom: 25px; flex: 1;">
+      
+      <div id="edit-img-section" style="text-align:center; margin-bottom:16px;">
+        <img id="edit-img-preview" src="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 16px; border: 1.5px solid var(--border); margin-bottom: 8px;">
+        <div>
+          <button id="btn-recrop-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="startEditCrop()">✂️ 重新裁切原圖</button>
+          <button id="btn-add-edit-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="document.getElementById('edit-file-input').click()">🖼️ 加入照片</button>
+        </div>
+        <input type="file" id="edit-file-input" accept="image/*" style="display:none;" onchange="handleEditFileUpload(this.files)">
       </div>
-      <input type="file" id="edit-file-input" accept="image/*" style="display:none;" onchange="handleEditFileUpload(this.files)">
-    </div>
 
-    <div class="edit-label">明信片名稱：</div>
-    <div class="edit-input-wrapper">
-      <input type="text" id="edit-name-input" class="edit-text-input no-icon" placeholder="輸入明信片名稱">
-    </div>
+      <div class="edit-label">明信片名稱：</div>
+      <div class="edit-input-wrapper">
+        <input type="text" id="edit-name-input" class="edit-text-input no-icon" placeholder="輸入明信片名稱">
+      </div>
 
-    <div class="edit-label">地點 (城市，國家)：</div>
-    <div class="edit-input-wrapper">
-      <input type="text" id="edit-loc-input" class="edit-text-input no-icon" placeholder="可自動偵測或手動輸入">
-    </div>
+      <div class="edit-label">地點 (城市，國家)：</div>
+      <div class="edit-input-wrapper">
+        <input type="text" id="edit-loc-input" class="edit-text-input no-icon" placeholder="可自動偵測或手動輸入">
+      </div>
 
-    <div class="edit-label">點位類型：</div>
-    <div class="type-toggle">
-      <button id="edit-type-flower" class="type-btn flower" onclick="setEditType('flower')">🌸 花點</button>
-      <button id="edit-type-mushroom" class="type-btn mushroom" onclick="setEditType('mushroom')">🍄 菇點</button>
-    </div>
+      <div class="edit-label">點位類型：</div>
+      <div class="type-toggle">
+        <button id="edit-type-flower" class="type-btn flower" onclick="setEditType('flower')">🌸 花點</button>
+        <button id="edit-type-mushroom" class="type-btn mushroom" onclick="setEditType('mushroom')">🍄 菇點</button>
+      </div>
 
-    <div class="edit-label">座標：</div>
-    <div class="edit-input-wrapper">
-      <input type="text" id="edit-coord-input" class="edit-text-input" placeholder="0.000000, 0.000000">
-      <button class="reset-input-btn" onclick="resetEditInput()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10h10a5 5 0 0 1 0 10H11M3 10l4-4M3 10l4 4"/></svg></button>
+      <div class="edit-label">座標：</div>
+      <div class="edit-input-wrapper">
+        <input type="text" id="edit-coord-input" class="edit-text-input" placeholder="0.000000, 0.000000">
+        <button class="reset-input-btn" onclick="resetEditInput()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10h10a5 5 0 0 1 0 10H11M3 10l4-4M3 10l4 4"/></svg></button>
+      </div>
+      
+      <div class="edit-label">主題分類 (可多選)：</div>
+      <div class="theme-selector" id="edit-theme-selector" style="margin-bottom: 24px;"></div>
+      
+      <button class="btn-primary" onclick="saveEdit()">儲存修改</button>
     </div>
     
-    <div class="edit-label">主題分類 (可多選)：</div>
-    <div class="theme-selector" id="edit-theme-selector"></div>
-    
-    <button class="btn-primary" onclick="saveEdit()">儲存修改</button>
   </div>
 </div>
 
@@ -1644,6 +1651,27 @@ function toggleFavorite(e, cat, id) {
     // 🌟 加入儲存到本地
     saveDataToLocal();
   } 
+}
+
+// 🌟 修改處 3：加入「我的收藏」層疊卡片點擊展開與放大的處理函數 🌟
+function toggleStackCard(cardEl) {
+  const isExpanded = cardEl.classList.contains('expanded');
+  document.querySelectorAll('.stack-card.expanded').forEach(el => {
+      if(el !== cardEl) el.classList.remove('expanded');
+  });
+  if(isExpanded) {
+      cardEl.classList.remove('expanded');
+  } else {
+      cardEl.classList.add('expanded');
+  }
+}
+
+function handleStackThumbClick(e, imgSrc, thumbEl) {
+  const card = thumbEl.closest('.stack-card');
+  if (card.classList.contains('expanded') && imgSrc && imgSrc !== 'null' && imgSrc !== '') {
+     e.stopPropagation();
+     showLightbox(imgSrc);
+  }
 }
 
 function cardHTML(c, thumbClass, cat) {
