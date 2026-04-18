@@ -583,11 +583,13 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   <div class="modal">
     <div class="modal-handle"></div><div class="modal-title">修改明信片資訊</div>
     
-    <div id="edit-img-section" style="display:none; text-align:center; margin-bottom:16px;">
+    <div id="edit-img-section" style="text-align:center; margin-bottom:16px;">
       <img id="edit-img-preview" src="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 16px; border: 1.5px solid var(--border); margin-bottom: 8px;">
       <div>
-        <button class="filter-pill" style="margin: 0 auto; display:inline-flex;" onclick="startEditCrop()">✂️ 重新裁切原圖</button>
+        <button id="btn-recrop-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="startEditCrop()">✂️ 重新裁切原圖</button>
+        <button id="btn-add-edit-img" class="filter-pill" style="margin: 0 auto; display:none;" onclick="document.getElementById('edit-file-input').click()">🖼️ 加入照片</button>
       </div>
+      <input type="file" id="edit-file-input" accept="image/*" style="display:none;" onchange="handleEditFileUpload(this.files)">
     </div>
 
     <div class="edit-label">明信片名稱：</div>
@@ -683,6 +685,7 @@ let cropperInstance = null;
 // 🌟 新增：用於判斷目前是在上傳裁切，還是編輯裁切
 let cropMode = 'upload';
 let tempEditImg = null;
+let tempEditOriginalImg = null;
 
 let dragStartX = 0;
 let dragStartY = 0;
@@ -858,11 +861,45 @@ function startCropNext() {
   reader.readAsDataURL(file);
 }
 
+// 處理編輯視窗的單張照片上傳
+function handleEditFileUpload(files) {
+    if(files.length === 0) return;
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        tempEditOriginalImg = e.target.result;
+        cropMode = 'edit';
+        const imageTarget = document.getElementById('crop-image-target');
+        openModal('cropModal');
+        imageTarget.onload = () => {
+            setTimeout(() => {
+                if (cropperInstance) { cropperInstance.destroy(); }
+                cropperInstance = new Cropper(imageTarget, {
+                    aspectRatio: 3 / 2,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    background: false,
+                    guides: true,
+                    center: true,
+                    zoomable: true,
+                    toggleDragModeOnDblclick: false
+                });
+            }, 150);
+        };
+        imageTarget.src = tempEditOriginalImg;
+    };
+    reader.readAsDataURL(file);
+    document.getElementById('edit-file-input').value = "";
+}
+
 // 🌟 新增：由編輯面板觸發的重新裁切
 function startEditCrop() {
   const list = currentEditCat === 'flower' ? flowerCards : mushroomCards;
   const c = list.find(x => x.id == currentEditId);
-  if (!c || !c.originalImg) return;
+  if (!c) return;
+  const targetOriginal = tempEditOriginalImg || c.originalImg;
+  if (!targetOriginal) return;
   
   cropMode = 'edit';
   const imageTarget = document.getElementById('crop-image-target');
@@ -884,7 +921,7 @@ function startEditCrop() {
       });
     }, 150); 
   };
-  imageTarget.src = c.originalImg;
+  imageTarget.src = targetOriginal;
 }
 
 // 雲端 OCR 辨識邏輯
@@ -980,6 +1017,10 @@ function confirmCrop() {
       const imgPre = document.getElementById('edit-img-preview');
       imgPre.src = tempEditImg;
       imgPre.style.display = 'inline-block';
+      
+      document.getElementById('btn-recrop-img').style.display = 'inline-flex';
+      document.getElementById('btn-add-edit-img').style.display = 'none';
+      
       closeModal('cropModal');
       cropperInstance.destroy(); cropperInstance = null;
       cropMode = 'upload'; // 復原狀態
@@ -1314,14 +1355,27 @@ function promptEdit(e, cat, id) {
   
   // 🌟 更新：編輯彈窗內的重新裁切縮圖顯示
   tempEditImg = c.img;
+  tempEditOriginalImg = null; // 重置這一次上傳的原圖暫存
   const imgSec = document.getElementById('edit-img-section');
   const imgPre = document.getElementById('edit-img-preview');
-  const btnRecrop = imgSec.querySelector('button');
-  if (c.img || c.icon) {
-      imgSec.style.display = 'block';
-      if(c.img) { imgPre.style.display = 'inline-block'; imgPre.src = c.img; } else { imgPre.style.display = 'none'; }
-      if (c.originalImg) { btnRecrop.style.display = 'inline-flex'; } else { btnRecrop.style.display = 'none'; }
-  } else { imgSec.style.display = 'none'; }
+  const btnRecrop = document.getElementById('btn-recrop-img');
+  const btnAddImg = document.getElementById('btn-add-edit-img');
+  
+  imgSec.style.display = 'block';
+  if(c.img) { 
+      imgPre.style.display = 'inline-block'; 
+      imgPre.src = c.img; 
+  } else { 
+      imgPre.style.display = 'none'; 
+  }
+  
+  if (c.originalImg) { 
+      btnRecrop.style.display = 'inline-flex'; 
+      btnAddImg.style.display = 'none';
+  } else { 
+      btnRecrop.style.display = 'none'; 
+      btnAddImg.style.display = 'inline-flex';
+  }
 
   document.getElementById('edit-name-input').value = c.name;
   document.getElementById('edit-loc-input').value = c.loc || '';
@@ -1433,7 +1487,8 @@ function saveEdit() {
     c.loc = nl; 
     c.tz = currentEditTz; 
     
-    c.img = tempEditImg; // 🌟 更新儲存重新裁切後的圖片
+    if (tempEditImg) c.img = tempEditImg; 
+    if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; // 儲存新上傳的原始圖片
     
     const locParts = nl.split(/[,，]/);
     c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl);
