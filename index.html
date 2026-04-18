@@ -674,7 +674,10 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
 
 let tokenClient;
 let gisInited = false;
-let currentAccessToken = null; 
+
+// 🌟 新增：改從 LocalStorage 讀取記憶的 Token 和過期時間，關閉分頁也不會消失 🌟
+let currentAccessToken = localStorage.getItem('pikmin_access_token') || null; 
+let tokenExpiry = localStorage.getItem('pikmin_token_expiry') || null;
 let driveFileId = localStorage.getItem('pikmin_driveFileId') || null;
 
 // 🌟 初始化 Google 登入 (GIS) 🌟
@@ -688,6 +691,9 @@ function gisLoaded() {
                 return; 
             }
             currentAccessToken = resp.access_token;
+            // 🌟 存入 localStorage (大約 1 小時過期，我們設 50 分鐘策安全)
+            localStorage.setItem('pikmin_access_token', currentAccessToken);
+            localStorage.setItem('pikmin_token_expiry', Date.now() + 50 * 60 * 1000);
             
             document.getElementById('cloud-sync-btn').innerText = '🔄';
             document.getElementById('cloud-sync-btn').classList.add('synced');
@@ -696,6 +702,13 @@ function gisLoaded() {
     });
     gisInited = true;
     console.log("✅ Google 登入套件載入成功");
+
+    // 🌟 網頁一打開，如果鑰匙還沒過期，就自動背景連線同步！
+    if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
+        document.getElementById('cloud-sync-btn').innerText = '🔄';
+        document.getElementById('cloud-sync-btn').classList.add('synced');
+        checkAndSyncDriveFile();
+    }
 }
 
 // 點擊雲端按鈕
@@ -710,13 +723,14 @@ function handleAuthClick() {
         return;
     }
 
-    if (!currentAccessToken) {
-        // 如果還沒 Token，要求登入授權
-        tokenClient.requestAccessToken({prompt: 'consent'});
-    } else {
-        // 已經有 Token，直接同步
+    // 🌟 檢查是否已經有記憶的 Token 且還沒過期
+    if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
+        // 如果還活著，手動點擊就當作強制同步
         document.getElementById('cloud-sync-btn').innerText = '🔄';
         checkAndSyncDriveFile();
+    } else {
+        // 🌟 如果過期了，向 Google 要新鑰匙 (因為之前同意過，視窗會閃退，不需再次授權)
+        tokenClient.requestAccessToken();
     }
 }
 
@@ -829,7 +843,7 @@ async function createInDrive() {
 }
 
 
-// 🌟 你的 GAS 網址 🌟
+// 🌟 你的 GAS 網址 (保留原版架構) 🌟
 const GAS_CLOUD_OCR_URL = 'https://script.google.com/macros/s/AKfycbxoCUQ4V-xHV77p4WwB29o3jq8Di4ZGyGXXE9ob2DtZ-f7FwQZBYY9m6lQHwCcOIzHvvQ/exec';
 
 let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
@@ -1156,6 +1170,7 @@ function startEditCrop() {
   imageTarget.src = targetOriginal;
 }
 
+// 🌟 你的 GAS 腳本呼叫邏輯 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -2218,7 +2233,7 @@ function initModalDrag() {
 // 執行初始渲染
 setTimeout(() => { 
   goTo('home'); 
-  initModalDrag(); // 🌟 啟動下拉關閉偵測
+  initModalDrag(); // 🌟 啟落關閉偵測
 }, 50);
 </script>
 </body>
