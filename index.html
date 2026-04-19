@@ -245,6 +245,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .edit-label { font-size: 0.85rem; font-weight: 800; color: var(--sub); margin-bottom: 8px; margin-left: 4px; }
 .edit-input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; flex-shrink:0;}
 
+/* 🌟 修改處 4：輸入框改為白底無邊線、微內陰影 🌟 */
 .edit-text-input { 
   width: 100%; padding: 16px 54px 16px 16px; 
   border: none; border-radius: 16px; font-family: 'Courier New', Courier, monospace; 
@@ -619,6 +620,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
       <div class="modal-handle"></div><div class="modal-title">管理自訂主題</div>
     </div>
     <div class="custom-theme-list" id="custom-theme-list"></div>
+    <button class="add-theme-btn" style="width: 100%; margin-bottom: 16px; border-radius: 16px; padding: 14px;" onclick="openAddThemeModal()">＋ 新增主題</button>
     <button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button>
   </div>
 </div>
@@ -845,7 +847,7 @@ async function createInDrive() {
 }
 
 
-// 🌟 你的 GAS 網址 (保留原版架構) 🌟
+// 🌟 你的 GAS 網址 🌟
 const GAS_CLOUD_OCR_URL = 'https://script.google.com/macros/s/AKfycbxoCUQ4V-xHV77p4WwB29o3jq8Di4ZGyGXXE9ob2DtZ-f7FwQZBYY9m6lQHwCcOIzHvvQ/exec';
 
 let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
@@ -890,7 +892,7 @@ function saveDataToLocal(skipCloud = false) {
 
 loadDataFromLocal();
 
-// 🌟 修改處 3：擴充更多 Emoji 選項 🌟
+// 🌟 修改處 3：擴充更多 Emoji 選項，包含雪地、水域等 🌟
 let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵','❄️','⛄','🧊','🌲','🌊','♨️','🚂','🚢','🌉','🏰'];
 let currentNewThemeEmoji = '✨';
 
@@ -1277,10 +1279,10 @@ function applyOcrToBatch(fileIndex) {
     }
 }
 
-// 🌟 修改處 1：拉高畫質到 1200px 與 85% 壓縮率 🌟
+// 🌟 修改處 3：畫質提升到 1440px 與 85% 壓縮率 🌟
 function confirmCrop() {
   if (!cropperInstance) return;
-  const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
+  const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1440, maxHeight: 1440 });
   const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.85);
   const originalImgUrl = document.getElementById('crop-image-target').src;
   
@@ -1370,13 +1372,13 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
-// 確保繁體中文優先
+// 🌟 修改處 1：將 Nominatim API 請求加上繁體中文優先的參數，退回英文 🌟
 async function fetchLocationForBatchItem(index, lat, lon) {
     let locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
     try {
         const [locRes, tz] = await Promise.all([
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,zh-HK,zh`),
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,en`),
             fetchTimeZone(lat, lon)
         ]);
         
@@ -1636,7 +1638,6 @@ function promptEdit(e, cat, id) {
   const c = list.find(x => x.id == id);
   if(!c) return;
   
-  // 🌟 修改處 2：修復預覽圖與上傳按鈕疊加的 Bug 🌟
   tempEditImg = c.img;
   tempEditOriginalImg = null; 
   tempEditCropData = c.cropData || null; 
@@ -1648,13 +1649,11 @@ function promptEdit(e, cat, id) {
   imgSec.style.display = 'flex';
   
   if (c.img || c.originalImg) { 
-      // 有圖片的話，隱藏預設上傳按鈕，顯示圖片與編輯圖示
       imgPre.style.display = 'inline-block'; 
       imgPre.src = c.img || c.originalImg; 
       btnRecrop.style.display = 'flex'; 
       btnAddImg.style.display = 'none';
   } else { 
-      // 沒圖片的話，顯示大大的加號按鈕
       imgPre.style.display = 'none'; 
       btnRecrop.style.display = 'none'; 
       btnAddImg.style.display = 'flex';
@@ -1692,14 +1691,14 @@ document.getElementById('edit-coord-input').addEventListener('input', function(e
     }, 800);
 });
 
-// 🌟 修改處 2：加上 zh-Hant 優先參數 🌟
+// 🌟 修改處 1：將 Nominatim API 請求加上繁體中文優先的參數，退回英文 🌟
 async function detectLocationFromCoords(lat, lon, targetInputId) {
     const input = document.getElementById(targetInputId);
     if(input) input.value = '🔍 偵測地點與時區中...';
     
     try {
         const [locRes, tz] = await Promise.all([
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,zh-HK,zh`),
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,en`),
             fetchTimeZone(lat, lon)
         ]);
 
