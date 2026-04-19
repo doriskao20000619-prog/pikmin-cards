@@ -49,6 +49,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .login-sub { font-size: 1.05rem; font-weight: 700; color: #6b7280; margin-bottom: 32px; }
 .btn-login { width: 100%; background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; padding: 18px; border-radius: 99px; font-size: 1.15rem; font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.35); transition: transform 0.2s; }
 .btn-login:active { transform: scale(0.96); }
+@keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
 
 /* ── HOME SCREEN (Redesigned Header) ── */
 .home-header { padding: max(32px, env(safe-area-inset-top)) 24px 20px; background: var(--bg); display: flex; justify-content: space-between; align-items: center; }
@@ -318,10 +319,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   </div>
 </div>
 
-<style>
-@keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
-</style>
-
 <div id="global-dropzone" class="global-dropzone" onclick="closeDropzone(event)">
   <div class="dropzone-box">
     <div class="dropzone-icon">📥</div>
@@ -470,7 +467,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
           </div>
       </div>
 
-      <button class="btn-primary" onclick="saveSettings()">儲存修改</button>
+      <button class="btn-primary" onclick="saveSettings()">儲存設定</button>
     </div>
   </div>
 </div>
@@ -533,9 +530,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 <div class="toast" id="toast"></div>
 
 <script>
-// 🌟 雲端同步設定 🌟
+// 🌟 雲端同步與個人化設定 🌟
 const GOOGLE_CLIENT_ID = '860667269256-ndj7kvt7es64r5in4p5gm7cf6iact7m4.apps.googleusercontent.com'; 
-// 🌟 增加 Email 與 Profile 權限以便讀取大頭貼與名稱 🌟
 const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'; 
 
 let tokenClient;
@@ -544,7 +540,7 @@ let currentAccessToken = localStorage.getItem('pikmin_access_token') || null;
 let tokenExpiry = localStorage.getItem('pikmin_token_expiry') || null;
 let driveFileId = localStorage.getItem('pikmin_driveFileId') || null;
 
-// 🌟 全域資料 🌟
+// 全域資料
 let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
 let customThemes = [];
 let flowerCards = [];
@@ -571,12 +567,12 @@ function gisLoaded() {
     });
     gisInited = true;
     
-    // 檢查登入狀態
+    // 檢查登入狀態與切換畫面
     if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
         showAppScreen();
         fetchUserInfo().then(success => {
             if(success) checkAndSyncDriveFile();
-            else handleLogout(); // Token失效強制登出
+            else handleLogout();
         });
     } else {
         showLoginScreen();
@@ -591,17 +587,13 @@ function showLoginScreen() {
 
 function showAppScreen() {
     document.getElementById('screen-login').classList.remove('active');
-    document.getElementById('screen-home').classList.add('active');
+    goTo('home');
     document.getElementById('global-nav').style.display = 'flex';
 }
 
 function handleAuthClick() {
-    if (GOOGLE_CLIENT_ID.includes('你的_')) {
-        showToast('⚠️ 請先填寫 Client ID'); return;
-    }
-    if (!gisInited) {
-        showToast('⏳ 系統準備中，請稍後再試'); return;
-    }
+    if (GOOGLE_CLIENT_ID.includes('你的_')) { showToast('⚠️ 請先填寫 Client ID'); return; }
+    if (!gisInited) { showToast('⏳ 系統準備中，請稍後再試'); return; }
     tokenClient.requestAccessToken();
 }
 
@@ -618,12 +610,9 @@ function handleLogout() {
     showToast('🚪 已登出帳號');
 }
 
-// 🌟 讀取 Google 使用者資訊 🌟
 async function fetchUserInfo() {
     try {
-        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-            headers: { 'Authorization': 'Bearer ' + currentAccessToken }
-        });
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + currentAccessToken }});
         if (!res.ok) return false;
         const data = await res.json();
         userProfile.email = data.email;
@@ -631,9 +620,7 @@ async function fetchUserInfo() {
         userProfile.picture = data.picture;
         updateProfileUI();
         return true;
-    } catch(e) { 
-        return false; 
-    }
+    } catch(e) { return false; }
 }
 
 function updateProfileUI() {
@@ -661,13 +648,53 @@ function updateProfileUI() {
     }
 }
 
+function openSettingsModal() {
+    updateProfileUI();
+    openModal('settingsModal');
+}
+
+function saveSettings() {
+    const newName = document.getElementById('settings-nickname').value.trim();
+    userProfile.customNickname = newName;
+    updateProfileUI();
+    saveDataToLocal();
+    closeModal('settingsModal');
+    showToast('✅ 設定已儲存');
+}
+
+function handleSettingsAvatarUpload(files) {
+    if(files.length === 0) return;
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const size = 300; 
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const minDim = Math.min(img.width, img.height);
+            const sx = (img.width - minDim) / 2;
+            const sy = (img.height - minDim) / 2;
+            ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+            userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85);
+            document.getElementById('settings-avatar-preview').src = userProfile.customAvatar;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    document.getElementById('settings-avatar-input').value = "";
+}
+
 function showSyncing(isSyncing) {
     const ind = document.getElementById('sync-status-indicator');
-    if(isSyncing) ind.classList.add('syncing');
-    else {
-        ind.classList.remove('syncing');
-        const now = new Date();
-        document.getElementById('settings-last-sync').innerText = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    if(ind) {
+        if(isSyncing) ind.classList.add('syncing');
+        else {
+            ind.classList.remove('syncing');
+            const now = new Date();
+            document.getElementById('settings-last-sync').innerText = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+        }
     }
 }
 
@@ -682,7 +709,7 @@ async function checkAndSyncDriveFile() {
         const response = await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='pikmin_data_v1.json'&fields=files(id,name)`, {
             headers: { 'Authorization': 'Bearer ' + currentAccessToken }
         });
-        if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) throw new Error('Network error');
         const data = await response.json();
         const files = data.files;
         if (files && files.length > 0) {
@@ -694,7 +721,7 @@ async function checkAndSyncDriveFile() {
         }
         showSyncing(false);
     } catch (err) {
-        console.error("Drive 存取錯誤:", err);
+        console.error("Drive 檔案存取錯誤:", err);
         showToast('❌ 雲端連接失敗');
         showSyncing(false);
     }
@@ -949,7 +976,7 @@ function startCropNext() {
   const reader = new FileReader();
   reader.onload = async (e) => {
     const originalImgUrl = e.target.result;
-    preloadOCR(currentCropIndex, originalImgUrl); // 傳遞無縮放原圖給 OCR
+    preloadOCR(currentCropIndex, originalImgUrl); 
     cropMode = 'upload'; 
     const imageTarget = document.getElementById('crop-image-target');
     openModal('cropModal'); 
@@ -965,45 +992,6 @@ function startCropNext() {
     imageTarget.src = originalImgUrl;
   };
   reader.readAsDataURL(file);
-}
-
-// 🌟 處理個人資料頭貼上傳 🌟
-function handleSettingsAvatarUpload(files) {
-    if(files.length === 0) return;
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const size = 300; 
-            canvas.width = size; canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            const minDim = Math.min(img.width, img.height);
-            const sx = (img.width - minDim) / 2;
-            const sy = (img.height - minDim) / 2;
-            ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
-            userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85);
-            document.getElementById('settings-avatar-preview').src = userProfile.customAvatar;
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    document.getElementById('settings-avatar-input').value = "";
-}
-
-function openSettingsModal() {
-    updateProfileUI();
-    openModal('settingsModal');
-}
-
-function saveSettings() {
-    const newName = document.getElementById('settings-nickname').value.trim();
-    userProfile.customNickname = newName;
-    updateProfileUI();
-    saveDataToLocal();
-    closeModal('settingsModal');
-    showToast('✅ 設定已儲存');
 }
 
 function handleEditFileUpload(files) {
@@ -1729,7 +1717,7 @@ function switchSubTab(cat, tab, el) { const s = document.getElementById('screen-
 function applyFilter(cat, mode, val) { activeFilters[cat] = val; refreshCurrentView(); }
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
 
-// 🌟 修改處 1：真正的複製到剪貼簿功能 🌟
+// 🌟 複製到剪貼簿功能 🌟
 function copyCoord(e, c) { 
   e.stopPropagation(); const b = e.currentTarget; 
   if (navigator.clipboard && window.isSecureContext) {
@@ -1750,7 +1738,7 @@ function closeModalOutside(e, id) { if(e.target.id === id) closeModal(id); }
 function resetSwipes() { document.querySelectorAll('.postcard.swiped').forEach(el => el.classList.remove('swiped')); }
 function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
 
-// 🌟 🌟 電腦版鍵盤捷徑 (ESC / Enter) 🌟 🌟
+// 🌟 電腦版鍵盤捷徑 (ESC / Enter) 🌟
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const openModals = document.querySelectorAll('.modal-overlay.open');
