@@ -205,7 +205,17 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .modal { background: var(--card); border-radius: 30px 30px 0 0; width: 100%; max-width: 480px; padding: 24px 20px 45px; animation: slideUp 0.3s ease; display: flex; flex-direction: column; position: relative; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-/* 🌟 修改處 3：優化橫桿觸控範圍，支援下拉關閉 🌟 */
+/* 🌟 修改處：新增 modal-header 讓橫桿與標題周圍都能觸控下拉 🌟 */
+.modal-header {
+  width: 100%;
+  background: transparent;
+  cursor: grab;
+  touch-action: none; /* 攔截原生滑動，優化拖曳體驗 */
+  -webkit-tap-highlight-color: transparent;
+}
+.modal-header:active {
+  cursor: grabbing;
+}
 .modal-handle { 
   width: 45px; height: 5px; background: #ddd; border-radius: 99px; margin: 0 auto 20px; flex-shrink:0; position: relative;
 }
@@ -235,7 +245,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .edit-label { font-size: 0.85rem; font-weight: 800; color: var(--sub); margin-bottom: 8px; margin-left: 4px; }
 .edit-input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; flex-shrink:0;}
 
-/* 🌟 修改處 4：輸入框改為白底無邊線、微內陰影 🌟 */
 .edit-text-input { 
   width: 100%; padding: 16px 54px 16px 16px; 
   border: none; border-radius: 16px; font-family: 'Courier New', Courier, monospace; 
@@ -583,7 +592,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="modal-overlay" id="uploadModal" onclick="closeModalOutside(event, 'uploadModal')">
   <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title">批次匯入確認</div>
+    <div class="modal-header">
+      <div class="modal-handle"></div><div class="modal-title">批次匯入確認</div>
+    </div>
     <div class="batch-results-container" id="batch-container" style="display:block;"></div>
     <button id="btn-batch-save" class="btn-primary" style="display:none;" onclick="handleBatchSave()">全部儲存入庫</button>
   </div>
@@ -591,7 +602,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')">
   <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增自訂主題</div>
+    <div class="modal-header">
+      <div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增自訂主題</div>
+    </div>
     <div class="emoji-picker-grid" id="emoji-grid"></div>
     <div class="edit-input-wrapper">
       <input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="輸入主題名稱（如：夜景、美食）">
@@ -602,7 +615,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')">
   <div class="modal">
-    <div class="modal-handle"></div><div class="modal-title">管理自訂主題</div>
+    <div class="modal-header">
+      <div class="modal-handle"></div><div class="modal-title">管理自訂主題</div>
+    </div>
     <div class="custom-theme-list" id="custom-theme-list"></div>
     <button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button>
   </div>
@@ -611,7 +626,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal" style="padding: 0; max-height: 85vh;">
     
-    <div style="flex-shrink: 0; padding: 24px 20px 0; width: 100%; border-radius: 30px 30px 0 0;">
+    <div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0; width: 100%; border-radius: 30px 30px 0 0;">
       <div class="modal-handle"></div>
       <div class="modal-title">修改明信片資訊</div>
     </div>
@@ -662,8 +677,23 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   </div>
 </div>
 
-<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">取消收藏</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeCancelOwned()">確定移除</button></div></div>
-<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')"><div class="modal"><div class="modal-handle"></div><div class="modal-title">刪除明信片</div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeHardDelete()">確定刪除</button></div></div>
+<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-handle"></div><div class="modal-title">取消收藏</div>
+    </div>
+    <button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeCancelOwned()">確定移除</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-handle"></div><div class="modal-title">刪除明信片</div>
+    </div>
+    <button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeHardDelete()">確定刪除</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -838,10 +868,9 @@ function loadDataFromLocal() {
     }
 }
 
-// 🌟 修改處 1：智慧瘦身存檔機制 🌟
 function saveDataToLocal(skipCloud = false) {
     try {
-        // 將耗空間的 originalImg 從本機快取剔除，避免 5MB 限制爆滿
+        // 智慧瘦身：存入 LocalStorage 前把 originalImg 刪除，避免 5MB 空間爆滿
         const localFlower = flowerCards.map(c => ({...c, originalImg: null}));
         const localMushroom = mushroomCards.map(c => ({...c, originalImg: null}));
 
@@ -1147,7 +1176,6 @@ function startEditCrop() {
   imageTarget.src = targetOriginal;
 }
 
-// 🌟 修改處 3：大幅增強社群平台截圖的雜訊過濾邏輯 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -1174,7 +1202,6 @@ async function preloadOCR(fileIndex, imgUrl) {
             }
         }
 
-        // 強大的黑名單字庫，包含 IG, Threads, 遊戲內建雜訊
         const ignoreList = [
             'pikmin', 'bloom', '一般', '巨大', '蘑菇', 'cleared', '點', '今日', '昨日',
             '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽',
@@ -1186,23 +1213,16 @@ async function preloadOCR(fileIndex, imgUrl) {
             const lower = l.toLowerCase();
             if (lower.length <= 1) return false;
             
-            // 🌟 終極排除 1：如果這行文字裡面包含我們剛剛抓到的「座標」，那它絕對不是名稱！
+            // 🌟 終極過濾 1：如果此行文字包含找到的座標數字，直接排除
             if (foundCoord && l.includes(foundCoord)) return false;
             
-            // 🌟 終極排除 2：把 Emoji 拔掉後，如果只剩下數字和符號 (例如 "🍄 1/2")，也直接殺掉
+            // 🌟 終極過濾 2：把所有表情符號拔掉後，檢查是否只剩下數字、空格或符號 (例如 "🍄 1/2")
             const noEmoji = lower.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
             if (noEmoji.match(/^[0-9.,:\-\s/|()]+$/)) return false; 
             
-            // 忽略社群時間戳記 (例如 12小時前)
             if (lower.match(/\d+\s*(小時|分鐘|天|週|月|年)前/)) return false; 
-            
-            // 忽略瀏覽次數
             if (lower.match(/\d+\s*次瀏覽/)) return false; 
-            
-            // 忽略純日期格式
-            if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; 
-            
-            // 忽略黑名單內的單字
+            if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; // 日期格式
             if (ignoreList.some(ignore => lower.includes(ignore))) return false;
             return true;
         });
@@ -1253,10 +1273,8 @@ function applyOcrToBatch(fileIndex) {
     }
 }
 
-// 🌟 修改處 1.5：進一步壓縮裁切後的預覽圖以節省空間 🌟
 function confirmCrop() {
   if (!cropperInstance) return;
-  // 限制最大寬高與畫質，以保護使用者的 LocalStorage
   const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 800, maxHeight: 800 });
   const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.7);
   const originalImgUrl = document.getElementById('crop-image-target').src;
@@ -1347,7 +1365,6 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
-// 🌟 修改處 2：將 Nominatim API 請求加上繁體中文優先的參數 🌟
 async function fetchLocationForBatchItem(index, lat, lon) {
     let locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
@@ -1669,7 +1686,6 @@ document.getElementById('edit-coord-input').addEventListener('input', function(e
     }, 800);
 });
 
-// 🌟 修改處 2：加上 zh-Hant 優先參數 🌟
 async function detectLocationFromCoords(lat, lon, targetInputId) {
     const input = document.getElementById(targetInputId);
     if(input) input.value = '🔍 偵測地點與時區中...';
@@ -2127,13 +2143,13 @@ function copyCoord(e, c) { e.stopPropagation(); const b = e.currentTarget; b.tex
 function openModal(id) { 
   document.getElementById(id).classList.add('open'); 
   document.getElementById('global-nav').classList.add('hidden-dock');
-  document.body.style.overflow = 'hidden'; // 🌟 加入防滑動鎖定
+  document.body.style.overflow = 'hidden'; 
 }
 function closeModal(id) { 
   document.getElementById(id).classList.remove('open'); 
   if (document.querySelectorAll('.modal-overlay.open').length === 0) {
       document.getElementById('global-nav').classList.remove('hidden-dock');
-      document.body.style.overflow = ''; // 🌟 解除防滑動鎖定
+      document.body.style.overflow = ''; 
   }
   if(id==='confirmModal') pendingRemoveCard = null; 
 }
@@ -2196,9 +2212,9 @@ function enableDragScroll() {
   });
 }
 
-// 🌟 初始化彈窗下拉關閉功能
+// 🌟 修改處：初始化彈窗下拉關閉功能 (針對整個 modal-header)
 function initModalDrag() {
-    document.querySelectorAll('.modal-handle').forEach(handle => {
+    document.querySelectorAll('.modal-header').forEach(handle => {
         let startY = 0;
         let currentY = 0;
         const modal = handle.closest('.modal');
@@ -2232,10 +2248,9 @@ function initModalDrag() {
     });
 }
 
-// 執行初始渲染
 setTimeout(() => { 
   goTo('home'); 
-  initModalDrag(); // 🌟 啟動下拉關閉偵測
+  initModalDrag(); 
 }, 50);
 </script>
 </body>
