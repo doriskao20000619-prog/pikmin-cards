@@ -890,8 +890,8 @@ function saveDataToLocal(skipCloud = false) {
 
 loadDataFromLocal();
 
-
-let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵'];
+// 🌟 修改處 3：擴充更多 Emoji 選項 🌟
+let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵','❄️','⛄','🧊','🌲','🌊','♨️','🚂','🚢','🌉','🏰'];
 let currentNewThemeEmoji = '✨';
 
 let activeSubTabs = { flower: 'country', mushroom: 'country' };
@@ -1136,7 +1136,8 @@ function startEditCrop() {
   const list = currentEditCat === 'flower' ? flowerCards : mushroomCards;
   const c = list.find(x => x.id == currentEditId);
   if (!c) return;
-  const targetOriginal = tempEditOriginalImg || c.originalImg;
+  // 🌟 修正處：如果 originalImg 被清空了，也可以直接使用 img (預覽圖) 進行二次裁切 🌟
+  const targetOriginal = tempEditOriginalImg || c.originalImg || c.img;
   if (!targetOriginal) return;
   
   if (!tempEditOriginalImg) {
@@ -1176,6 +1177,7 @@ function startEditCrop() {
   imageTarget.src = targetOriginal;
 }
 
+// 🌟 修改處 4：增強社群貼文與 Emoji 雜訊的過濾邏輯 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -1194,6 +1196,7 @@ async function preloadOCR(fileIndex, imgUrl) {
         
         const coordRegex = /-?\d{1,3}\.\d+\s*[,，]\s*-?\d{1,3}\.\d+/;
         
+        // 尋找座標
         for(let i=0; i<lines.length; i++){
             const match = lines[i].match(coordRegex);
             if(match) {
@@ -1202,11 +1205,13 @@ async function preloadOCR(fileIndex, imgUrl) {
             }
         }
 
+        // 黑名單字庫
         const ignoreList = [
             'pikmin', 'bloom', '一般', '巨大', '蘑菇', 'cleared', '點', '今日', '昨日',
             '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽',
             '明信片', '皮克敏', '最相關', '回覆', '送出', '翻譯年糕', '讚', 
-            '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏'
+            '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏',
+            '葉子', '打卡', '好美', '好可愛', '開心', '路過' // 新增口語字眼
         ];
         
         const validLines = lines.filter(l => {
@@ -1216,9 +1221,8 @@ async function preloadOCR(fileIndex, imgUrl) {
             // 🌟 終極過濾 1：如果此行文字包含找到的座標數字，直接排除
             if (foundCoord && l.includes(foundCoord)) return false;
             
-            // 🌟 終極過濾 2：把所有表情符號拔掉後，檢查是否只剩下數字、空格或符號 (例如 "🍄 1/2")
-            const noEmoji = lower.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
-            if (noEmoji.match(/^[0-9.,:\-\s/|()]+$/)) return false; 
+            // 🌟 終極過濾 2：遊戲內建的明信片名稱絕對不可能包含 Emoji！
+            if (/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu.test(l)) return false;
             
             if (lower.match(/\d+\s*(小時|分鐘|天|週|月|年)前/)) return false; 
             if (lower.match(/\d+\s*次瀏覽/)) return false; 
@@ -1273,10 +1277,11 @@ function applyOcrToBatch(fileIndex) {
     }
 }
 
+// 🌟 修改處 1：拉高畫質到 1200px 與 85% 壓縮率 🌟
 function confirmCrop() {
   if (!cropperInstance) return;
-  const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 800, maxHeight: 800 });
-  const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.7);
+  const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
+  const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.85);
   const originalImgUrl = document.getElementById('crop-image-target').src;
   
   const currentCropData = {
@@ -1365,6 +1370,7 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
+// 確保繁體中文優先
 async function fetchLocationForBatchItem(index, lat, lon) {
     let locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
@@ -1630,6 +1636,7 @@ function promptEdit(e, cat, id) {
   const c = list.find(x => x.id == id);
   if(!c) return;
   
+  // 🌟 修改處 2：修復預覽圖與上傳按鈕疊加的 Bug 🌟
   tempEditImg = c.img;
   tempEditOriginalImg = null; 
   tempEditCropData = c.cropData || null; 
@@ -1639,17 +1646,16 @@ function promptEdit(e, cat, id) {
   const btnAddImg = document.getElementById('btn-add-edit-img');
   
   imgSec.style.display = 'flex';
-  if(c.img) { 
-      imgPre.style.display = 'inline-block'; 
-      imgPre.src = c.img; 
-  } else { 
-      imgPre.style.display = 'none'; 
-  }
   
-  if (c.originalImg) { 
+  if (c.img || c.originalImg) { 
+      // 有圖片的話，隱藏預設上傳按鈕，顯示圖片與編輯圖示
+      imgPre.style.display = 'inline-block'; 
+      imgPre.src = c.img || c.originalImg; 
       btnRecrop.style.display = 'flex'; 
       btnAddImg.style.display = 'none';
   } else { 
+      // 沒圖片的話，顯示大大的加號按鈕
+      imgPre.style.display = 'none'; 
       btnRecrop.style.display = 'none'; 
       btnAddImg.style.display = 'flex';
   }
@@ -1686,6 +1692,7 @@ document.getElementById('edit-coord-input').addEventListener('input', function(e
     }, 800);
 });
 
+// 🌟 修改處 2：加上 zh-Hant 優先參數 🌟
 async function detectLocationFromCoords(lat, lon, targetInputId) {
     const input = document.getElementById(targetInputId);
     if(input) input.value = '🔍 偵測地點與時區中...';
@@ -2212,7 +2219,6 @@ function enableDragScroll() {
   });
 }
 
-// 🌟 修改處：初始化彈窗下拉關閉功能 (針對整個 modal-header)
 function initModalDrag() {
     document.querySelectorAll('.modal-header').forEach(handle => {
         let startY = 0;
