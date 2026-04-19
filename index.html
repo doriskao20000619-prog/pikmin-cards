@@ -24,7 +24,7 @@
   --flower-dark: #b0457e;
   --bg: #f9fbf9;
   --card: #ffffff;
-  --text: #1a2e22;
+  --text: #111111;
   --sub: #6b8c76;
   --border: #e2e8e4;
   --shadow: 0 8px 30px rgba(0,0,0,0.06);
@@ -38,17 +38,20 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-.screen { display: none; min-height: 100vh; }
-.screen.active { display: block; }
+.screen { display: none; min-height: 100vh; width: 100%; position: absolute; top:0; left:0; }
+/* 🌟 新增：畫面切換的流暢過場動畫 🌟 */
+.screen.active { display: block; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+@keyframes screenFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.screen-transition-out { opacity: 0 !important; transform: scale(0.98) !important; pointer-events: none; transition: all 0.3s ease !important; }
 
-/* 🌟 LOGIN SCREEN 🌟 */
-#screen-login { background: #F0EDFE; z-index: 1000; }
+/* 🌟 LOGIN SCREEN (綠色系更新) 🌟 */
+#screen-login { background: #f0f7f2; z-index: 1000; transition: opacity 0.3s ease, transform 0.3s ease; }
 #screen-login.active { display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
 .login-art { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-.login-box { width: 100%; padding: 40px 30px max(40px, env(safe-area-inset-bottom)); background: white; border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(139, 92, 246, 0.1); }
+.login-box { width: 100%; padding: 40px 30px max(40px, env(safe-area-inset-bottom)); background: white; border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(76, 175, 110, 0.08); }
 .login-title { font-family: 'Nunito', sans-serif; font-size: 2.4rem; font-weight: 900; margin-bottom: 8px; color: #111; letter-spacing: -0.5px; }
 .login-sub { font-size: 1.05rem; font-weight: 700; color: #6b7280; margin-bottom: 32px; }
-.btn-login { width: 100%; background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; padding: 18px; border-radius: 99px; font-size: 1.15rem; font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.35); transition: transform 0.2s; }
+.btn-login { width: 100%; background: linear-gradient(135deg, #c4fc62, #a8ff4a); color: #000; border: none; padding: 18px; border-radius: 99px; font-size: 1.15rem; font-family: 'Nunito', sans-serif; font-weight: 900; cursor: pointer; box-shadow: 0 8px 20px rgba(168, 255, 74, 0.35); transition: transform 0.2s; }
 .btn-login:active { transform: scale(0.96); }
 @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
 
@@ -57,7 +60,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .home-greeting { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 900; color: var(--text); letter-spacing: -0.5px; margin-bottom: 2px; }
 .home-email { font-size: 0.85rem; font-weight: 700; color: var(--sub); }
 .home-avatar-container { position: relative; cursor: pointer; }
-.home-avatar { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2.5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.home-avatar { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2.5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #a0a0a0; }
 .sync-indicator { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; border: 3px solid var(--bg); transition: background 0.3s; z-index: 2; opacity: 0; }
 .sync-indicator.syncing { opacity: 1; background: transparent; border-top-color: var(--green); border-right-color: var(--green); border-bottom-color: var(--green); border-left-color: transparent; animation: spin 0.8s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -84,7 +87,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .cat-topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--card); border-bottom: 1.5px solid var(--border); }
 .back-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 4px; }
 .cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; } 
-.toggle-hide-btn { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; color: var(--sub); cursor: pointer; }
 
 .sub-tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); }
 .sub-tab { flex: 1; padding: 14px 10px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; color: var(--sub); cursor: pointer; border-bottom: 3px solid transparent; }
@@ -350,7 +352,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
     </div>
     <div class="home-avatar-container" onclick="openSettingsModal()">
       <img id="display-avatar" src="" class="home-avatar" style="display:none;">
-      <div id="display-avatar-fallback" class="home-avatar">👤</div>
+      <div id="display-avatar-fallback" class="home-avatar">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
       <div id="sync-status-indicator" class="sync-indicator"></div>
     </div>
   </div>
@@ -447,7 +451,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
       <div style="text-align: center; margin-bottom: 24px; margin-top: 10px;">
         <div style="position: relative; display: inline-block;">
           <img id="settings-avatar-preview" src="" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border); box-shadow: var(--shadow); background: #f0f0f0;">
-          <button onclick="document.getElementById('settings-avatar-input').click()" style="position: absolute; bottom: 0; right: 0; background: var(--green); color: white; border: 3px solid #fff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">✏️</button>
+          <button onclick="document.getElementById('settings-avatar-input').click()" style="position: absolute; bottom: 0; right: 0; background: var(--green); color: white; border: 3px solid #fff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          </button>
         </div>
         <input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)">
       </div>
@@ -542,7 +548,6 @@ let currentAccessToken = localStorage.getItem('pikmin_access_token') || null;
 let tokenExpiry = localStorage.getItem('pikmin_token_expiry') || null;
 let driveFileId = localStorage.getItem('pikmin_driveFileId') || null;
 
-// 全域資料
 let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
 let customThemes = [];
 let flowerCards = [];
@@ -564,34 +569,39 @@ function gisLoaded() {
             localStorage.setItem('pikmin_token_expiry', Date.now() + 50 * 60 * 1000);
             
             showAppScreen();
-            
-            fetchUserInfo().finally(() => {
-                checkAndSyncDriveFile();
-            });
+            fetchUserInfo().finally(() => { checkAndSyncDriveFile(); });
         },
     });
     gisInited = true;
     
     if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
         showAppScreen();
-        fetchUserInfo().finally(() => {
-            checkAndSyncDriveFile();
-        });
+        fetchUserInfo().finally(() => { checkAndSyncDriveFile(); });
     } else {
         showLoginScreen();
     }
 }
 
 function showLoginScreen() {
+    document.getElementById('screen-login').classList.remove('screen-transition-out');
     document.getElementById('screen-login').classList.add('active');
     document.getElementById('screen-home').classList.remove('active');
     document.getElementById('global-nav').style.display = 'none';
 }
 
 function showAppScreen() {
-    document.getElementById('screen-login').classList.remove('active');
-    goTo('home');
-    document.getElementById('global-nav').style.display = 'flex';
+    const loginScreen = document.getElementById('screen-login');
+    if (loginScreen.classList.contains('active')) {
+        loginScreen.classList.add('screen-transition-out');
+        setTimeout(() => {
+            loginScreen.classList.remove('active', 'screen-transition-out');
+            goTo('home');
+            document.getElementById('global-nav').style.display = 'flex';
+        }, 350);
+    } else {
+        goTo('home');
+        document.getElementById('global-nav').style.display = 'flex';
+    }
 }
 
 function handleAuthClick() {
@@ -616,10 +626,7 @@ function handleLogout() {
 async function fetchUserInfo() {
     try {
         const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + currentAccessToken }});
-        if (!res.ok) {
-            updateProfileUI();
-            return false;
-        }
+        if (!res.ok) { updateProfileUI(); return false; }
         const data = await res.json();
         userProfile.email = data.email;
         userProfile.name = data.name;
@@ -627,8 +634,7 @@ async function fetchUserInfo() {
         updateProfileUI();
         return true;
     } catch(e) { 
-        updateProfileUI();
-        return false; 
+        updateProfileUI(); return false; 
     }
 }
 
@@ -657,10 +663,7 @@ function updateProfileUI() {
     }
 }
 
-function openSettingsModal() {
-    updateProfileUI();
-    openModal('settingsModal');
-}
+function openSettingsModal() { updateProfileUI(); openModal('settingsModal'); }
 
 function saveSettings() {
     const newName = document.getElementById('settings-nickname').value.trim();
@@ -676,20 +679,20 @@ function handleSettingsAvatarUpload(files) {
     const file = files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const size = 300; 
-            canvas.width = size; canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            const minDim = Math.min(img.width, img.height);
-            const sx = (img.width - minDim) / 2;
-            const sy = (img.height - minDim) / 2;
-            ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
-            userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85);
-            document.getElementById('settings-avatar-preview').src = userProfile.customAvatar;
+        tempEditOriginalImg = e.target.result;
+        cropMode = 'avatar';
+        const imageTarget = document.getElementById('crop-image-target');
+        openModal('cropModal');
+        imageTarget.onload = () => {
+            setTimeout(() => {
+                if (cropperInstance) { cropperInstance.destroy(); }
+                cropperInstance = new Cropper(imageTarget, {
+                    aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, 
+                    guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false, checkCrossOrigin: false
+                });
+            }, 150);
         };
-        img.src = e.target.result;
+        imageTarget.src = tempEditOriginalImg;
     };
     reader.readAsDataURL(file);
     document.getElementById('settings-avatar-input').value = "";
@@ -708,10 +711,7 @@ function showSyncing(isSyncing) {
     }
 }
 
-function forceSync() {
-    closeModal('settingsModal');
-    checkAndSyncDriveFile();
-}
+function forceSync() { closeModal('settingsModal'); checkAndSyncDriveFile(); }
 
 async function checkAndSyncDriveFile() {
     try {
@@ -747,9 +747,7 @@ async function downloadFromDrive() {
         
         const localTime = parseInt(localStorage.getItem('pikmin_lastUpdate') || '0');
         let cloudTime = parseInt(dataObj.lastUpdate || '0');
-        if (isNaN(cloudTime) && typeof dataObj.lastUpdate === 'string') {
-            cloudTime = new Date(dataObj.lastUpdate).getTime();
-        }
+        if (isNaN(cloudTime) && typeof dataObj.lastUpdate === 'string') cloudTime = new Date(dataObj.lastUpdate).getTime();
 
         if (localTime > cloudTime) {
             console.log("本機較新，反向同步");
@@ -768,9 +766,7 @@ async function downloadFromDrive() {
             updateProfileUI();
             refreshCurrentView();
         }
-    } catch (err) {
-        console.error('Download error', err);
-    }
+    } catch (err) { console.error('Download error', err); }
 }
 
 async function uploadToCloud() {
@@ -835,20 +831,15 @@ async function createInDrive() {
     }
 }
 
-
 const GAS_CLOUD_OCR_URL = 'https://script.google.com/macros/s/AKfycbxoCUQ4V-xHV77p4WwB29o3jq8Di4ZGyGXXE9ob2DtZ-f7FwQZBYY9m6lQHwCcOIzHvvQ/exec';
 
 function loadDataFromLocal() {
     try {
-        const localFlower = localStorage.getItem('pikmin_flowerCards');
-        if (localFlower) flowerCards = JSON.parse(localFlower);
-        const localMushroom = localStorage.getItem('pikmin_mushroomCards');
-        if (localMushroom) mushroomCards = JSON.parse(localMushroom);
-        const localCustomThemes = localStorage.getItem('pikmin_customThemes');
-        if (localCustomThemes) customThemes = JSON.parse(localCustomThemes);
-    } catch (e) {
-        console.error('讀取本地資料失敗:', e);
-    }
+        const localFlower = localStorage.getItem('pikmin_flowerCards'); if (localFlower) flowerCards = JSON.parse(localFlower);
+        const localMushroom = localStorage.getItem('pikmin_mushroomCards'); if (localMushroom) mushroomCards = JSON.parse(localMushroom);
+        const localCustomThemes = localStorage.getItem('pikmin_customThemes'); if (localCustomThemes) customThemes = JSON.parse(localCustomThemes);
+        const localProfile = localStorage.getItem('pikmin_userProfile'); if (localProfile) userProfile = JSON.parse(localProfile);
+    } catch (e) { console.error('讀取本地資料失敗:', e); }
 }
 
 function saveDataToLocal(skipCloud = false, isFromCloud = false) {
@@ -859,6 +850,7 @@ function saveDataToLocal(skipCloud = false, isFromCloud = false) {
         localStorage.setItem('pikmin_flowerCards', JSON.stringify(localFlower));
         localStorage.setItem('pikmin_mushroomCards', JSON.stringify(localMushroom));
         localStorage.setItem('pikmin_customThemes', JSON.stringify(customThemes));
+        localStorage.setItem('pikmin_userProfile', JSON.stringify(userProfile));
         
         if (!isFromCloud) { localStorage.setItem('pikmin_lastUpdate', Date.now().toString()); }
         if(!skipCloud) { uploadToCloud(); }
@@ -894,19 +886,10 @@ let tempEditOriginalImg = null;
 let tempEditCropData = null; 
 let isEditImgDeleted = false;
 
-let dragStartX = 0;
-let dragStartY = 0;
-let isSwiping = false;
-let swipeDirection = null; 
-
+let dragStartX = 0; let dragStartY = 0; let isSwiping = false; let swipeDirection = null; 
 let ocrCache = {};
 
-function cleanLocText(text) {
-  if (!text) return '';
-  const parts = text.split(';');
-  return parts.pop().trim(); 
-}
-
+function cleanLocText(text) { if (!text) return ''; const parts = text.split(';'); return parts.pop().trim(); }
 function showDropzone() { document.getElementById('global-dropzone').classList.add('active'); }
 function closeDropzone(e) { if (e.target.id === 'global-dropzone') { document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0; } }
 
@@ -965,25 +948,16 @@ function getLocalTime(tz) {
 }
 
 function handleFiles(files) {
-  document.getElementById('global-dropzone').classList.remove('active');
-  dragCounter = 0;
+  document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0;
   if (files.length === 0) return;
-  filesToCrop = Array.from(files);
-  currentCropIndex = 0;
-  tempBatchList = [];
-  ocrCache = {}; 
+  filesToCrop = Array.from(files); currentCropIndex = 0; tempBatchList = []; ocrCache = {}; 
   startCropNext();
   document.getElementById('file-input').value = "";
 }
 
 function startCropNext() {
-  if (currentCropIndex >= filesToCrop.length) {
-    openModal('uploadModal');
-    renderBatchItems();
-    return;
-  }
-  const file = filesToCrop[currentCropIndex];
-  const reader = new FileReader();
+  if (currentCropIndex >= filesToCrop.length) { openModal('uploadModal'); renderBatchItems(); return; }
+  const file = filesToCrop[currentCropIndex]; const reader = new FileReader();
   reader.onload = async (e) => {
     const originalImgUrl = e.target.result;
     preloadOCR(currentCropIndex, originalImgUrl); 
@@ -1006,15 +980,10 @@ function startCropNext() {
 
 function handleEditFileUpload(files) {
     if(files.length === 0) return;
-    const file = files[0];
-    const reader = new FileReader();
+    const file = files[0]; const reader = new FileReader();
     reader.onload = (e) => {
-        tempEditOriginalImg = e.target.result;
-        tempEditCropData = null; 
-        cropMode = 'edit';
-        isEditImgDeleted = false;
-        const imageTarget = document.getElementById('crop-image-target');
-        openModal('cropModal');
+        tempEditOriginalImg = e.target.result; tempEditCropData = null; cropMode = 'edit'; isEditImgDeleted = false;
+        const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal');
         imageTarget.onload = () => {
             setTimeout(() => {
                 if (cropperInstance) { cropperInstance.destroy(); }
@@ -1034,23 +1003,15 @@ function handleEditFileUpload(files) {
         };
         imageTarget.src = tempEditOriginalImg;
     };
-    reader.readAsDataURL(file);
-    document.getElementById('edit-file-input').value = "";
+    reader.readAsDataURL(file); document.getElementById('edit-file-input').value = "";
 }
 
 function startEditCrop() {
-  const list = currentEditCat === 'flower' ? flowerCards : mushroomCards;
-  const c = list.find(x => x.id == currentEditId);
-  if (!c) return;
-  const targetOriginal = tempEditOriginalImg || c.originalImg || c.img;
-  if (!targetOriginal) return;
-  
+  const list = currentEditCat === 'flower' ? flowerCards : mushroomCards; const c = list.find(x => x.id == currentEditId); if (!c) return;
+  const targetOriginal = tempEditOriginalImg || c.originalImg || c.img; if (!targetOriginal) return;
   if (!tempEditOriginalImg) { tempEditCropData = c.cropData || null; }
-
   cropMode = 'edit';
-  const imageTarget = document.getElementById('crop-image-target');
-  openModal('cropModal'); 
-  
+  const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); 
   imageTarget.onload = () => {
     setTimeout(() => {
       if (cropperInstance) { cropperInstance.destroy(); }
@@ -1075,41 +1036,25 @@ async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
         const base64Image = imgUrl.split(',')[1];
-        const response = await fetch(GAS_CLOUD_OCR_URL, {
-            method: 'POST',
-            body: JSON.stringify({ image: base64Image })
-        });
-        const data = await response.json();
-        const text = data.text || "";
-
+        const response = await fetch(GAS_CLOUD_OCR_URL, { method: 'POST', body: JSON.stringify({ image: base64Image }) });
+        const data = await response.json(); const text = data.text || "";
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
-        let foundCoord = '';
-        const coordRegex = /-?\d{1,3}\.\d+\s*[,，]\s*-?\d{1,3}\.\d+/;
-        
-        for(let i=0; i<lines.length; i++){
-            const match = lines[i].match(coordRegex);
-            if(match) { foundCoord = match[0].replace('，', ','); break; }
-        }
+        let foundCoord = ''; const coordRegex = /-?\d{1,3}\.\d+\s*[,，]\s*-?\d{1,3}\.\d+/;
+        for(let i=0; i<lines.length; i++){ const match = lines[i].match(coordRegex); if(match) { foundCoord = match[0].replace('，', ','); break; } }
 
         const ignoreList = [
-            'pikmin', 'bloom', '一般', '巨大', '蘑菇', 'cleared', '點', '今日', '昨日',
-            '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽',
-            '明信片', '皮克敏', '最相關', '回覆', '送出', '翻譯年糕', '讚', 
-            '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏', '葉子', '打卡', '好美', '好可愛', '開心', '路過'
+            'pikmin', 'bloom', '一般', '巨大', '蘑菇', 'cleared', '點', '今日', '昨日', '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽',
+            '明信片', '皮克敏', '最相關', '回覆', '送出', '翻譯年糕', '讚', '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏', '葉子', '打卡', '好美', '好可愛', '開心', '路過'
         ];
         
         const validLines = lines.filter(l => {
-            const lower = l.toLowerCase();
-            if (lower.length <= 1) return false;
+            const lower = l.toLowerCase(); if (lower.length <= 1) return false;
             if (foundCoord && l.includes(foundCoord)) return false;
             if (/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu.test(l)) return false;
             if (/^\d{1,2}:\d{2}/.test(lower)) return false;
             if (/^\d+%$/.test(lower)) return false;
             if (/^(4g|5g|lte|wi-fi|wifi)$/.test(lower)) return false;
-            
-            const noSymbol = lower.replace(/[0-9.,:\-\s/|()%]/g, '').trim();
-            if (noSymbol === '') return false; 
-            
+            const noSymbol = lower.replace(/[0-9.,:\-\s/|()%]/g, '').trim(); if (noSymbol === '') return false; 
             if (lower.match(/\d+\s*(小時|分鐘|天|週|月|年)前/)) return false; 
             if (lower.match(/\d+\s*次瀏覽/)) return false; 
             if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; 
@@ -1118,107 +1063,80 @@ async function preloadOCR(fileIndex, imgUrl) {
         });
 
         let foundName = validLines.length > 0 ? validLines[0] : '未命名明信片';
-
-        ocrCache[fileIndex].done = true;
-        ocrCache[fileIndex].name = foundName.substring(0, 40);
-        ocrCache[fileIndex].coord = foundCoord;
-        applyOcrToBatch(fileIndex);
+        ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = foundName.substring(0, 40); ocrCache[fileIndex].coord = foundCoord; applyOcrToBatch(fileIndex);
     } catch(e) {
         console.error('Cloud OCR Error:', e);
-        ocrCache[fileIndex].done = true;
-        ocrCache[fileIndex].name = '雲端辨識失敗';
-        ocrCache[fileIndex].coord = '';
-        applyOcrToBatch(fileIndex);
+        ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '雲端辨識失敗'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex);
     }
 }
 
 function updateOcrProgressUI(fileIndex) {
-    const cache = ocrCache[fileIndex];
-    if (!cache || cache.batchIdx === undefined) return;
+    const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined) return;
     const progressEl = document.getElementById(`batch-ocr-progress-${cache.batchIdx}`);
     if (progressEl) progressEl.innerText = cache.done ? `辨識完成` : `雲端 AI 視覺分析中...`;
 }
 
 function applyOcrToBatch(fileIndex) {
-    const cache = ocrCache[fileIndex];
-    if (!cache || cache.batchIdx === undefined || !cache.done) return;
-    const batchIdx = cache.batchIdx;
-    tempBatchList[batchIdx].name = cache.name;
-    tempBatchList[batchIdx].coord = cache.coord;
-    tempBatchList[batchIdx].status = 'detecting';
+    const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return;
+    const batchIdx = cache.batchIdx; tempBatchList[batchIdx].name = cache.name; tempBatchList[batchIdx].coord = cache.coord; tempBatchList[batchIdx].status = 'detecting';
     renderBatchItems();
     if (cache.coord) {
         const parts = cache.coord.split(',').map(s => s.trim());
-        const lat = parseFloat(parts[0]);
-        const lon = parseFloat(parts[1]);
+        const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]);
         if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon);
     }
 }
 
 function confirmCrop() {
   if (!cropperInstance) return;
+  
+  if (cropMode === 'avatar') {
+      const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 400, maxHeight: 400 });
+      userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('settings-avatar-preview').src = userProfile.customAvatar;
+      document.getElementById('display-avatar').src = userProfile.customAvatar; 
+      document.getElementById('display-avatar').style.display = 'flex';
+      document.getElementById('display-avatar-fallback').style.display = 'none';
+      
+      closeModal('cropModal');
+      cropperInstance.destroy(); cropperInstance = null;
+      cropMode = 'upload';
+      return;
+  }
+
   const canvas = cropperInstance.getCroppedCanvas();
   const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.98);
   const originalImgUrl = document.getElementById('crop-image-target').src;
   
-  const currentCropData = {
-      data: cropperInstance.getData(),
-      canvasData: cropperInstance.getCanvasData(),
-      cropBoxData: cropperInstance.getCropBoxData()
-  };
+  const currentCropData = { data: cropperInstance.getData(), canvasData: cropperInstance.getCanvasData(), cropBoxData: cropperInstance.getCropBoxData() };
 
   if (cropMode === 'edit') {
-      tempEditCropData = currentCropData; 
-      tempEditImg = croppedImgUrl;
-      const imgPre = document.getElementById('edit-img-preview');
-      imgPre.src = tempEditImg;
-      imgPre.style.display = 'inline-block';
-      
-      document.getElementById('btn-recrop-img').style.display = 'flex';
-      document.getElementById('btn-replace-edit-img').style.display = 'flex'; 
-      document.getElementById('btn-add-edit-img').style.display = 'none';
-      
-      closeModal('cropModal');
-      cropperInstance.destroy(); cropperInstance = null;
-      cropMode = 'upload'; 
-      return;
+      tempEditCropData = currentCropData; tempEditImg = croppedImgUrl;
+      const imgPre = document.getElementById('edit-img-preview'); imgPre.src = tempEditImg; imgPre.style.display = 'inline-block';
+      document.getElementById('btn-recrop-img').style.display = 'flex'; document.getElementById('btn-replace-edit-img').style.display = 'flex'; document.getElementById('btn-add-edit-img').style.display = 'none';
+      closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return;
   }
   
-  const cropData = cropperInstance.getData(); 
-  const batchIdx = tempBatchList.length;
-  tempBatchList.push({
-    name: '辨識中...', loc: '', coord: '', favorite: false, status: 'ocr_detecting', 
-    img: croppedImgUrl, originalImg: originalImgUrl, cropData: currentCropData, tz: '', type: 'flower'
-  });
+  const cropData = cropperInstance.getData(); const batchIdx = tempBatchList.length;
+  tempBatchList.push({ name: '辨識中...', loc: '', coord: '', favorite: false, status: 'ocr_detecting', img: croppedImgUrl, originalImg: originalImgUrl, cropData: currentCropData, tz: '', type: 'flower' });
 
-  closeModal('cropModal');
-  cropperInstance.destroy(); cropperInstance = null;
+  closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null;
   if(ocrCache[currentCropIndex]) { ocrCache[currentCropIndex].batchIdx = batchIdx; applyOcrToBatch(currentCropIndex); }
-  currentCropIndex++;
-  startCropNext();
+  currentCropIndex++; startCropNext();
 }
 
 function cancelCrop() {
   closeModal('cropModal');
   if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
-  if (cropMode === 'edit') { cropMode = 'upload'; return; }
-  currentCropIndex++;
-  startCropNext();
+  if (cropMode === 'edit' || cropMode === 'avatar') { cropMode = 'upload'; return; }
+  currentCropIndex++; startCropNext();
 }
 
 function updateBatchItem(idx, key, val) { tempBatchList[idx][key] = val; renderBatchItems(); }
 
 async function fetchTimeZone(lat, lon) {
-    try {
-        const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`);
-        const data = await res.json();
-        if(data && data.timeZone) return data.timeZone;
-    } catch(e) {}
-    try {
-        const res = await fetch(`https://api.wheretheiss.at/v1/coordinates/${lat},${lon}`);
-        const data = await res.json();
-        if(data && data.timezone_id) return data.timezone_id;
-    } catch(e) {}
+    try { const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`); const data = await res.json(); if(data && data.timeZone) return data.timeZone; } catch(e) {}
+    try { const res = await fetch(`https://api.wheretheiss.at/v1/coordinates/${lat},${lon}`); const data = await res.json(); if(data && data.timezone_id) return data.timezone_id; } catch(e) {}
     return null;
 }
 
@@ -1233,94 +1151,42 @@ async function fetchLocationForBatchItem(index, lat, lon) {
         if (tz) tempBatchList[index].tz = tz; 
         const data = await locRes.json();
         if (data && data.address) {
-            const addr = data.address;
-            const country = cleanLocText(addr.country);
-            const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || '';
-            const city = cleanLocText(cityRaw);
+            const addr = data.address; const country = cleanLocText(addr.country); const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || ''; const city = cleanLocText(cityRaw);
             tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country;
-            locPreview = document.getElementById(`batch-loc-preview-${index}`);
-            if(locPreview) locPreview.innerText = `📍 ${tempBatchList[index].loc}`;
+            locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = `📍 ${tempBatchList[index].loc}`;
         } else {
-            locPreview = document.getElementById(`batch-loc-preview-${index}`);
-            if(locPreview) locPreview.innerText = '⚠️ 無法辨識地點';
+            locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '⚠️ 無法辨識地點';
         }
-    } catch(e) {
-        locPreview = document.getElementById(`batch-loc-preview-${index}`);
-        if(locPreview) locPreview.innerText = '⚠️ 網路錯誤';
-    }
+    } catch(e) { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '⚠️ 網路錯誤'; }
 }
 
 let batchDebounceTimers = {};
 function handleBatchCoordInput(index, val, el) {
-    el.value = val.replace(/[^0-9.,\- ]/g, '');
-    tempBatchList[index].coord = el.value;
+    el.value = val.replace(/[^0-9.,\- ]/g, ''); tempBatchList[index].coord = el.value;
     clearTimeout(batchDebounceTimers[index]);
     batchDebounceTimers[index] = setTimeout(() => {
         const parts = el.value.split(',').map(s => s.trim());
         if (parts.length === 2 && parts[0] && parts[1]) {
-            const lat = parseFloat(parts[0]);
-            const lon = parseFloat(parts[1]);
+            const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]);
             if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(index, lat, lon);
         }
     }, 800);
 }
 
 function renderBatchItems() {
-  const container = document.getElementById('batch-container');
-  const allCards = [...flowerCards, ...mushroomCards];
+  const container = document.getElementById('batch-container'); const allCards = [...flowerCards, ...mushroomCards];
   
   container.innerHTML = tempBatchList.map((item, index) => {
     if (item.status === 'ocr_detecting') {
-      return `
-      <div class="batch-item">
-        <div class="batch-confirm-box" style="display:flex; align-items:center; gap:12px; padding: 16px;">
-          <img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-          <div style="flex:1; text-align:left;">
-            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text);">🤖 雲端 AI 視覺辨識中...</div>
-            <div id="batch-ocr-progress-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700; margin-top:4px;">請稍後...</div>
-          </div>
-        </div>
-      </div>`;
+      return `<div class="batch-item"><div class="batch-confirm-box" style="display:flex; align-items:center; gap:12px; padding: 16px;"><img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);"><div style="flex:1; text-align:left;"><div style="font-weight: 800; font-size: 0.95rem; color: var(--text);">🤖 雲端 AI 視覺辨識中...</div><div id="batch-ocr-progress-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700; margin-top:4px;">請稍後...</div></div></div></div>`;
     }
-
     if (item.status === 'detecting') {
-      return `
-      <div class="batch-item">
-        <div class="batch-confirm-box" style="position:relative;">
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom: 16px; text-align: left;">
-            <img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-            <div style="flex:1; overflow:hidden;">
-              <input type="text" value="${item.name}" oninput="tempBatchList[${index}].name = this.value" style="width: 100%; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); background: transparent; border: none; border-bottom: 1.5px dashed var(--green-light); outline: none; padding-bottom: 2px; margin-bottom: 4px; box-sizing: border-box;" placeholder="自訂明信片名稱">
-              <div id="batch-loc-preview-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700;">📍 ${item.loc || '請輸入座標以自動偵測地點'}</div>
-            </div>
-            <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:32px; height:32px; flex-shrink:0;" onclick="toggleBatchFav(${index})"><svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:16px; height:16px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
-          </div>
-          <input type="text" class="edit-text-input no-icon" style="text-align:center; margin-bottom:16px; font-family:monospace; color:var(--green-dark);" value="${item.coord}" placeholder="貼上座標" oninput="handleBatchCoordInput(${index}, this.value, this)">
-          <div class="type-toggle">
-            <button class="type-btn flower ${item.type==='flower'?'active':''}" onclick="updateBatchItem(${index}, 'type', 'flower')">🌸 花點</button>
-            <button class="type-btn mushroom ${item.type==='mushroom'?'active':''}" onclick="updateBatchItem(${index}, 'type', 'mushroom')">🍄 菇點</button>
-          </div>
-          <div class="confirm-btns"><button class="btn-confirm-yes" onclick="confirmBatchItem(${index})">確認帶入</button></div>
-        </div>
-      </div>`;
+      return `<div class="batch-item"><div class="batch-confirm-box" style="position:relative;"><div style="display:flex; align-items:center; gap:12px; margin-bottom: 16px; text-align: left;"><img src="${item.img}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);"><div style="flex:1; overflow:hidden;"><input type="text" value="${item.name}" oninput="tempBatchList[${index}].name = this.value" style="width: 100%; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--text); background: transparent; border: none; border-bottom: 1.5px dashed var(--green-light); outline: none; padding-bottom: 2px; margin-bottom: 4px; box-sizing: border-box;" placeholder="自訂明信片名稱"><div id="batch-loc-preview-${index}" style="font-size: 0.75rem; color: var(--sub); font-weight: 700;">📍 ${item.loc || '請輸入座標以自動偵測地點'}</div></div><button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:32px; height:32px; flex-shrink:0;" onclick="toggleBatchFav(${index})"><svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:16px; height:16px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button></div><input type="text" class="edit-text-input no-icon" style="text-align:center; margin-bottom:16px; font-family:monospace; color:var(--green-dark);" value="${item.coord}" placeholder="貼上座標" oninput="handleBatchCoordInput(${index}, this.value, this)"><div class="type-toggle"><button class="type-btn flower ${item.type==='flower'?'active':''}" onclick="updateBatchItem(${index}, 'type', 'flower')">🌸 花點</button><button class="type-btn mushroom ${item.type==='mushroom'?'active':''}" onclick="updateBatchItem(${index}, 'type', 'mushroom')">🍄 菇點</button></div><div class="confirm-btns"><button class="btn-confirm-yes" onclick="confirmBatchItem(${index})">確認帶入</button></div></div></div>`;
     }
-    
-    const isDup = allCards.some(c => c.name === item.name || c.coord === item.coord);
-    const dupBadge = isDup ? `<span class="duplicate-badge">已存在相同明信片</span>` : '';
-
-    return `<div class="batch-item">
-      <div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-        <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width: 0;">
-          <div class="res-main-title"><span class="res-main-title-text" title="${item.name}">${item.name}</span> ${dupBadge}</div>
-          <div class="res-coord-sub">${item.coord}</div>
-        </div>
-        <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:36px; height:36px; flex-shrink:0;" onclick="toggleBatchFav(${index})"><svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:18px; height:18px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
-      </div>
-    </div>`;
+    const isDup = allCards.some(c => c.name === item.name || c.coord === item.coord); const dupBadge = isDup ? `<span class="duplicate-badge">已存在相同明信片</span>` : '';
+    return `<div class="batch-item"><div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px;"><div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width: 0;"><div class="res-main-title"><span class="res-main-title-text" title="${item.name}">${item.name}</span> ${dupBadge}</div><div class="res-coord-sub">${item.coord}</div></div><button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="width:36px; height:36px; flex-shrink:0;" onclick="toggleBatchFav(${index})"><svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor" style="width:18px; height:18px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button></div></div>`;
   }).join('');
-
-  const allConfirmed = tempBatchList.every(item => item.status === 'confirmed');
-  document.getElementById('btn-batch-save').style.display = allConfirmed && tempBatchList.length > 0 ? 'block' : 'none';
+  const allConfirmed = tempBatchList.every(item => item.status === 'confirmed'); document.getElementById('btn-batch-save').style.display = allConfirmed && tempBatchList.length > 0 ? 'block' : 'none';
 }
 
 function confirmBatchItem(index) { tempBatchList[index].status = 'confirmed'; renderBatchItems(); }
@@ -1328,228 +1194,118 @@ function toggleBatchFav(index) { tempBatchList[index].favorite = !tempBatchList[
 
 function handleBatchSave() {
   tempBatchList.forEach(item => {
-    const n = item.name.toLowerCase();
-    let theme = '🏞️ 自然景觀';
+    const n = item.name.toLowerCase(); let theme = '🏞️ 自然景觀';
     if (n.includes('temple') || n.includes('shrine') || n.includes('palace') || n.includes('之家') || n.includes('mila') || n.includes('mural')) theme = '🏛️ 歷史古蹟';
     if (item.themes && item.themes.length) theme = item.themes[0];
-    const locParts = (item.loc || '').split(/[,，]/);
-    const country = locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc;
+    const locParts = (item.loc || '').split(/[,，]/); const country = locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc;
 
     const list = item.type === 'flower' ? flowerCards : mushroomCards;
     list.push({ 
       id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000), 
       name: item.name, loc: item.loc || '未設定地點', country: country || '未設定國家', 
-      themes: [theme], coord: item.coord, icon: '🖼️', 
-      tz: item.tz || Intl.DateTimeFormat().resolvedOptions().timeZone, 
+      themes: [theme], coord: item.coord, icon: '🖼️', tz: item.tz || Intl.DateTimeFormat().resolvedOptions().timeZone, 
       owned: false, favorite: item.favorite, img: item.img, originalImg: item.originalImg, cropData: item.cropData
     });
   });
-  showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`);
-  closeModal('uploadModal'); refreshCurrentView();
-  saveDataToLocal();
+  showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`); closeModal('uploadModal'); refreshCurrentView(); saveDataToLocal();
 }
 
 function openAddThemeModal() {
-  editingThemeIndex = -1;
-  document.getElementById('addThemeModalTitle').innerHTML = '新增自訂主題';
-  document.getElementById('addThemeModalBtn').textContent = '確認新增';
-  document.getElementById('new-theme-name').value = '';
-  currentNewThemeEmoji = '✨';
-  const grid = document.getElementById('emoji-grid');
-  grid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e==='✨'?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join('');
+  editingThemeIndex = -1; document.getElementById('addThemeModalTitle').innerHTML = '新增自訂主題'; document.getElementById('addThemeModalBtn').textContent = '確認新增'; document.getElementById('new-theme-name').value = ''; currentNewThemeEmoji = '✨';
+  const grid = document.getElementById('emoji-grid'); grid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e==='✨'?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join('');
   openModal('addThemeModal');
 }
 
-function selectEmoji(el, e) {
-  document.querySelectorAll('.emoji-item').forEach(x => x.classList.remove('selected'));
-  el.classList.add('selected'); currentNewThemeEmoji = e;
-}
+function selectEmoji(el, e) { document.querySelectorAll('.emoji-item').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); currentNewThemeEmoji = e; }
 
 function saveThemeAction() {
-  const name = document.getElementById('new-theme-name').value.trim();
-  if(!name) return;
-  const fullTheme = `${currentNewThemeEmoji} ${name}`;
-  
+  const name = document.getElementById('new-theme-name').value.trim(); if(!name) return; const fullTheme = `${currentNewThemeEmoji} ${name}`;
   if (editingThemeIndex > -1) {
-    const oldTheme = customThemes[editingThemeIndex];
-    customThemes[editingThemeIndex] = fullTheme;
-    [...flowerCards, ...mushroomCards].forEach(c => {
-      const idx = c.themes.indexOf(oldTheme);
-      if (idx > -1) c.themes[idx] = fullTheme;
-    });
-    showToast('🎨 主題已更新');
-    closeModal('addThemeModal'); openManageThemeModal(); refreshCurrentView();
+    const oldTheme = customThemes[editingThemeIndex]; customThemes[editingThemeIndex] = fullTheme;
+    [...flowerCards, ...mushroomCards].forEach(c => { const idx = c.themes.indexOf(oldTheme); if (idx > -1) c.themes[idx] = fullTheme; });
+    showToast('🎨 主題已更新'); closeModal('addThemeModal'); openManageThemeModal(); refreshCurrentView();
   } else {
     if (!defaultThemes.includes(fullTheme) && !customThemes.includes(fullTheme)) customThemes.push(fullTheme);
-    document.getElementById('new-theme-name').value = '';
-    closeModal('addThemeModal'); refreshCurrentView(); showToast('🎨 主題已新增');
+    document.getElementById('new-theme-name').value = ''; closeModal('addThemeModal'); refreshCurrentView(); showToast('🎨 主題已新增');
   }
   saveDataToLocal();
 }
 
 function openManageThemeModal() {
   const list = document.getElementById('custom-theme-list');
-  if (customThemes.length === 0) {
-    list.innerHTML = '<div style="text-align:center; color:var(--sub); font-size:0.9rem; padding: 20px;">尚無自訂主題</div>';
-  } else {
-    list.innerHTML = customThemes.map((t, i) => `
-      <div class="custom-theme-item">
-        <span>${t}</span>
-        <div class="theme-action-group">
-          <button class="modal-action-btn edit-btn" onclick="openEditCustomTheme(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-          <button class="modal-action-btn del-btn" onclick="deleteCustomTheme(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-        </div>
-      </div>`).join('');
+  if (customThemes.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--sub); font-size:0.9rem; padding: 20px;">尚無自訂主題</div>'; } else {
+    list.innerHTML = customThemes.map((t, i) => `<div class="custom-theme-item"><span>${t}</span><div class="theme-action-group"><button class="modal-action-btn edit-btn" onclick="openEditCustomTheme(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="modal-action-btn del-btn" onclick="deleteCustomTheme(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div>`).join('');
   }
   openModal('manageThemeModal');
 }
 
 function openEditCustomTheme(idx) {
-  editingThemeIndex = idx;
-  const themeStr = customThemes[idx]; 
-  const spaceIdx = themeStr.indexOf(' ');
-  const emoji = spaceIdx > -1 ? themeStr.substring(0, spaceIdx) : '✨';
-  const name = spaceIdx > -1 ? themeStr.substring(spaceIdx + 1) : themeStr;
-  document.getElementById('addThemeModalTitle').innerHTML = '修改自訂主題';
-  document.getElementById('addThemeModalBtn').textContent = '儲存修改';
-  document.getElementById('new-theme-name').value = name;
-  currentNewThemeEmoji = emoji;
-  const grid = document.getElementById('emoji-grid');
-  grid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===emoji?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join('');
+  editingThemeIndex = idx; const themeStr = customThemes[idx]; const spaceIdx = themeStr.indexOf(' '); const emoji = spaceIdx > -1 ? themeStr.substring(0, spaceIdx) : '✨'; const name = spaceIdx > -1 ? themeStr.substring(spaceIdx + 1) : themeStr;
+  document.getElementById('addThemeModalTitle').innerHTML = '修改自訂主題'; document.getElementById('addThemeModalBtn').textContent = '儲存修改'; document.getElementById('new-theme-name').value = name; currentNewThemeEmoji = emoji;
+  const grid = document.getElementById('emoji-grid'); grid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===emoji?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join('');
   closeModal('manageThemeModal'); openModal('addThemeModal');
 }
 
 function deleteCustomTheme(idx) {
   const t = customThemes[idx]; customThemes.splice(idx, 1);
-  [...flowerCards, ...mushroomCards].forEach(c => {
-    const i = c.themes.indexOf(t);
-    if (i > -1) c.themes.splice(i, 1);
-    if (c.themes.length === 0) c.themes = ['🏷️ 未分類'];
-  });
+  [...flowerCards, ...mushroomCards].forEach(c => { const i = c.themes.indexOf(t); if (i > -1) c.themes.splice(i, 1); if (c.themes.length === 0) c.themes = ['🏷️ 未分類']; });
   showToast(`🗑️ 已移除 ${t}`); openManageThemeModal(); refreshCurrentView(); saveDataToLocal();
 }
 
 function setEditType(type) {
-  currentEditType = type;
-  document.getElementById('edit-type-flower').classList.toggle('active', type === 'flower');
-  document.getElementById('edit-type-mushroom').classList.toggle('active', type === 'mushroom');
+  currentEditType = type; document.getElementById('edit-type-flower').classList.toggle('active', type === 'flower'); document.getElementById('edit-type-mushroom').classList.toggle('active', type === 'mushroom');
 }
 
 function promptEdit(e, cat, id) {
-  e.stopPropagation();
-  currentEditCat = cat; currentEditId = id;
-  const list = cat === 'flower' ? flowerCards : mushroomCards;
-  const c = list.find(x => x.id == id);
-  if(!c) return;
-  
-  isEditImgDeleted = false;
-  tempEditImg = c.img; tempEditOriginalImg = null; tempEditCropData = c.cropData || null; 
-  const imgSec = document.getElementById('edit-img-section');
-  const imgPre = document.getElementById('edit-img-preview');
-  const btnRecrop = document.getElementById('btn-recrop-img');
-  const btnReplace = document.getElementById('btn-replace-edit-img');
-  const btnAddImg = document.getElementById('btn-add-edit-img');
+  e.stopPropagation(); currentEditCat = cat; currentEditId = id; const list = cat === 'flower' ? flowerCards : mushroomCards; const c = list.find(x => x.id == id); if(!c) return;
+  isEditImgDeleted = false; tempEditImg = c.img; tempEditOriginalImg = null; tempEditCropData = c.cropData || null; 
+  const imgSec = document.getElementById('edit-img-section'); const imgPre = document.getElementById('edit-img-preview'); const btnRecrop = document.getElementById('btn-recrop-img'); const btnReplace = document.getElementById('btn-replace-edit-img'); const btnAddImg = document.getElementById('btn-add-edit-img');
   
   imgSec.style.display = 'flex';
-  if (c.img || c.originalImg) { 
-      imgPre.style.display = 'inline-block'; imgPre.src = c.img || c.originalImg; 
-      btnRecrop.style.display = 'flex'; btnReplace.style.display = 'flex'; btnAddImg.style.display = 'none';
-  } else { 
-      imgPre.style.display = 'none'; btnRecrop.style.display = 'none'; btnReplace.style.display = 'none'; btnAddImg.style.display = 'flex';
-  }
+  if (c.img || c.originalImg) { imgPre.style.display = 'inline-block'; imgPre.src = c.img || c.originalImg; btnRecrop.style.display = 'flex'; btnReplace.style.display = 'flex'; btnAddImg.style.display = 'none'; } 
+  else { imgPre.style.display = 'none'; btnRecrop.style.display = 'none'; btnReplace.style.display = 'none'; btnAddImg.style.display = 'flex'; }
 
-  document.getElementById('edit-name-input').value = c.name;
-  document.getElementById('edit-loc-input').value = c.loc || '';
-  currentEditCountry = c.country || '';
-  currentEditTz = c.tz || Intl.DateTimeFormat().resolvedOptions().timeZone; 
-  setEditType(cat);
-  originalCoordBeforeEdit = c.coord; document.getElementById('edit-coord-input').value = c.coord;
-  tempEditThemes = [...c.themes];
-  renderEditThemes(); openModal('editModal');
+  document.getElementById('edit-name-input').value = c.name; document.getElementById('edit-loc-input').value = c.loc || '';
+  currentEditCountry = c.country || ''; currentEditTz = c.tz || Intl.DateTimeFormat().resolvedOptions().timeZone; setEditType(cat); originalCoordBeforeEdit = c.coord; document.getElementById('edit-coord-input').value = c.coord;
+  tempEditThemes = [...c.themes]; renderEditThemes(); openModal('editModal');
 }
 
 let coordDebounceTimer;
 document.getElementById('edit-coord-input').addEventListener('input', function(e) {
-    this.value = this.value.replace(/[^0-9.,\- ]/g, '');
-    clearTimeout(coordDebounceTimer);
-    const val = this.value;
-    coordDebounceTimer = setTimeout(() => {
-        const parts = val.split(',').map(s => s.trim());
-        if (parts.length === 2 && parts[0] && parts[1]) {
-            const lat = parseFloat(parts[0]);
-            const lon = parseFloat(parts[1]);
-            if (!isNaN(lat) && !isNaN(lon)) detectLocationFromCoords(lat, lon, 'edit-loc-input');
-        }
-    }, 800);
+    this.value = this.value.replace(/[^0-9.,\- ]/g, ''); clearTimeout(coordDebounceTimer); const val = this.value;
+    coordDebounceTimer = setTimeout(() => { const parts = val.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) detectLocationFromCoords(lat, lon, 'edit-loc-input'); } }, 800);
 });
 
 function renderEditThemes() {
-  const container = document.getElementById('edit-theme-selector');
-  const allCurrentThemes = [...defaultThemes, ...customThemes];
-  let html = allCurrentThemes.map(t => {
-    const isSel = tempEditThemes.includes(t);
-    return `<div class="theme-option ${isSel?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`;
-  }).join('');
-  html += `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`;
-  container.innerHTML = html;
+  const container = document.getElementById('edit-theme-selector'); const allCurrentThemes = [...defaultThemes, ...customThemes];
+  let html = allCurrentThemes.map(t => { const isSel = tempEditThemes.includes(t); return `<div class="theme-option ${isSel?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`; }).join('');
+  html += `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`; container.innerHTML = html;
 }
 
-function toggleEditTheme(t) {
-  const i = tempEditThemes.indexOf(t);
-  if(i > -1) tempEditThemes.splice(i, 1); else tempEditThemes.push(t);
-  renderEditThemes();
-}
+function toggleEditTheme(t) { const i = tempEditThemes.indexOf(t); if(i > -1) tempEditThemes.splice(i, 1); else tempEditThemes.push(t); renderEditThemes(); }
 
 function saveEdit() {
-  const nc = document.getElementById('edit-coord-input').value;
-  const nn = document.getElementById('edit-name-input').value.trim();
-  const nl = document.getElementById('edit-loc-input').value.trim(); 
+  const nc = document.getElementById('edit-coord-input').value; const nn = document.getElementById('edit-name-input').value.trim(); const nl = document.getElementById('edit-loc-input').value.trim(); 
   if (!nc || !nn || !nl) { showToast('⚠️ 請填寫完整資訊'); return; }
 
-  const oldList = currentEditCat === 'flower' ? flowerCards : mushroomCards;
-  const idx = oldList.findIndex(x => x.id == currentEditId);
-  
+  const oldList = currentEditCat === 'flower' ? flowerCards : mushroomCards; const idx = oldList.findIndex(x => x.id == currentEditId);
   if(idx > -1){
-    const c = oldList[idx];
-    c.coord = nc; c.name = nn; c.loc = nl; c.tz = currentEditTz; 
-    
-    if (isEditImgDeleted) { c.img = null; c.originalImg = null; c.cropData = null; } 
-    else {
-        if (tempEditImg) c.img = tempEditImg; 
-        if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; 
-        if (tempEditCropData) c.cropData = tempEditCropData; 
-    }
-    
-    const locParts = nl.split(/[,，]/);
-    c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl);
-    c.themes = tempEditThemes.length > 0 ? [...tempEditThemes] : ['🏷️ 未分類'];
-
-    if (currentEditCat !== currentEditType) {
-        oldList.splice(idx, 1);
-        const newList = currentEditType === 'flower' ? flowerCards : mushroomCards;
-        newList.push(c);
-    }
+    const c = oldList[idx]; c.coord = nc; c.name = nn; c.loc = nl; c.tz = currentEditTz; 
+    if (isEditImgDeleted) { c.img = null; c.originalImg = null; c.cropData = null; } else { if (tempEditImg) c.img = tempEditImg; if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; if (tempEditCropData) c.cropData = tempEditCropData; }
+    const locParts = nl.split(/[,，]/); c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl); c.themes = tempEditThemes.length > 0 ? [...tempEditThemes] : ['🏷️ 未分類'];
+    if (currentEditCat !== currentEditType) { oldList.splice(idx, 1); const newList = currentEditType === 'flower' ? flowerCards : mushroomCards; newList.push(c); }
     refreshCurrentView();
   }
   closeModal('editModal'); showToast('✅ 明信片已更新'); saveDataToLocal();
 }
 
-function showLightbox(imgSrc) {
-  if (!imgSrc) return;
-  document.getElementById('lightbox-img').src = imgSrc; document.getElementById('lightbox').classList.add('open');
-}
+function showLightbox(imgSrc) { if (!imgSrc) return; document.getElementById('lightbox-img').src = imgSrc; document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 
 function goTo(screen) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + screen).classList.add('active');
-  const screenToIndex = { 'home': 0, 'flower': 1, 'mushroom': 3, 'owned': 4 };
-  const index = screenToIndex[screen];
-  if (index !== undefined) {
-    const dockItems = document.querySelectorAll('.dock-nav > div'); 
-    dockItems.forEach(nav => nav.classList.remove('active'));
-    if(dockItems[index]) dockItems[index].classList.add('active');
-  }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('screen-' + screen).classList.add('active');
+  const screenToIndex = { 'home': 0, 'flower': 1, 'mushroom': 3, 'owned': 4 }; const index = screenToIndex[screen];
+  if (index !== undefined) { const dockItems = document.querySelectorAll('.dock-nav > div'); dockItems.forEach(nav => nav.classList.remove('active')); if(dockItems[index]) dockItems[index].classList.add('active'); }
   refreshCurrentView(); window.scrollTo(0, 0);
 }
 
@@ -1558,163 +1314,68 @@ function refreshCurrentView() {
   if (document.getElementById('screen-mushroom').classList.contains('active')) renderCat('mushroom', activeSubTabs.mushroom);
   if (document.getElementById('screen-owned').classList.contains('active')) renderOwned();
   if (document.getElementById('screen-home').classList.contains('active')) handleGlobalSearch();
-  document.getElementById('stat-f-total').textContent = flowerCards.length + ' 張';
-  document.getElementById('stat-m-total').textContent = mushroomCards.length + ' 張';
+  document.getElementById('stat-f-total').textContent = flowerCards.length + ' 張'; document.getElementById('stat-m-total').textContent = mushroomCards.length + ' 張';
   enableDragScroll(); 
 }
 
 function handleDragStart(e) { isSwiping = false; swipeDirection = null; dragStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].screenX; dragStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].screenY; }
 function handleDragMove(e) {
-  if (!dragStartX || !e.touches) return;
-  let dx = e.touches[0].screenX - dragStartX; let dy = e.touches[0].screenY - dragStartY;
+  if (!dragStartX || !e.touches) return; let dx = e.touches[0].screenX - dragStartX; let dy = e.touches[0].screenY - dragStartY;
   if (!swipeDirection) { if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) swipeDirection = 'h'; else if (Math.abs(dy) > 10) swipeDirection = 'v'; }
   if (swipeDirection === 'h') { if (e.cancelable) e.preventDefault(); }
 }
 function handleDragEnd(e, el) {
-  if (!dragStartX) return;
-  let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX;
-  let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY;
-  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { 
-    isSwiping = true; 
-    if (dx < -40) { resetSwipes(); el.classList.add('swiped'); } else if (dx > 40) { el.classList.remove('swiped'); }
-  }
-  dragStartX = 0; dragStartY = 0;
+  if (!dragStartX) return; let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX; let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY;
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { isSwiping = true; if (dx < -40) { resetSwipes(); el.classList.add('swiped'); } else if (dx > 40) { el.classList.remove('swiped'); } } dragStartX = 0; dragStartY = 0;
 }
 
 function toggleOwned(e, cat, id) {
   if (e && e.target && (e.target.closest('.mac-btns-container') || e.target.closest('.coord-btn'))) return;
-  if(isSwiping) { isSwiping = false; return; }
-  const list = cat === 'flower' ? flowerCards : mushroomCards;
-  const c = list.find(x => x.id == id);
-  if(c){
-    if(c.owned){ pendingRemoveCard = c; openModal('confirmModal'); } 
-    else { c.owned = true; showToast('✅ 標記為已擁有'); refreshCurrentView(); saveDataToLocal(); }
-  }
+  if(isSwiping) { isSwiping = false; return; } const list = cat === 'flower' ? flowerCards : mushroomCards; const c = list.find(x => x.id == id);
+  if(c){ if(c.owned){ pendingRemoveCard = c; openModal('confirmModal'); } else { c.owned = true; showToast('✅ 標記為已擁有'); refreshCurrentView(); saveDataToLocal(); } }
 }
 function executeToggleOwnedBtn(e, cat, id) { e.stopPropagation(); const list = cat === 'flower' ? flowerCards : mushroomCards; const c = list.find(x => x.id == id); if(c) { pendingRemoveCard = c; openModal('confirmModal'); } }
 function executeCancelOwned() { if(pendingRemoveCard) { pendingRemoveCard.owned = false; refreshCurrentView(); saveDataToLocal(); } closeModal('confirmModal'); }
 function executeHardDelete() { if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); refreshCurrentView(); closeModal('deleteConfirmModal'); saveDataToLocal(); }
 function toggleFavorite(e, cat, id) { e.stopPropagation(); const list = cat==='flower'?flowerCards:mushroomCards; const card = list.find(x => x.id == id); if(card){ card.favorite = !card.favorite; showToast(card.favorite?'⭐ 已加入最愛':'⚪ 已取消最愛'); refreshCurrentView(); saveDataToLocal(); } }
 
-function toggleStackCard(cardEl) {
-  const isExpanded = cardEl.classList.contains('expanded');
-  document.querySelectorAll('.stack-card.expanded').forEach(el => { if(el !== cardEl) el.classList.remove('expanded'); });
-  if(isExpanded) { cardEl.classList.remove('expanded'); } else { cardEl.classList.add('expanded'); }
-}
-function handleStackThumbClick(e, imgSrc, thumbEl) {
-  if (e.target.closest('.stack-indicator') || e.target.closest('.stack-title') || e.target.closest('.stack-time-badge')) return; 
-  const card = thumbEl.closest('.stack-card');
-  if (card.classList.contains('expanded') && imgSrc && imgSrc !== 'null' && imgSrc !== '') { e.stopPropagation(); showLightbox(imgSrc); }
-}
+function toggleStackCard(cardEl) { const isExpanded = cardEl.classList.contains('expanded'); document.querySelectorAll('.stack-card.expanded').forEach(el => { if(el !== cardEl) el.classList.remove('expanded'); }); if(isExpanded) { cardEl.classList.remove('expanded'); } else { cardEl.classList.add('expanded'); } }
+function handleStackThumbClick(e, imgSrc, thumbEl) { if (e.target.closest('.stack-indicator') || e.target.closest('.stack-title') || e.target.closest('.stack-time-badge')) return; const card = thumbEl.closest('.stack-card'); if (card.classList.contains('expanded') && imgSrc && imgSrc !== 'null' && imgSrc !== '') { e.stopPropagation(); showLightbox(imgSrc); } }
 
 function cardHTML(c, thumbClass, cat) {
-  const starFill = c.favorite ? 'var(--star-gold)' : 'none';
-  const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : c.icon;
-  const isOwnedClass = c.owned ? 'is-owned' : '';
-  return `
-    <div class="postcard-wrapper">
-      <div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除</div>
-      <div class="postcard ${isOwnedClass}" onclick="toggleOwned(event, '${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)">
-        <div class="postcard-thumb ${thumbClass}">${thumbContent}<div class="image-time-badge">🕒 ${getLocalTime(c.tz)}</div></div>
-        <div class="postcard-info">
-          <div class="mac-btns-container">
-            <button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
-            <button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-            <button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-          </div>
-          <div class="postcard-name-row"><div class="postcard-name" title="${c.name}">${c.name}</div></div>
-          <div class="postcard-loc-row"><div class="postcard-loc">📍 ${c.loc}</div></div>
-          <div class="postcard-tags">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-          <div class="postcard-footer">
-            <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">${c.coord}</div>
-            ${c.owned ? '<div class="owned-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : ''}
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
-function stackCardHTML(c, cat) {
-  const starFill = c.favorite ? 'var(--star-gold)' : 'none';
-  const bgStyle = c.img ? `background-image: url('${c.img}');` : `background: ${cat==='flower'?'var(--flower-light)':'var(--mushroom-light)'}; display:flex; align-items:center; justify-content:center; font-size: 5rem;`;
-  const innerThumb = c.img ? '' : c.icon;
-  return `
-    <div class="stack-card" onclick="toggleStackCard(this)">
-      <div class="stack-thumb" style="${bgStyle}" onclick="handleStackThumbClick(event, '${c.img}', this)">
-        ${innerThumb}<div class="stack-title" title="${c.name}">${c.name}</div><div class="stack-time-badge">🕒 ${getLocalTime(c.tz)}</div>
-        <div class="stack-indicator"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-      </div>
-      <div class="stack-info">
-        <div class="stack-info-inner" onclick="event.stopPropagation()">
-          <div class="res-title-row" style="margin-bottom:12px;">
-            <div class="res-main-title" style="font-size:0.95rem; color:var(--sub);">📍 ${c.loc}</div>
-            <div class="mac-btns-container" style="position:static; display:flex; gap:8px;">
-              <button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
-              <button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-              <button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-            </div>
-          </div>
-          <div class="postcard-tags" style="margin-bottom:12px;">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-          <div class="postcard-footer" style="margin-top:20px; border-top: 1.5px dashed var(--border); padding-top:16px;">
-            <div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">${c.coord}</div>
-            <button class="btn-danger" style="width:auto; padding:8px 24px; border-radius:99px; font-size:0.85rem;" onclick="executeToggleOwnedBtn(event, '${cat}', '${c.id}')">取消收藏</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
+  const starFill = c.favorite ? 'var(--star-gold)' : 'none'; const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : c.icon; const isOwnedClass = c.owned ? 'is-owned' : '';
+  return `<div class="postcard-wrapper"><div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除</div><div class="postcard ${isOwnedClass}" onclick="toggleOwned(event, '${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)"><div class="postcard-thumb ${thumbClass}">${thumbContent}<div class="image-time-badge">🕒 ${getLocalTime(c.tz)}</div></div><div class="postcard-info"><div class="mac-btns-container"><button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button><button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button><button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></div><div class="postcard-name-row"><div class="postcard-name" title="${c.name}">${c.name}</div></div><div class="postcard-loc-row"><div class="postcard-loc">📍 ${c.loc}</div></div><div class="postcard-tags">${c.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div><div class="postcard-footer"><div class="coord-btn" onclick="copyCoord(event,'${c.coord}')">${c.coord}</div>${c.owned ? '<div class="owned-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : ''}</div></div></div></div>`;
 }
 
 function handleGlobalSearch() {
-  const q = document.getElementById('global-search').value.toLowerCase();
-  const res = document.getElementById('search-results-section');
+  const q = document.getElementById('global-search').value.toLowerCase(); const res = document.getElementById('search-results-section');
   if(!q){ res.style.display='none'; return; }
-  const all = [...flowerCards, ...mushroomCards];
-  const filter = all.filter(c => c.name.toLowerCase().includes(q) || c.loc.toLowerCase().includes(q) || c.themes.some(t => t.toLowerCase().includes(q)));
-  res.style.display='block';
-  res.innerHTML = filter.length > 0 ? filter.map(c => cardHTML(c, flowerCards.includes(c)?'':'mushroom-thumb', flowerCards.includes(c)?'flower':'mushroom')).join('') : '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
+  const all = [...flowerCards, ...mushroomCards]; const filter = all.filter(c => c.name.toLowerCase().includes(q) || c.loc.toLowerCase().includes(q) || c.themes.some(t => t.toLowerCase().includes(q)));
+  res.style.display='block'; res.innerHTML = filter.length > 0 ? filter.map(c => cardHTML(c, flowerCards.includes(c)?'':'mushroom-thumb', flowerCards.includes(c)?'flower':'mushroom')).join('') : '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
 }
 
 function renderCat(cat, mode) {
-  const raw = cat === 'flower' ? flowerCards : mushroomCards;
-  const body = document.getElementById(cat + '-body');
-  const fw = document.getElementById(cat + '-filters');
-  let processed = hideOwnedState[cat] ? raw.filter(x => !x.owned) : [...raw];
-  
-  if (mode === 'favorite') { 
-    fw.style.display = 'none'; 
-    const favs = processed.filter(x => x.favorite); favs.sort((a,b) => a.owned - b.owned); 
-    body.innerHTML = favs.length > 0 ? favs.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('') : '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏的最愛喔 ⭐</div>'; 
-    return; 
-  }
+  const raw = cat === 'flower' ? flowerCards : mushroomCards; const body = document.getElementById(cat + '-body'); const fw = document.getElementById(cat + '-filters'); let processed = hideOwnedState[cat] ? raw.filter(x => !x.owned) : [...raw];
+  if (mode === 'favorite') { fw.style.display = 'none'; const favs = processed.filter(x => x.favorite); favs.sort((a,b) => a.owned - b.owned); body.innerHTML = favs.length > 0 ? favs.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('') : '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏的最愛喔 ⭐</div>'; return; }
   
   fw.style.display = 'flex'; const gs = {}; const allCurrentThemes = [...defaultThemes, ...customThemes];
-  
-  if (mode === 'theme') {
-    allCurrentThemes.forEach(t => { gs[t] = []; });
-    processed.forEach(x => { x.themes.forEach(t => { if(!gs[t]) gs[t] = []; gs[t].push(x); }); });
-  } else { processed.forEach(x => { const k = x.country; if(!gs[k]) gs[k] = []; gs[k].push(x); }); }
+  if (mode === 'theme') { allCurrentThemes.forEach(t => { gs[t] = []; }); processed.forEach(x => { x.themes.forEach(t => { if(!gs[t]) gs[t] = []; gs[t].push(x); }); }); } else { processed.forEach(x => { const k = x.country; if(!gs[k]) gs[k] = []; gs[k].push(x); }); }
   Object.keys(gs).forEach(key => { gs[key].sort((a, b) => { if (a.owned === b.owned) return 0; return a.owned ? 1 : -1; }); });
 
-  const cf = activeFilters[cat] || '全部'; 
-  let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">🌍 全部</div>`;
+  const cf = activeFilters[cat] || '全部'; let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">🌍 全部</div>`;
   Object.keys(gs).forEach(n => { fH += `<div class="filter-pill ${cf===n?'active':''}" onclick="applyFilter('${cat}','${mode}','${n}')">${n}</div>`; });
   if (mode === 'theme') { fH += `<button class="add-theme-btn" style="margin-left: 6px;" onclick="openAddThemeModal()">＋</button><button class="add-theme-btn manage-theme-btn" style="margin-left: 6px;" onclick="openManageThemeModal()">⚙️</button>`; }
   fw.innerHTML = fH;
   
   let bH = '';
   Object.entries(gs).forEach(([l, items]) => { 
-    if(cf === '全部' || cf === l) {
-      if (items.length > 0) bH += `<div class="group-section"><div class="group-header">${l} <span class="group-count">${items.length}</span></div>${items.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('')}</div>`; 
-      else if (cf === l) bH = '<div style="text-align:center; padding:40px; color:var(--sub);">此分類尚無明信片 📭</div>';
-    }
+    if(cf === '全部' || cf === l) { if (items.length > 0) bH += `<div class="group-section"><div class="group-header">${l} <span class="group-count">${items.length}</span></div>${items.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('')}</div>`; else if (cf === l) bH = '<div style="text-align:center; padding:40px; color:var(--sub);">此分類尚無明信片 📭</div>'; }
   });
-  if (cf === '全部' && bH === '') bH = '<div style="text-align:center; padding:40px; color:var(--sub);">快去收集明信片吧！</div>';
-  body.innerHTML = bH;
+  if (cf === '全部' && bH === '') bH = '<div style="text-align:center; padding:40px; color:var(--sub);">快去收集明信片吧！</div>'; body.innerHTML = bH;
 }
 
 function renderOwned() {
-  const body = document.getElementById('owned-body');
-  const f = flowerCards.filter(x => x.owned); const m = mushroomCards.filter(x => x.owned);
+  const body = document.getElementById('owned-body'); const f = flowerCards.filter(x => x.owned); const m = mushroomCards.filter(x => x.owned);
   if(!f.length && !m.length){ body.innerHTML = '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏喔🎒</div>'; return; }
   let h = '';
   if(f.length) h += `<div class="group-section"><div class="group-header" style="padding:0 16px;">🌸 花點收藏 <span class="group-count">${f.length}</span></div><div class="postcard-stack">${f.map(x => stackCardHTML(x, 'flower')).join('')}</div></div>`;
@@ -1727,18 +1388,16 @@ function switchSubTab(cat, tab, el) { const s = document.getElementById('screen-
 function applyFilter(cat, mode, val) { activeFilters[cat] = val; refreshCurrentView(); }
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
 
+// 🌟 複製到剪貼簿功能 🌟
 function copyCoord(e, c) { 
   e.stopPropagation(); const b = e.currentTarget; 
   if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(c).then(() => {
-          b.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { b.textContent = c; }, 2000); 
-      }).catch(err => { fallbackCopy(b, c); });
+      navigator.clipboard.writeText(c).then(() => { b.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { b.textContent = c; }, 2000); }).catch(err => { fallbackCopy(b, c); });
   } else { fallbackCopy(b, c); }
 }
 function fallbackCopy(btn, text) {
     let textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-999999px"; textArea.style.top = "-999999px"; document.body.appendChild(textArea); textArea.focus(); textArea.select();
-    try { document.execCommand('copy'); btn.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { btn.textContent = text; }, 2000); } catch (err) { showToast('⚠️ 複製失敗，請手動選取'); }
-    textArea.remove();
+    try { document.execCommand('copy'); btn.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { btn.textContent = text; }, 2000); } catch (err) { showToast('⚠️ 複製失敗，請手動選取'); } textArea.remove();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); document.getElementById('global-nav').classList.add('hidden-dock'); document.body.style.overflow = 'hidden'; }
@@ -1759,6 +1418,8 @@ document.addEventListener('keydown', (e) => {
         else if (document.getElementById('addThemeModal').classList.contains('open')) saveThemeAction();
         else if (document.getElementById('cropModal').classList.contains('open')) confirmCrop();
         else if (document.getElementById('settingsModal').classList.contains('open')) saveSettings();
+        else if (document.getElementById('confirmModal').classList.contains('open')) executeCancelOwned();
+        else if (document.getElementById('deleteConfirmModal').classList.contains('open')) executeHardDelete();
     }
 });
 
