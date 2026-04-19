@@ -38,7 +38,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-.screen { display: none; min-height: 100vh; width: 100%; position: absolute; top:0; left:0; }
+.screen { display: none; min-height: 100vh; width: 100%; }
 .screen.active { display: block; }
 
 /* 🌟 LOGIN SCREEN 🌟 */
@@ -551,9 +551,10 @@ function gisLoaded() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: SCOPES,
-        callback: async (resp) => {
+        callback: (resp) => {
             if (resp.error !== undefined) { 
                 console.error("登入錯誤:", resp.error);
+                showToast('⚠️ 登入未完成');
                 return; 
             }
             currentAccessToken = resp.access_token;
@@ -561,8 +562,10 @@ function gisLoaded() {
             localStorage.setItem('pikmin_token_expiry', Date.now() + 50 * 60 * 1000);
             
             showAppScreen();
-            await fetchUserInfo();
-            await checkAndSyncDriveFile();
+            
+            fetchUserInfo().finally(() => {
+                checkAndSyncDriveFile();
+            });
         },
     });
     gisInited = true;
@@ -570,9 +573,8 @@ function gisLoaded() {
     // 檢查登入狀態與切換畫面
     if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
         showAppScreen();
-        fetchUserInfo().then(success => {
-            if(success) checkAndSyncDriveFile();
-            else handleLogout();
+        fetchUserInfo().finally(() => {
+            checkAndSyncDriveFile();
         });
     } else {
         showLoginScreen();
@@ -613,14 +615,20 @@ function handleLogout() {
 async function fetchUserInfo() {
     try {
         const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + currentAccessToken }});
-        if (!res.ok) return false;
+        if (!res.ok) {
+            updateProfileUI(); // 允許沒有資料也能繼續使用
+            return false;
+        }
         const data = await res.json();
         userProfile.email = data.email;
         userProfile.name = data.name;
         userProfile.picture = data.picture;
         updateProfileUI();
         return true;
-    } catch(e) { return false; }
+    } catch(e) { 
+        updateProfileUI();
+        return false; 
+    }
 }
 
 function updateProfileUI() {
@@ -1538,7 +1546,7 @@ function goTo(screen) {
   if (index !== undefined) {
     const dockItems = document.querySelectorAll('.dock-nav > div'); 
     dockItems.forEach(nav => nav.classList.remove('active'));
-    dockItems[index].classList.add('active');
+    if(dockItems[index]) dockItems[index].classList.add('active');
   }
   refreshCurrentView(); window.scrollTo(0, 0);
 }
@@ -1717,7 +1725,6 @@ function switchSubTab(cat, tab, el) { const s = document.getElementById('screen-
 function applyFilter(cat, mode, val) { activeFilters[cat] = val; refreshCurrentView(); }
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
 
-// 🌟 複製到剪貼簿功能 🌟
 function copyCoord(e, c) { 
   e.stopPropagation(); const b = e.currentTarget; 
   if (navigator.clipboard && window.isSecureContext) {
@@ -1738,15 +1745,11 @@ function closeModalOutside(e, id) { if(e.target.id === id) closeModal(id); }
 function resetSwipes() { document.querySelectorAll('.postcard.swiped').forEach(el => el.classList.remove('swiped')); }
 function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
 
-// 🌟 電腦版鍵盤捷徑 (ESC / Enter) 🌟
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const openModals = document.querySelectorAll('.modal-overlay.open');
-        if (openModals.length > 0) {
-            closeModal(openModals[openModals.length - 1].id);
-        } else if (document.getElementById('lightbox').classList.contains('open')) {
-            closeLightbox();
-        }
+        if (openModals.length > 0) closeModal(openModals[openModals.length - 1].id);
+        else if (document.getElementById('lightbox').classList.contains('open')) closeLightbox();
     } else if (e.key === 'Enter') {
         if (e.target.tagName === 'TEXTAREA') return;
         if (document.getElementById('editModal').classList.contains('open')) saveEdit();
@@ -1779,7 +1782,7 @@ function initModalDrag() {
     });
 }
 
-setTimeout(() => { goTo('home'); initModalDrag(); }, 50);
+document.addEventListener('DOMContentLoaded', () => { initModalDrag(); });
 </script>
 </body>
 </html>
