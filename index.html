@@ -48,419 +48,74 @@
   --dock-add-bg: linear-gradient(135deg, #c4fc62, #a8ff4a);
 }
 
-* { 
-  box-sizing: border-box; 
-  margin: 0; 
-  padding: 0; 
-  -webkit-tap-highlight-color: transparent; 
-}
-
-body { 
-  font-family: 'Noto Sans TC', sans-serif; 
-  background: var(--bg); 
-  color: var(--text); 
-  min-height: 100vh; 
-  overflow-x: hidden; 
-}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
 /* 🌟 畫面切換的流暢過場動畫 🌟 */
-.screen { 
-  display: none; 
-  min-height: 100vh; 
-  width: 100%; 
-  position: absolute; 
-  top: 0; 
-  left: 0; 
-}
-
-.screen.active { 
-  display: block; 
-  animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); 
-}
-
-@keyframes screenFadeIn { 
-  from { opacity: 0; transform: translateY(15px); } 
-  to { opacity: 1; transform: translateY(0); } 
-}
-
-.screen-transition-out { 
-  opacity: 0 !important; 
-  transform: scale(0.98) !important; 
-  pointer-events: none; 
-  transition: all 0.3s ease !important; 
-}
+.screen { display: none; min-height: 100vh; width: 100%; position: absolute; top: 0; left: 0; }
+.screen.active { display: block; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+@keyframes screenFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.screen-transition-out { opacity: 0 !important; transform: scale(0.98) !important; pointer-events: none; transition: all 0.3s ease !important; }
 
 /* 🌟 LOGIN SCREEN 🌟 */
-#screen-login { 
-  background: #f0f7f2; 
-  z-index: 1000; 
-  transition: opacity 0.3s ease, transform 0.3s ease; 
-}
+#screen-login { background: #f0f7f2; z-index: 1000; transition: opacity 0.3s ease, transform 0.3s ease; }
+#screen-login.active { display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+.login-art { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.login-box { width: 100%; padding: 40px 30px max(40px, env(safe-area-inset-bottom)); background: white; border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(76, 175, 110, 0.08); }
+.login-title { font-family: 'Nunito', sans-serif; font-size: 2.4rem; font-weight: 900; margin-bottom: 8px; color: #111; letter-spacing: -0.5px; }
+.login-sub { font-size: 1.05rem; font-weight: 700; color: #6b7280; margin-bottom: 32px; }
+.btn-login { width: 100%; background: linear-gradient(135deg, #c4fc62, #a8ff4a); color: #000; border: none; padding: 18px; border-radius: 99px; font-size: 1.15rem; font-family: 'Nunito', sans-serif; font-weight: 900; cursor: pointer; box-shadow: 0 8px 20px rgba(168, 255, 74, 0.35); transition: transform 0.2s; }
+.btn-login:active { transform: scale(0.96); }
+@keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
 
-#screen-login.active { 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: space-between; 
-}
+/* ── HOME SCREEN ── */
+.home-header { padding: max(32px, env(safe-area-inset-top)) 24px 20px; background: var(--bg); display: flex; justify-content: space-between; align-items: center; }
+.home-greeting { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 900; color: var(--text); letter-spacing: -0.5px; margin-bottom: 2px; }
+.home-email { font-size: 0.85rem; font-weight: 700; color: var(--sub); }
+.home-avatar-container { position: relative; cursor: pointer; }
+.home-avatar { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2.5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #a0a0a0; }
+.sync-indicator { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; border: 3px solid var(--bg); transition: background 0.3s; z-index: 2; opacity: 0; }
+.sync-indicator.syncing { opacity: 1; background: transparent; border-top-color: var(--green); border-right-color: var(--green); border-bottom-color: var(--green); border-left-color: transparent; animation: spin 0.8s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
-.login-art { 
-  flex: 1; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  flex-direction: column; 
-}
+.home-body { padding: 10px 20px 140px; } 
+.home-section-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; margin-top: 24px; }
+.home-section-title:first-child { margin-top: 0; }
+.category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.cat-btn { border-radius: 24px; padding: 24px 16px; border: none; cursor: pointer; text-align: left; transition: transform 0.15s; box-shadow: var(--shadow); }
+.cat-btn:active { transform: scale(0.97); }
+.cat-btn.flower-btn { background: linear-gradient(135deg, #f9c8e3, #f0a0cc); }
+.cat-btn.mushroom-btn { background: linear-gradient(135deg, #fde0a0, #f5c060); }
+.cat-btn .cat-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.cat-btn .cat-label { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #3a1a2e; }
+.cat-btn .cat-count { font-size: 0.78rem; font-weight: 700; color: rgba(0,0,0,0.4); margin-top: 2px; }
 
-.login-box { 
-  width: 100%; 
-  padding: 40px 30px max(40px, env(safe-area-inset-bottom)); 
-  background: white; 
-  border-radius: 40px 40px 0 0; 
-  box-shadow: 0 -10px 40px rgba(76, 175, 110, 0.08); 
-}
-
-.login-title { 
-  font-family: 'Nunito', sans-serif; 
-  font-size: 2.4rem; 
-  font-weight: 900; 
-  margin-bottom: 8px; 
-  color: #111; 
-  letter-spacing: -0.5px; 
-}
-
-.login-sub { 
-  font-size: 1.05rem; 
-  font-weight: 700; 
-  color: #6b7280; 
-  margin-bottom: 32px; 
-}
-
-.btn-login { 
-  width: 100%; 
-  background: linear-gradient(135deg, #c4fc62, #a8ff4a); 
-  color: #000; 
-  border: none; 
-  padding: 18px; 
-  border-radius: 99px; 
-  font-size: 1.15rem; 
-  font-family: 'Nunito', sans-serif; 
-  font-weight: 900; 
-  cursor: pointer; 
-  box-shadow: 0 8px 20px rgba(168, 255, 74, 0.35); 
-  transition: transform 0.2s; 
-}
-
-.btn-login:active { 
-  transform: scale(0.96); 
-}
-
-@keyframes float { 
-  0% { transform: translateY(0); } 
-  50% { transform: translateY(-10px); } 
-  100% { transform: translateY(0); } 
-}
-
-/* ── HOME SCREEN (Header) ── */
-.home-header { 
-  padding: max(32px, env(safe-area-inset-top)) 24px 20px; 
-  background: var(--bg); 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-}
-
-.home-greeting { 
-  font-family: 'Nunito', sans-serif; 
-  font-size: 1.7rem; 
-  font-weight: 900; 
-  color: var(--text); 
-  letter-spacing: -0.5px; 
-  margin-bottom: 2px; 
-}
-
-.home-email { 
-  font-size: 0.85rem; 
-  font-weight: 700; 
-  color: var(--sub); 
-}
-
-.home-avatar-container { 
-  position: relative; 
-  cursor: pointer; 
-}
-
-.home-avatar { 
-  width: 54px; 
-  height: 54px; 
-  border-radius: 50%; 
-  object-fit: cover; 
-  border: 2.5px solid #fff; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-  background: #e0e0e0; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  color: #a0a0a0; 
-}
-
-.sync-indicator { 
-  position: absolute; 
-  bottom: 0; 
-  right: -2px; 
-  width: 18px; 
-  height: 18px; 
-  background: var(--green); 
-  border-radius: 50%; 
-  border: 3px solid var(--bg); 
-  transition: background 0.3s; 
-  z-index: 2; 
-  opacity: 0; 
-}
-
-.sync-indicator.syncing { 
-  opacity: 1; 
-  background: transparent; 
-  border-top-color: var(--green); 
-  border-right-color: var(--green); 
-  border-bottom-color: var(--green); 
-  border-left-color: transparent; 
-  animation: spin 0.8s linear infinite; 
-}
-
-@keyframes spin { 
-  100% { transform: rotate(360deg); } 
-}
-
-.home-body { 
-  padding: 10px 20px 140px; 
-} 
-
-.home-section-title { 
-  font-family: 'Nunito', sans-serif; 
-  font-weight: 900; 
-  font-size: 0.85rem; 
-  color: var(--sub); 
-  letter-spacing: 1px; 
-  text-transform: uppercase; 
-  margin-bottom: 12px; 
-  margin-top: 24px; 
-}
-
-.home-section-title:first-child { 
-  margin-top: 0; 
-}
-
-.category-grid { 
-  display: grid; 
-  grid-template-columns: 1fr 1fr; 
-  gap: 12px; 
-  margin-bottom: 24px; 
-}
-
-.cat-btn { 
-  border-radius: 24px; 
-  padding: 24px 16px; 
-  border: none; 
-  cursor: pointer; 
-  text-align: left; 
-  transition: transform 0.15s; 
-  box-shadow: var(--shadow); 
-}
-
-.cat-btn:active { 
-  transform: scale(0.97); 
-}
-
-.cat-btn.flower-btn { 
-  background: linear-gradient(135deg, #f9c8e3, #f0a0cc); 
-}
-
-.cat-btn.mushroom-btn { 
-  background: linear-gradient(135deg, #fde0a0, #f5c060); 
-}
-
-.cat-btn .cat-icon { 
-  font-size: 2.4rem; 
-  display: block; 
-  margin-bottom: 8px; 
-}
-
-.cat-btn .cat-label { 
-  font-family: 'Nunito', sans-serif; 
-  font-weight: 900; 
-  font-size: 1.1rem; 
-  color: #3a1a2e; 
-}
-
-.cat-btn .cat-count { 
-  font-size: 0.78rem; 
-  font-weight: 700; 
-  color: rgba(0,0,0,0.4); 
-  margin-top: 2px; 
-}
-
-.search-wrapper { 
-  position: relative; 
-  width: 100%; 
-  margin-bottom: 20px; 
-}
-
-.search-input { 
-  width: 100%; 
-  padding: 14px 16px 14px 44px; 
-  border-radius: 16px; 
-  border: 1.5px solid var(--border); 
-  background: #fff; 
-  font-size: 0.95rem; 
-  font-weight: 500; 
-  outline: none; 
-  box-shadow: var(--shadow); 
-  transition: all 0.2s; 
-}
-
-.search-icon { 
-  position: absolute; 
-  left: 16px; 
-  top: 50%; 
-  transform: translateY(-50%); 
-  color: var(--sub); 
-  font-size: 1.1rem; 
-}
+.search-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
+.search-input { width: 100%; padding: 14px 16px 14px 44px; border-radius: 16px; border: 1.5px solid var(--border); background: #fff; font-size: 0.95rem; font-weight: 500; outline: none; box-shadow: var(--shadow); transition: all 0.2s; }
+.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); font-size: 1.1rem; }
 
 /* ── CATEGORY LAYOUT & FILTERS ── */
-.cat-screen-header { 
-  position: sticky; 
-  top: 0; 
-  z-index: 50; 
-  background: var(--bg); 
-}
+.cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); }
+.cat-topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--card); border-bottom: 1.5px solid var(--border); }
+.back-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 4px; }
+.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; } 
 
-.cat-topbar { 
-  display: flex; 
-  align-items: center; 
-  gap: 10px; 
-  padding: 14px 16px; 
-  background: var(--card); 
-  border-bottom: 1.5px solid var(--border); 
-}
+.sub-tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); }
+.sub-tab { flex: 1; padding: 14px 10px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; color: var(--sub); cursor: pointer; border-bottom: 3px solid transparent; }
+.sub-tab.active { color: var(--green-dark); border-bottom-color: var(--green); }
 
-.back-btn { 
-  background: none; 
-  border: none; 
-  font-size: 1.4rem; 
-  cursor: pointer; 
-  color: var(--text); 
-  padding: 4px; 
-}
-
-.cat-topbar-title { 
-  font-family: 'Nunito', sans-serif; 
-  font-weight: 900; 
-  font-size: 1.1rem; 
-  flex: 1; 
-  text-align: center; 
-} 
-
-.sub-tabs { 
-  display: flex; 
-  background: var(--card); 
-  border-bottom: 1px solid var(--border); 
-}
-
-.sub-tab { 
-  flex: 1; 
-  padding: 14px 10px; 
-  text-align: center; 
-  font-family: 'Nunito', sans-serif; 
-  font-weight: 800; 
-  font-size: 0.9rem; 
-  color: var(--sub); 
-  cursor: pointer; 
-  border-bottom: 3px solid transparent; 
-}
-
-.sub-tab.active { 
-  color: var(--green-dark); 
-  border-bottom-color: var(--green); 
-}
-
-.quick-filter-wrapper { 
-  display: flex; 
-  gap: 10px; 
-  padding: 14px 16px; 
-  background: var(--bg); 
-  overflow-x: auto; 
-  scrollbar-width: none; 
-  border-bottom: 1.5px solid var(--border); 
-  align-items: center; 
-  cursor: grab; 
-}
-
+.quick-filter-wrapper { display: flex; gap: 10px; padding: 14px 16px; background: var(--bg); overflow-x: auto; scrollbar-width: none; border-bottom: 1.5px solid var(--border); align-items: center; cursor: grab; }
 .quick-filter-wrapper:active { cursor: grabbing; }
 .quick-filter-wrapper::-webkit-scrollbar { display: none; }
+.filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: 1.5px solid var(--border); background: #ffffff; color: var(--sub); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; user-select: none;}
+.filter-pill.active { background: #4a7c59; color: #ffffff; border-color: #4a7c59; }
 
-.filter-pill { 
-  display: flex; 
-  align-items: center; 
-  gap: 6px; 
-  padding: 8px 18px; 
-  border-radius: 99px; 
-  border: 1.5px solid var(--border); 
-  background: #ffffff; 
-  color: var(--sub); 
-  font-family: 'Nunito', sans-serif; 
-  font-weight: 700; 
-  font-size: 0.85rem; 
-  cursor: pointer; 
-  white-space: nowrap; 
-  transition: all 0.2s; 
-  user-select: none;
-}
-
-.filter-pill.active { 
-  background: #4a7c59; 
-  color: #ffffff; 
-  border-color: #4a7c59; 
-}
-
-.add-theme-btn { 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  padding: 8px 16px; 
-  border-radius: 99px; 
-  border: 1.5px dashed var(--sub); 
-  background: transparent; 
-  color: var(--sub); 
-  font-weight: 900; 
-  cursor: pointer; 
-  font-size: 0.9rem; 
-  flex-shrink: 0; 
-}
+.add-theme-btn { display: flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: transparent; color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
 
 .cat-body { padding: 16px 16px 140px; }
 .group-section { margin-bottom: 24px; }
-.group-header { 
-  font-family: 'Nunito', sans-serif; 
-  font-weight: 900; 
-  font-size: 0.85rem; 
-  color: var(--sub); 
-  letter-spacing: 1px; 
-  text-transform: uppercase; 
-  margin-bottom: 10px; 
-  display: flex; 
-  align-items: center; 
-  gap: 8px; 
-}
-
-.group-count { 
-  background: var(--border); 
-  color: var(--sub); 
-  border-radius: 99px; 
-  padding: 2px 10px; 
-  font-size: 0.7rem; 
-}
+.group-header { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.group-count { background: var(--border); color: var(--sub); border-radius: 99px; padding: 2px 10px; font-size: 0.7rem; }
 
 /* ── POSTCARD CARDS ── */
 .postcard-wrapper { position: relative; margin-bottom: 14px; border-radius: 20px; background: var(--danger); overflow: hidden; }
@@ -489,20 +144,16 @@ body {
   align-items: center;
   gap: 3px;
 }
-
 .image-time-badge { top: 8px; right: 8px; }
 .stack-time-badge { bottom: 16px; left: 24px; }
 
 .postcard-info { flex: 1; padding: 14px 14px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; }
-
 .mac-btns-container { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 6px; z-index: 10; }
 .mac-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(142, 142, 147, 0.1); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: all 0.2s; }
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; margin: auto; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
 
-@media (max-width: 768px) and (pointer: coarse) {
-  .postcard .mac-btn.del-btn { display: none !important; }
-}
+@media (max-width: 768px) and (pointer: coarse) { .postcard .mac-btn.del-btn { display: none !important; } }
 
 .modal-action-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: rgba(142, 142, 147, 0.12); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: all 0.2s; flex-shrink: 0;}
 .modal-action-btn svg { width: 16px; height: 16px; stroke-width: 2.5; pointer-events: none; }
@@ -728,16 +379,8 @@ body {
   <div class="home-body">
     <div class="home-section-title">瀏覽分類</div>
     <div class="category-grid">
-      <button class="cat-btn flower-btn" onclick="goTo('flower')">
-        <span class="cat-icon">🌸</span>
-        <div class="cat-label">花點</div>
-        <div class="cat-count" id="stat-f-total">0 張</div>
-      </button>
-      <button class="cat-btn mushroom-btn" onclick="goTo('mushroom')">
-        <span class="cat-icon">🍄</span>
-        <div class="cat-label">菇點</div>
-        <div class="cat-count" id="stat-m-total">0 張</div>
-      </button>
+      <button class="cat-btn flower-btn" onclick="goTo('flower')"><span class="cat-icon">🌸</span><div class="cat-label">花點</div><div class="cat-count" id="stat-f-total">0 張</div></button>
+      <button class="cat-btn mushroom-btn" onclick="goTo('mushroom')"><span class="cat-icon">🍄</span><div class="cat-label">菇點</div><div class="cat-count" id="stat-m-total">0 張</div></button>
     </div>
     <div class="home-section-title">快速搜尋</div>
     <div class="search-wrapper">
@@ -903,17 +546,11 @@ body {
 </div>
 
 <div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-handle"></div><div class="modal-title">取消收藏</div></div>
-    <button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeCancelOwned()">確定移除</button>
-  </div>
+  <div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">取消收藏</div></div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeCancelOwned()">確定移除</button></div>
 </div>
 
 <div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-handle"></div><div class="modal-title">刪除明信片</div></div>
-    <button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeHardDelete()">確定刪除</button>
-  </div>
+  <div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">刪除明信片</div></div><button class="btn-danger" style="width:100%; border-radius:16px; padding:16px; font-weight:900; border:none;" onclick="executeHardDelete()">確定刪除</button></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1078,7 +715,7 @@ function updateProfileUI() {
     if (displayAvatar) {
         avatarEl.src = displayAvatar;
         settingsAvatarEl.src = displayAvatar;
-        avatarEl.style.display = 'flex';
+        avatarEl.style.display = 'block';
         fallbackEl.style.display = 'none';
     } else {
         avatarEl.style.display = 'none';
@@ -1390,12 +1027,37 @@ function handleFiles(files) {
   document.getElementById('file-input').value = "";
 }
 
+// 🌟 雙軌機制：用壓縮圖去 OCR，但介面與儲存用原圖 🌟
+async function resizeForOCR(imgUrl) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxDim = 1024;
+            let scale = 1;
+            if (img.width > maxDim || img.height > maxDim) {
+                scale = Math.min(maxDim / img.width, maxDim / img.height);
+            }
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.src = imgUrl;
+    });
+}
+
 function startCropNext() {
   if (currentCropIndex >= filesToCrop.length) { openModal('uploadModal'); renderBatchItems(); return; }
   const file = filesToCrop[currentCropIndex]; const reader = new FileReader();
   reader.onload = async (e) => {
     const originalImgUrl = e.target.result;
-    preloadOCR(currentCropIndex, originalImgUrl); 
+    
+    // 壓縮一份極小的圖片送給 OCR，避免被 Google Apps Script 阻擋
+    const smallImgForOcr = await resizeForOCR(originalImgUrl);
+    preloadOCR(currentCropIndex, smallImgForOcr); 
+    
     cropMode = 'upload'; 
     const imageTarget = document.getElementById('crop-image-target');
     openModal('cropModal'); 
@@ -1408,7 +1070,7 @@ function startCropNext() {
         });
       }, 150); 
     };
-    imageTarget.src = originalImgUrl;
+    imageTarget.src = originalImgUrl; // 這裡依然保留 100% 原始解析度的截圖！
   };
   reader.readAsDataURL(file);
 }
@@ -1467,6 +1129,7 @@ function startEditCrop() {
   imageTarget.src = targetOriginal;
 }
 
+// 🌟 黑名單與空值防呆更新 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -1479,7 +1142,7 @@ async function preloadOCR(fileIndex, imgUrl) {
 
         const ignoreList = [
             'pikmin', 'bloom', '一般', '巨大', '蘑菇', 'cleared', '點', '今日', '昨日', '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽',
-            '明信片', '皮克敏', '最相關', '回覆', '送出', '翻譯年糕', '讚', '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏', '葉子', '打卡', '好美', '好可愛', '開心', '路過'
+            '明信片', '皮克敏', '最相關', '回覆', '送出', '翻譯年糕', '讚', '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏', '葉子', '打卡', '好美', '好可愛', '開心', '路過', '圖片中找不到文字'
         ];
         
         const validLines = lines.filter(l => {
@@ -1498,6 +1161,8 @@ async function preloadOCR(fileIndex, imgUrl) {
         });
 
         let foundName = validLines.length > 0 ? validLines[0] : '未命名明信片';
+        if (foundName.includes('找不到文字') || foundName.includes('Error')) foundName = '未命名明信片';
+        
         ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = foundName.substring(0, 40); ocrCache[fileIndex].coord = foundCoord; applyOcrToBatch(fileIndex);
     } catch(e) {
         console.error('Cloud OCR Error:', e);
@@ -1926,6 +1591,7 @@ function initModalDrag() {
     });
 }
 
+// 初始化
 document.addEventListener('DOMContentLoaded', () => { initModalDrag(); });
 </script>
 </body>
