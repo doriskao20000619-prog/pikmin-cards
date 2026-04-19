@@ -795,13 +795,26 @@ async function downloadFromDrive() {
         if (!response.ok) throw new Error('Download failed');
         const dataObj = await response.json();
         
-        if(dataObj.flowerCards) flowerCards = dataObj.flowerCards;
-        if(dataObj.mushroomCards) mushroomCards = dataObj.mushroomCards;
-        if(dataObj.customThemes) customThemes = dataObj.customThemes;
-        
-        saveDataToLocal(true); 
-        refreshCurrentView();
-        showToast('✅ 已從雲端載入最新資料');
+        const localTime = parseInt(localStorage.getItem('pikmin_lastUpdate') || '0');
+        let cloudTime = parseInt(dataObj.lastUpdate || '0');
+        if (isNaN(cloudTime) && typeof dataObj.lastUpdate === 'string') {
+            cloudTime = new Date(dataObj.lastUpdate).getTime();
+        }
+
+        if (localTime > cloudTime) {
+            console.log("本機較新，執行反向同步上傳");
+            showToast('☁️ 發現本機有最新進度，正在同步至雲端...');
+            uploadToCloud();
+        } else {
+            if(dataObj.flowerCards) flowerCards = dataObj.flowerCards;
+            if(dataObj.mushroomCards) mushroomCards = dataObj.mushroomCards;
+            if(dataObj.customThemes) customThemes = dataObj.customThemes;
+            
+            localStorage.setItem('pikmin_lastUpdate', cloudTime.toString());
+            saveDataToLocal(true, true); 
+            refreshCurrentView();
+            showToast('✅ 已從雲端載入最新資料');
+        }
     } catch (err) {
         console.error('Download error', err);
     }
@@ -809,7 +822,14 @@ async function downloadFromDrive() {
 
 async function uploadToCloud() {
     if (!driveFileId || !currentAccessToken) return;
-    const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: new Date().toISOString() });
+    
+    let localTime = localStorage.getItem('pikmin_lastUpdate');
+    if (!localTime) {
+        localTime = Date.now().toString();
+        localStorage.setItem('pikmin_lastUpdate', localTime);
+    }
+
+    const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: localTime });
     const file = new Blob([fileContent], {type: 'application/json'});
     const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify({mimeType: 'application/json'})], {type: 'application/json'}));
@@ -829,7 +849,14 @@ async function uploadToCloud() {
 
 async function createInDrive() {
     if (!currentAccessToken) return;
-    const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: new Date().toISOString() });
+    
+    let localTime = localStorage.getItem('pikmin_lastUpdate');
+    if (!localTime) {
+        localTime = Date.now().toString();
+        localStorage.setItem('pikmin_lastUpdate', localTime);
+    }
+
+    const fileContent = JSON.stringify({ flowerCards, mushroomCards, customThemes, lastUpdate: localTime });
     const file = new Blob([fileContent], {type: 'application/json'});
     const metadata = { name: 'pikmin_data_v1.json', parents: ['appDataFolder'], mimeType: 'application/json' };
     const form = new FormData();
@@ -875,7 +902,7 @@ function loadDataFromLocal() {
     }
 }
 
-function saveDataToLocal(skipCloud = false) {
+function saveDataToLocal(skipCloud = false, isFromCloud = false) {
     try {
         const localFlower = flowerCards.map(c => ({...c, originalImg: null}));
         const localMushroom = mushroomCards.map(c => ({...c, originalImg: null}));
@@ -883,6 +910,10 @@ function saveDataToLocal(skipCloud = false) {
         localStorage.setItem('pikmin_flowerCards', JSON.stringify(localFlower));
         localStorage.setItem('pikmin_mushroomCards', JSON.stringify(localMushroom));
         localStorage.setItem('pikmin_customThemes', JSON.stringify(customThemes));
+        
+        if (!isFromCloud) {
+            localStorage.setItem('pikmin_lastUpdate', Date.now().toString());
+        }
         
         if(!skipCloud) {
             uploadToCloud();
@@ -1031,26 +1062,6 @@ function handleFiles(files) {
   document.getElementById('file-input').value = "";
 }
 
-async function resizeForOCR(imgUrl) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const maxDim = 800;
-            let scale = 1;
-            if (img.width > maxDim || img.height > maxDim) {
-                scale = Math.min(maxDim / img.width, maxDim / img.height);
-            }
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.7));
-        };
-        img.src = imgUrl;
-    });
-}
-
 function startCropNext() {
   if (currentCropIndex >= filesToCrop.length) {
     openModal('uploadModal');
@@ -1064,8 +1075,8 @@ function startCropNext() {
   reader.onload = async (e) => {
     const originalImgUrl = e.target.result;
     
-    const smallImgForOcr = await resizeForOCR(originalImgUrl);
-    preloadOCR(currentCropIndex, smallImgForOcr);
+    // 🌟 取消預縮圖機制，保留原始高畫質 🌟
+    preloadOCR(currentCropIndex, originalImgUrl);
     
     cropMode = 'upload'; 
     const imageTarget = document.getElementById('crop-image-target');
@@ -1286,13 +1297,10 @@ function applyOcrToBatch(fileIndex) {
     }
 }
 
-// 🌟 修改處 1：拔除大小限制，使用高品質 JPEG 輸出以維持截圖清晰度 🌟
+// 🌟 取消圖片大小強制壓縮，改用 0.98 的無損高品質輸出 🌟
 function confirmCrop() {
   if (!cropperInstance) return;
-  
-  // 完全移除 maxWidth 與 maxHeight 限制，原尺寸輸出
   const canvas = cropperInstance.getCroppedCanvas();
-  // 輸出為 0.98 的高品質 JPEG (在確保清晰度與省空間之間取得最佳平衡)
   const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.98);
   const originalImgUrl = document.getElementById('crop-image-target').src;
   
@@ -2164,29 +2172,46 @@ function applyFilter(cat, mode, val) { activeFilters[cat] = val; refreshCurrentV
 function toggleHideOwned(cat) { hideOwnedState[cat] = !hideOwnedState[cat]; refreshCurrentView(); }
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
 
-// 🌟 修改處：真正執行寫入剪貼簿的 copyCoord 🌟
+// 🌟 修改處 1：真正的複製到剪貼簿功能 🌟
 function copyCoord(e, c) { 
   e.stopPropagation(); 
   const b = e.currentTarget; 
   
+  // 優先使用現代的 Clipboard API
   if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(c);
+      navigator.clipboard.writeText(c).then(() => {
+          b.textContent = '✅ 已複製！'; 
+          showToast('📋 已複製'); 
+          setTimeout(() => { b.textContent = c; }, 2000); 
+      }).catch(err => {
+          console.error('Failed to copy', err);
+          fallbackCopy(b, c);
+      });
   } else {
-      let textArea = document.createElement("textarea");
-      textArea.value = c;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try { document.execCommand('copy'); } catch (err) { console.error('Fallback copy failed', err); }
-      textArea.remove();
+      fallbackCopy(b, c);
   }
-  
-  b.textContent = '✅ 已複製！'; 
-  showToast('📋 已複製'); 
-  setTimeout(() => { b.textContent = c; }, 2000); 
+}
+
+// 支援舊版手機瀏覽器的複製寫法
+function fallbackCopy(btn, text) {
+    let textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try { 
+        document.execCommand('copy'); 
+        btn.textContent = '✅ 已複製！'; 
+        showToast('📋 已複製'); 
+        setTimeout(() => { btn.textContent = text; }, 2000); 
+    } catch (err) { 
+        console.error('Fallback copy failed', err); 
+        showToast('⚠️ 複製失敗，請手動選取');
+    }
+    textArea.remove();
 }
 
 function openModal(id) { 
