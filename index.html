@@ -638,10 +638,16 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
       <div id="edit-img-section" style="text-align:center; margin-bottom:24px; display:flex; flex-direction:column; align-items:center; margin-top: 10px; cursor: pointer;" onclick="startEditCrop()">
         <div style="position: relative; display: inline-block;">
           <img id="edit-img-preview" src="" style="width: 120px; height: 120px; object-fit: cover; border-radius: 20px; border: 2px solid var(--border); display:none; box-shadow: var(--shadow);">
+          
+          <button id="btn-delete-edit-img" onclick="deleteEditImg(event)" style="position: absolute; top: -8px; left: -8px; width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 1.5px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: none; align-items: center; justify-content: center; color: #FF3B30; padding:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px; pointer-events:none;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+          
           <button id="btn-recrop-img" style="position: absolute; top: -8px; right: -8px; width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 1.5px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: none; align-items: center; justify-content: center; color: var(--text); padding:0; pointer-events: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px; pointer-events:none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
           </button>
         </div>
+        
         <div id="btn-add-edit-img" onclick="event.stopPropagation(); document.getElementById('edit-file-input').click()" style="width: 120px; height: 120px; border-radius: 20px; border: 2px dashed var(--border); background: #f9fbf9; display: none; align-items: center; justify-content: center; cursor: pointer; color: var(--sub); box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
         </div>
@@ -847,7 +853,7 @@ async function createInDrive() {
 }
 
 
-// 🌟 你的 GAS 網址 🌟
+// 🌟 你的 GAS 網址 (保留原版架構) 🌟
 const GAS_CLOUD_OCR_URL = 'https://script.google.com/macros/s/AKfycbxoCUQ4V-xHV77p4WwB29o3jq8Di4ZGyGXXE9ob2DtZ-f7FwQZBYY9m6lQHwCcOIzHvvQ/exec';
 
 let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
@@ -872,7 +878,6 @@ function loadDataFromLocal() {
 
 function saveDataToLocal(skipCloud = false) {
     try {
-        // 智慧瘦身：存入 LocalStorage 前把 originalImg 刪除，避免 5MB 空間爆滿
         const localFlower = flowerCards.map(c => ({...c, originalImg: null}));
         const localMushroom = mushroomCards.map(c => ({...c, originalImg: null}));
 
@@ -892,7 +897,6 @@ function saveDataToLocal(skipCloud = false) {
 
 loadDataFromLocal();
 
-// 🌟 修改處 3：擴充更多 Emoji 選項，包含雪地、水域等 🌟
 let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵','❄️','⛄','🧊','🌲','🌊','♨️','🚂','🚢','🌉','🏰'];
 let currentNewThemeEmoji = '✨';
 
@@ -914,6 +918,7 @@ let cropMode = 'upload';
 let tempEditImg = null;
 let tempEditOriginalImg = null;
 let tempEditCropData = null; 
+let isEditImgDeleted = false; // 🌟 追蹤是否刪除了編輯中的照片
 
 let dragStartX = 0;
 let dragStartY = 0;
@@ -1092,6 +1097,21 @@ function startCropNext() {
   reader.readAsDataURL(file);
 }
 
+// 🌟 修改處：新增刪除已上傳照片的函數 🌟
+function deleteEditImg(e) {
+    e.stopPropagation(); // 阻止點擊事件冒泡觸發 startEditCrop
+    isEditImgDeleted = true;
+    tempEditImg = null;
+    tempEditOriginalImg = null;
+    tempEditCropData = null;
+
+    document.getElementById('edit-img-preview').style.display = 'none';
+    document.getElementById('btn-recrop-img').style.display = 'none';
+    document.getElementById('btn-delete-edit-img').style.display = 'none';
+    document.getElementById('btn-add-edit-img').style.display = 'flex';
+    document.getElementById('edit-file-input').value = "";
+}
+
 function handleEditFileUpload(files) {
     if(files.length === 0) return;
     const file = files[0];
@@ -1100,6 +1120,7 @@ function handleEditFileUpload(files) {
         tempEditOriginalImg = e.target.result;
         tempEditCropData = null; 
         cropMode = 'edit';
+        isEditImgDeleted = false; // 重新上傳後取消刪除標記
         const imageTarget = document.getElementById('crop-image-target');
         openModal('cropModal');
         imageTarget.onload = () => {
@@ -1138,7 +1159,6 @@ function startEditCrop() {
   const list = currentEditCat === 'flower' ? flowerCards : mushroomCards;
   const c = list.find(x => x.id == currentEditId);
   if (!c) return;
-  // 🌟 修正處：如果 originalImg 被清空了，也可以直接使用 img (預覽圖) 進行二次裁切 🌟
   const targetOriginal = tempEditOriginalImg || c.originalImg || c.img;
   if (!targetOriginal) return;
   
@@ -1179,7 +1199,7 @@ function startEditCrop() {
   imageTarget.src = targetOriginal;
 }
 
-// 🌟 修改處 4：增強社群貼文與 Emoji 雜訊的過濾邏輯 🌟
+// 🌟 修改處 1：過濾時間戳記與電量，並且完全剔除有 Emoji 的文字 🌟
 async function preloadOCR(fileIndex, imgUrl) {
     ocrCache[fileIndex] = { done: false, progress: 0 };
     try {
@@ -1198,7 +1218,6 @@ async function preloadOCR(fileIndex, imgUrl) {
         
         const coordRegex = /-?\d{1,3}\.\d+\s*[,，]\s*-?\d{1,3}\.\d+/;
         
-        // 尋找座標
         for(let i=0; i<lines.length; i++){
             const match = lines[i].match(coordRegex);
             if(match) {
@@ -1207,29 +1226,40 @@ async function preloadOCR(fileIndex, imgUrl) {
             }
         }
 
-        // 黑名單字庫
         const ignoreList = [
             'pikmin', 'bloom', '一般', '巨大', '蘑菇', 'cleared', '點', '今日', '昨日',
             '串文', 'threads', '查看動態', '新增回覆', '留言', '分享', '次瀏覽',
             '明信片', '皮克敏', '最相關', '回覆', '送出', '翻譯年糕', '讚', 
             '轉發', '引用', '搜尋', '追蹤', '粉絲', '隱藏',
-            '葉子', '打卡', '好美', '好可愛', '開心', '路過' // 新增口語字眼
+            '葉子', '打卡', '好美', '好可愛', '開心', '路過'
         ];
         
         const validLines = lines.filter(l => {
             const lower = l.toLowerCase();
             if (lower.length <= 1) return false;
             
-            // 🌟 終極過濾 1：如果此行文字包含找到的座標數字，直接排除
+            // 排除座標所在的文字
             if (foundCoord && l.includes(foundCoord)) return false;
             
-            // 🌟 終極過濾 2：遊戲內建的明信片名稱絕對不可能包含 Emoji！
+            // 🌟 終極過濾 1：如果此行文字包含任何 Emoji 表情符號，絕對不是明信片官方名稱！
             if (/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu.test(l)) return false;
+            
+            // 🌟 終極過濾 2：過濾掉手機狀態列的「時間」 (例如 13:54 或 03:56)
+            if (/^\d{1,2}:\d{2}/.test(lower)) return false;
+            
+            // 🌟 終極過濾 3：過濾手機電量或網路符號 (例如 68%, 5G)
+            if (/^\d+%$/.test(lower)) return false;
+            if (/^(4g|5g|lte|wi-fi|wifi)$/.test(lower)) return false;
+            
+            // 拔除特殊符號後，如果只剩下數字與標點符號，也是雜訊
+            const noSymbol = lower.replace(/[0-9.,:\-\s/|()%]/g, '').trim();
+            if (noSymbol === '') return false; 
             
             if (lower.match(/\d+\s*(小時|分鐘|天|週|月|年)前/)) return false; 
             if (lower.match(/\d+\s*次瀏覽/)) return false; 
-            if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; // 日期格式
+            if (lower.match(/^\d{1,4}[/.-]\d{1,2}[/.-]\d{1,4}$/)) return false; 
             if (ignoreList.some(ignore => lower.includes(ignore))) return false;
+            
             return true;
         });
 
@@ -1300,6 +1330,7 @@ function confirmCrop() {
       imgPre.style.display = 'inline-block';
       
       document.getElementById('btn-recrop-img').style.display = 'flex';
+      document.getElementById('btn-delete-edit-img').style.display = 'flex'; // 顯示刪除按鈕
       document.getElementById('btn-add-edit-img').style.display = 'none';
       
       closeModal('cropModal');
@@ -1372,7 +1403,7 @@ async function fetchTimeZone(lat, lon) {
     return null;
 }
 
-// 🌟 修改處 1：將 Nominatim API 請求加上繁體中文優先的參數，退回英文 🌟
+// 🌟 修改處 1：找不到繁體字時強制改為英文，不再顯示簡體 🌟
 async function fetchLocationForBatchItem(index, lat, lon) {
     let locPreview = document.getElementById(`batch-loc-preview-${index}`);
     if(locPreview) locPreview.innerText = '🔍 偵測地點與時區中...';
@@ -1638,6 +1669,7 @@ function promptEdit(e, cat, id) {
   const c = list.find(x => x.id == id);
   if(!c) return;
   
+  isEditImgDeleted = false; // 重置刪除標記
   tempEditImg = c.img;
   tempEditOriginalImg = null; 
   tempEditCropData = c.cropData || null; 
@@ -1645,17 +1677,21 @@ function promptEdit(e, cat, id) {
   const imgPre = document.getElementById('edit-img-preview');
   const btnRecrop = document.getElementById('btn-recrop-img');
   const btnAddImg = document.getElementById('btn-add-edit-img');
+  const btnDelete = document.getElementById('btn-delete-edit-img');
   
   imgSec.style.display = 'flex';
   
+  // 🌟 修改處 2：如果原本有圖片，顯示圖片與編輯/刪除按鈕
   if (c.img || c.originalImg) { 
       imgPre.style.display = 'inline-block'; 
       imgPre.src = c.img || c.originalImg; 
       btnRecrop.style.display = 'flex'; 
+      btnDelete.style.display = 'flex'; 
       btnAddImg.style.display = 'none';
   } else { 
       imgPre.style.display = 'none'; 
       btnRecrop.style.display = 'none'; 
+      btnDelete.style.display = 'none'; 
       btnAddImg.style.display = 'flex';
   }
 
@@ -1691,7 +1727,6 @@ document.getElementById('edit-coord-input').addEventListener('input', function(e
     }, 800);
 });
 
-// 🌟 修改處 1：將 Nominatim API 請求加上繁體中文優先的參數，退回英文 🌟
 async function detectLocationFromCoords(lat, lon, targetInputId) {
     const input = document.getElementById(targetInputId);
     if(input) input.value = '🔍 偵測地點與時區中...';
@@ -1770,9 +1805,16 @@ function saveEdit() {
     c.loc = nl; 
     c.tz = currentEditTz; 
     
-    if (tempEditImg) c.img = tempEditImg; 
-    if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; 
-    if (tempEditCropData) c.cropData = tempEditCropData; 
+    // 🌟 處理刪除或更新照片的邏輯
+    if (isEditImgDeleted) {
+        c.img = null;
+        c.originalImg = null;
+        c.cropData = null;
+    } else {
+        if (tempEditImg) c.img = tempEditImg; 
+        if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; 
+        if (tempEditCropData) c.cropData = tempEditCropData; 
+    }
     
     const locParts = nl.split(/[,，]/);
     c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl);
