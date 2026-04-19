@@ -24,7 +24,7 @@
   --flower-dark: #b0457e;
   --bg: #f9fbf9;
   --card: #ffffff;
-  --text: #111111;
+  --text: #1a2e22;
   --sub: #6b8c76;
   --border: #e2e8e4;
   --shadow: 0 8px 30px rgba(0,0,0,0.06);
@@ -38,11 +38,12 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-.screen { display: none; min-height: 100vh; width: 100%; }
+.screen { display: none; min-height: 100vh; }
 .screen.active { display: block; }
 
 /* 🌟 LOGIN SCREEN 🌟 */
-#screen-login { background: #F0EDFE; display: flex; flex-direction: column; align-items: center; justify-content: space-between; z-index: 1000; }
+#screen-login { background: #F0EDFE; z-index: 1000; }
+#screen-login.active { display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
 .login-art { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
 .login-box { width: 100%; padding: 40px 30px max(40px, env(safe-area-inset-bottom)); background: white; border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(139, 92, 246, 0.1); }
 .login-title { font-family: 'Nunito', sans-serif; font-size: 2.4rem; font-weight: 900; margin-bottom: 8px; color: #111; letter-spacing: -0.5px; }
@@ -57,8 +58,8 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .home-email { font-size: 0.85rem; font-weight: 700; color: var(--sub); }
 .home-avatar-container { position: relative; cursor: pointer; }
 .home-avatar { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2.5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-.sync-indicator { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; border: 3px solid var(--bg); transition: background 0.3s; z-index: 2; }
-.sync-indicator.syncing { background: transparent; border-top-color: var(--green); border-right-color: var(--green); border-bottom-color: var(--green); border-left-color: transparent; animation: spin 0.8s linear infinite; }
+.sync-indicator { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; border: 3px solid var(--bg); transition: background 0.3s; z-index: 2; opacity: 0; }
+.sync-indicator.syncing { opacity: 1; background: transparent; border-top-color: var(--green); border-right-color: var(--green); border-bottom-color: var(--green); border-left-color: transparent; animation: spin 0.8s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
 .home-body { padding: 10px 20px 140px; } 
@@ -83,6 +84,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .cat-topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--card); border-bottom: 1.5px solid var(--border); }
 .back-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 4px; }
 .cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; } 
+.toggle-hide-btn { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; color: var(--sub); cursor: pointer; }
 
 .sub-tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); }
 .sub-tab { flex: 1; padding: 14px 10px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; color: var(--sub); cursor: pointer; border-bottom: 3px solid transparent; }
@@ -570,7 +572,6 @@ function gisLoaded() {
     });
     gisInited = true;
     
-    // 檢查登入狀態與切換畫面
     if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
         showAppScreen();
         fetchUserInfo().finally(() => {
@@ -616,7 +617,7 @@ async function fetchUserInfo() {
     try {
         const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + currentAccessToken }});
         if (!res.ok) {
-            updateProfileUI(); // 允許沒有資料也能繼續使用
+            updateProfileUI();
             return false;
         }
         const data = await res.json();
@@ -647,7 +648,7 @@ function updateProfileUI() {
     if (displayAvatar) {
         avatarEl.src = displayAvatar;
         settingsAvatarEl.src = displayAvatar;
-        avatarEl.style.display = 'block';
+        avatarEl.style.display = 'flex';
         fallbackEl.style.display = 'none';
     } else {
         avatarEl.style.display = 'none';
@@ -701,7 +702,8 @@ function showSyncing(isSyncing) {
         else {
             ind.classList.remove('syncing');
             const now = new Date();
-            document.getElementById('settings-last-sync').innerText = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            const settingsLastSync = document.getElementById('settings-last-sync');
+            if(settingsLastSync) settingsLastSync.innerText = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
         }
     }
 }
@@ -1745,6 +1747,7 @@ function closeModalOutside(e, id) { if(e.target.id === id) closeModal(id); }
 function resetSwipes() { document.querySelectorAll('.postcard.swiped').forEach(el => el.classList.remove('swiped')); }
 function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
 
+// 🌟 電腦版鍵盤捷徑 (ESC / Enter) 🌟
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const openModals = document.querySelectorAll('.modal-overlay.open');
@@ -1782,6 +1785,7 @@ function initModalDrag() {
     });
 }
 
+// 🌟 讓登入邏輯全權負責畫面跳轉，避免互相覆蓋 🌟
 document.addEventListener('DOMContentLoaded', () => { initModalDrag(); });
 </script>
 </body>
