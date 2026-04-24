@@ -12,12 +12,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script>
-  if ('serviceWorker' in navigator) {
+  // 檢查是否支援 Service Worker 且通訊協定為 http/https（避免在 blob: 或 file: 預覽環境中報錯）
+  if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
         .then(reg => console.log('Service Worker registered!'))
         .catch(err => console.error('Service Worker registration failed:', err));
     });
+  } else {
+    console.log('Service Worker registration skipped (protocol not supported).');
   }
 </script>
 
@@ -395,6 +398,7 @@ body {
   border-bottom: 1.5px solid var(--border); 
   align-items: center; 
   cursor: grab; 
+  scroll-behavior: auto !important; /* 強制關閉平滑滾動，確保重算瞬間無動畫干擾 */
 }
 
 .quick-filter-wrapper:active { cursor: grabbing; }
@@ -598,7 +602,7 @@ body {
 .type-btn.flower.active { background: #fdf2f8; border-color: var(--flower); color: var(--flower-dark); }
 .type-btn.mushroom.active { background: #fffcf2; border-color: var(--mushroom); color: var(--mushroom-dark); }
 
-.theme-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; max-height: 180px; overflow-y: auto; scrollbar-width: none; align-content: flex-start; cursor: grab; }
+.theme-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; max-height: 180px; overflow-y: auto; scrollbar-width: none; align-content: flex-start; cursor: grab; scroll-behavior: auto !important; }
 .theme-selector:active { cursor: grabbing; }
 .theme-option { padding: 8px 16px; border-radius: 99px; border: 1.5px solid var(--border); font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; background: #fff; color: var(--sub); transition: all 0.2s; user-select: none; }
 .theme-option.selected { background: var(--green); color: #fff; border-color: var(--green); }
@@ -905,6 +909,9 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
+// 🌟 捲動記憶全域變數 🌟
+let targetScrollLeft = null;
+
 // 🌟 IndexedDB 儲存引擎初始化 🌟
 const idb = {
   db: null,
@@ -1817,9 +1824,15 @@ document.getElementById('edit-coord-input').addEventListener('input', function(e
 });
 
 function renderEditThemes() {
-  const container = document.getElementById('edit-theme-selector'); const allCurrentThemes = [...defaultThemes, ...customThemes];
+  const container = document.getElementById('edit-theme-selector');
+  const savedScroll = container.scrollLeft; // 紀錄寫入前的捲動位置
+  
+  const allCurrentThemes = [...defaultThemes, ...customThemes];
   let html = allCurrentThemes.map(t => { const isSel = tempEditThemes.includes(t); return `<div class="theme-option ${isSel?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`; }).join('');
-  html += `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`; container.innerHTML = html;
+  html += `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`; 
+  
+  container.innerHTML = html;
+  container.scrollLeft = savedScroll; // 寫入後瞬間還原，搭配 scroll-behavior: auto 做到視覺無縫
 }
 
 function toggleEditTheme(t) { const i = tempEditThemes.indexOf(t); if(i > -1) tempEditThemes.splice(i, 1); else tempEditThemes.push(t); renderEditThemes(); }
@@ -1862,6 +1875,7 @@ function refreshCurrentView() {
   if (document.getElementById('screen-home').classList.contains('active')) handleGlobalSearch();
   document.getElementById('stat-f-total').textContent = flowerCards.length + ' 張'; document.getElementById('stat-m-total').textContent = mushroomCards.length + ' 張';
   enableDragScroll(); 
+  targetScrollLeft = null; // 流程跑完後清空暫存
 }
 
 function handleDragStart(e) { isSwiping = false; swipeDirection = null; dragStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].screenX; dragStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].screenY; }
@@ -1907,6 +1921,23 @@ function handleGlobalSearch() {
   res.style.display='block'; res.innerHTML = filter.length > 0 ? filter.map(c => cardHTML(c, flowerCards.includes(c)?'':'mushroom-thumb', flowerCards.includes(c)?'flower':'mushroom')).join('') : '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
 }
 
+function switchSubTab(cat, tab, el) { 
+  const s = document.getElementById('screen-'+cat); 
+  s.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active')); 
+  el.classList.add('active'); 
+  activeSubTabs[cat] = tab; 
+  activeFilters[cat] = '全部'; 
+  targetScrollLeft = 0; // 切換大 Tab 時回歸排頭
+  refreshCurrentView(); 
+}
+
+function applyFilter(cat, mode, val) { 
+  const fw = document.getElementById(cat + '-filters');
+  if (fw) targetScrollLeft = fw.scrollLeft; // 記住點擊過濾器當下的捲動位置
+  activeFilters[cat] = val; 
+  refreshCurrentView(); 
+}
+
 function renderCat(cat, mode) {
   const raw = cat === 'flower' ? flowerCards : mushroomCards; const body = document.getElementById(cat + '-body'); const fw = document.getElementById(cat + '-filters'); let processed = hideOwnedState[cat] ? raw.filter(x => !x.owned) : [...raw];
   if (mode === 'favorite') { fw.style.display = 'none'; const favs = processed.filter(x => x.favorite); favs.sort((a,b) => a.owned - b.owned); body.innerHTML = favs.length > 0 ? favs.map(x => cardHTML(x, cat==='mushroom'?'mushroom-thumb':'', cat)).join('') : '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏的最愛喔 ⭐</div>'; return; }
@@ -1918,7 +1949,11 @@ function renderCat(cat, mode) {
   const cf = activeFilters[cat] || '全部'; let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">全部</div>`;
   Object.keys(gs).forEach(n => { fH += `<div class="filter-pill ${cf===n?'active':''}" onclick="applyFilter('${cat}','${mode}','${n}')">${n}</div>`; });
   if (mode === 'theme') { fH += `<button class="add-theme-btn" style="margin-left: 6px;" onclick="openAddThemeModal()">＋</button><button class="add-theme-btn manage-theme-btn" style="margin-left: 6px;" onclick="openManageThemeModal()">⚙️</button>`; }
+  
   fw.innerHTML = fH;
+  if (targetScrollLeft !== null) {
+      fw.scrollLeft = targetScrollLeft; // HTML 更新後瞬間還原記憶的滾動位置
+  }
   
   let bH = '';
   Object.entries(gs).forEach(([l, items]) => { 
@@ -1953,9 +1988,6 @@ function renderOwned() {
   body.innerHTML = h;
 }
 
-function resetEditInput() { document.getElementById('edit-coord-input').value = originalCoordBeforeEdit; showToast('🔄 已還原'); }
-function switchSubTab(cat, tab, el) { const s = document.getElementById('screen-'+cat); s.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); activeSubTabs[cat] = tab; activeFilters[cat] = '全部'; refreshCurrentView(); }
-function applyFilter(cat, mode, val) { activeFilters[cat] = val; refreshCurrentView(); }
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
 
 // 🌟 複製到剪貼簿功能 🌟
@@ -1967,7 +1999,7 @@ function copyCoord(e, c) {
 }
 function fallbackCopy(btn, text) {
     let textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-999999px"; textArea.style.top = "-999999px"; document.body.appendChild(textArea); textArea.focus(); textArea.select();
-    try { document.execCommand('copy'); btn.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { btn.textContent = text; }, 2000); } catch (err) { showToast('⚠️ 複製失敗，請手動選取'); } textArea.remove();
+    try { document.execCommand('copy'); btn.textContent = '✅ 已複製！'; showToast('📋 已複製'); setTimeout(() => { btn.textContent = text; }, 2000); } catch (err) { showToast('⚠️ 複製失敗，請手手動選取'); } textArea.remove();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); document.getElementById('global-nav').classList.add('hidden-dock'); document.body.style.overflow = 'hidden'; }
@@ -1996,7 +2028,14 @@ document.addEventListener('keydown', (e) => {
 function enableDragScroll() {
   const sliders = document.querySelectorAll('.quick-filter-wrapper, .theme-selector');
   sliders.forEach(slider => {
-    const newSlider = slider.cloneNode(true); slider.parentNode.replaceChild(newSlider, slider);
+    const savedScroll = slider.scrollLeft; // 記憶替換前的精確位置
+    
+    const newSlider = slider.cloneNode(true); 
+    newSlider.style.scrollBehavior = 'auto'; // 強制拔除平滑滾動
+    slider.parentNode.replaceChild(newSlider, slider);
+    
+    newSlider.scrollLeft = savedScroll; // 無縫瞬間套用繼承的位置
+    
     let isDown = false; let startX; let scrollLeft; let isDragging = false; 
     newSlider.addEventListener('mousedown', (e) => { isDown = true; isDragging = false; newSlider.style.cursor = 'grabbing'; startX = e.pageX - newSlider.offsetLeft; scrollLeft = newSlider.scrollLeft; });
     newSlider.addEventListener('mouseleave', () => { isDown = false; newSlider.style.cursor = 'grab'; });
