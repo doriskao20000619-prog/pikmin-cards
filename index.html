@@ -1825,14 +1825,14 @@ document.getElementById('edit-coord-input').addEventListener('input', function(e
 
 function renderEditThemes() {
   const container = document.getElementById('edit-theme-selector');
-  const savedScroll = container.scrollLeft; // 紀錄寫入前的捲動位置
+  const savedScroll = container.scrollTop; // 記憶垂直捲動位置
   
   const allCurrentThemes = [...defaultThemes, ...customThemes];
   let html = allCurrentThemes.map(t => { const isSel = tempEditThemes.includes(t); return `<div class="theme-option ${isSel?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`; }).join('');
   html += `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`; 
   
   container.innerHTML = html;
-  container.scrollLeft = savedScroll; // 寫入後瞬間還原，搭配 scroll-behavior: auto 做到視覺無縫
+  container.scrollTop = savedScroll; // 瞬間還原垂直捲動位置
 }
 
 function toggleEditTheme(t) { const i = tempEditThemes.indexOf(t); if(i > -1) tempEditThemes.splice(i, 1); else tempEditThemes.push(t); renderEditThemes(); }
@@ -2028,21 +2028,53 @@ document.addEventListener('keydown', (e) => {
 function enableDragScroll() {
   const sliders = document.querySelectorAll('.quick-filter-wrapper, .theme-selector');
   sliders.forEach(slider => {
-    const savedScroll = slider.scrollLeft; // 記憶替換前的精確位置
-    
+    const savedScrollLeft = slider.scrollLeft;
+    const savedScrollTop = slider.scrollTop;
+
     const newSlider = slider.cloneNode(true); 
-    newSlider.style.scrollBehavior = 'auto'; // 強制拔除平滑滾動
+    newSlider.style.scrollBehavior = 'auto'; // 強制關閉平滑滾動
     slider.parentNode.replaceChild(newSlider, slider);
     
-    newSlider.scrollLeft = savedScroll; // 無縫瞬間套用繼承的位置
+    newSlider.scrollLeft = savedScrollLeft;
+    newSlider.scrollTop = savedScrollTop;
     
-    let isDown = false; let startX; let scrollLeft; let isDragging = false; 
-    newSlider.addEventListener('mousedown', (e) => { isDown = true; isDragging = false; newSlider.style.cursor = 'grabbing'; startX = e.pageX - newSlider.offsetLeft; scrollLeft = newSlider.scrollLeft; });
+    const isVertical = newSlider.classList.contains('theme-selector');
+    
+    let isDown = false; let startX; let startY; let scrollLeft; let scrollTop; let isDragging = false; 
+
+    newSlider.addEventListener('mousedown', (e) => { 
+      isDown = true; isDragging = false; newSlider.style.cursor = 'grabbing'; 
+      startX = e.pageX - newSlider.offsetLeft; 
+      startY = e.pageY - newSlider.offsetTop;
+      scrollLeft = newSlider.scrollLeft; 
+      scrollTop = newSlider.scrollTop;
+    });
     newSlider.addEventListener('mouseleave', () => { isDown = false; newSlider.style.cursor = 'grab'; });
     newSlider.addEventListener('mouseup', () => { isDown = false; newSlider.style.cursor = 'grab'; setTimeout(() => { isDragging = false; }, 0); });
-    newSlider.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); const x = e.pageX - newSlider.offsetLeft; const walk = (x - startX) * 1.5; if (Math.abs(walk) > 3) isDragging = true; newSlider.scrollLeft = scrollLeft - walk; });
+    newSlider.addEventListener('mousemove', (e) => { 
+      if (!isDown) return; 
+      e.preventDefault(); 
+      const x = e.pageX - newSlider.offsetLeft; 
+      const y = e.pageY - newSlider.offsetTop;
+      const walkX = (x - startX) * 1.5; 
+      const walkY = (y - startY) * 1.5;
+      
+      if (Math.abs(walkX) > 3 || Math.abs(walkY) > 3) isDragging = true; 
+      
+      if (isVertical) {
+        newSlider.scrollTop = scrollTop - walkY;
+      } else {
+        newSlider.scrollLeft = scrollLeft - walkX;
+      }
+    });
     newSlider.addEventListener('click', (e) => { if (isDragging) { e.preventDefault(); e.stopPropagation(); } }, true);
-    newSlider.addEventListener('wheel', (e) => { if (e.deltaY !== 0) { e.preventDefault(); newSlider.scrollLeft += e.deltaY > 0 ? 40 : -40; } }, { passive: false });
+    newSlider.addEventListener('wheel', (e) => { 
+      if (!isVertical) {
+        // 只有橫向的分類列需要把滾輪 Y 軸轉成 X 軸捲動
+        if (e.deltaY !== 0) { e.preventDefault(); newSlider.scrollLeft += e.deltaY > 0 ? 40 : -40; } 
+      }
+      // 直向的主題區塊 (.theme-selector) 不做 preventDefault()，保留原生垂直滾動
+    }, { passive: false });
   });
 }
 
