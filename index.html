@@ -86,8 +86,6 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .folder-tab { position: absolute; top: 0; left: 8%; width: 40%; height: 30%; background: rgba(255,255,255,0.6); border-radius: 10px 10px 0 0; backdrop-filter: blur(10px); }
 .folder-back-main { position: absolute; top: 20%; left: 0; width: 100%; height: 80%; background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-radius: 12px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4); }
 .folder-photos { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; }
-
-/* 🌟 完美置中的資料夾相片 */
 .folder-photo { position: absolute; top: 50%; left: 50%; margin-top: -32%; margin-left: -32%; width: 64%; aspect-ratio: 1; border-radius: 8px; border: 3px solid #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover; transition: transform 0.4s; transform-origin: bottom center; background: #f0f2f5; }
 .folder-photo:nth-child(1) { transform: rotate(-10deg) translate(-15%, -15%) scale(0.9); z-index: 1; }
 .folder-photo:nth-child(2) { transform: rotate(10deg) translate(15%, -15%) scale(0.9); z-index: 2; }
@@ -120,7 +118,6 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .sub-tabs { display: flex; padding: 0 16px; gap: 8px; margin-bottom: 12px; }
 .sub-tab { flex: 1; padding: 12px 8px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: #8e9a92; cursor: pointer; border-radius: 16px; transition: all 0.2s; }
 .sub-tab.active { background: #ffffff; color: var(--green-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
-/* 🌟 已徹底移除 scroll-behavior: smooth 確保無縫紀錄 */
 .quick-filter-wrapper { display: flex; gap: 10px; padding: 4px 16px 16px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.04); }
 .quick-filter-wrapper::-webkit-scrollbar { display: none; }
 .filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: none; background: #ffffff; color: var(--sub); font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
@@ -152,8 +149,6 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .postcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .tag { background: rgba(255,255,255,0.7); color: var(--sub); font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.9); display: inline-flex; width: max-content; align-items: center; gap: 4px; }
 .postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-
-/* 🌟 坐標按鈕 (乾淨極簡的單行設計) */
 .coord-btn { background: rgba(240, 247, 242, 0.8); border: 1.5px solid var(--green-light); font-size: 0.8rem; font-weight: 800; color: var(--green-dark); cursor: pointer; padding: 6px 16px; border-radius: 99px; font-family: 'Nunito', monospace; display: block; text-align: center; transition: transform 0.2s; white-space: nowrap; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .coord-btn:active { transform: scale(0.95); }
 .owned-badge { background: var(--green); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -168,17 +163,14 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .stack-card.expanded .stack-thumb { height: 260px; cursor: zoom-in; }
 .stack-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.3) 100%); pointer-events: none; }
 .stack-title { position: absolute; top: 24px; left: 24px; right: 60px; color: #fff; font-weight: 900; font-size: 1.4rem; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
-/* 🌟 修復 Stack Card 內部時間標籤的絕對定位 */
 .stack-time-badge { position: absolute; bottom: 16px; right: 24px; background: rgba(255,255,255,0.9); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px;}
 .stack-time-badge svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5;}
-
 .stack-indicator { position: absolute; top: 20px; right: 20px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: #fff; transition: transform 0.5s; }
 .stack-card.expanded .stack-indicator { transform: rotate(180deg); }
 .stack-info { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
 .stack-info-inner { overflow: hidden; opacity: 0; transition: opacity 0.4s; padding: 0; position: relative;}
 .stack-card.expanded .stack-info { grid-template-rows: 1fr; }
 .stack-card.expanded .stack-info-inner { padding: 24px; opacity: 1; }
-
 .res-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .res-main-title { font-size: 0.95rem; color: var(--sub); display: flex; align-items: center; gap: 6px; font-weight: 800; }
 .res-main-title svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0;}
@@ -204,7 +196,6 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 
 .map-floating-header { position: absolute; top: 16px; left: 0; width: 100%; z-index: 2000; padding: 16px; pointer-events: none; }
 .map-search-row { display: flex; gap: 12px; margin-bottom: 16px; pointer-events: auto; }
-/* 🌟 搜尋框淺色內陰影質感 */
 .map-search-bar { flex: 1; background: #f2f7f4; border-radius: 99px; display: flex; align-items: center; padding: 12px 20px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.08); border: 1.5px solid #fff; pointer-events: auto; }
 .map-search-bar input { background: transparent; border: none; color: #111; width: 100%; font-size: 1rem; font-weight: 700; outline: none; margin-left: 12px; }
 .map-search-bar input::placeholder { color: #8e9a92; font-weight: 600;}
@@ -269,14 +260,12 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .btn-route-add { background: rgba(76, 175, 110, 0.85); backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 99px; font-weight: 800; font-size: 0.95rem; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 16px rgba(76, 175, 110, 0.3); transition: transform 0.2s; flex-shrink: 0;}
 .btn-route-add:active { transform: scale(0.95); }
 
-/* 🌟 長按/右鍵 Context Menu */
 #map-context-menu { display:none; position:absolute; background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:3000; flex-direction:column; overflow:hidden; }
 .context-menu-item { display: flex; align-items: center; gap: 12px; padding:16px 24px; border:none; background:transparent; font-weight:800; font-size:1rem; cursor:pointer; color:var(--text); transition:background 0.2s; white-space:nowrap;}
 .context-menu-item svg { stroke: var(--green-dark); fill: none; stroke-width: 2.5;}
 .context-menu-item:hover { background: #f5f5f5; }
 .context-menu-item:first-child { border-bottom:1px solid #eee; }
 
-/* 🌟 路線規劃 Panel Overlay */
 .route-panel-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100000; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); }
 .route-panel-overlay.open { display: flex; }
 .route-panel { background: #fff; width: 100%; max-width: 480px; border-radius: 32px 32px 0 0; padding: 24px 20px 40px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); display: flex; flex-direction: column; max-height: 85vh;}
@@ -306,7 +295,6 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .route-locate-btn { background: var(--green-light); color: var(--green-dark); border: none; padding: 8px 12px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .route-locate-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
 
-/* 🌟 自動完成選單 */
 .autocomplete-dropdown { position: absolute; top: calc(100% + 4px); left: 0; width: 100%; background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 10; max-height: 200px; overflow-y: auto; display: none; }
 .autocomplete-dropdown.show { display: block; }
 .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; transition: background 0.2s; }
@@ -324,20 +312,16 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .modal-title { font-weight: 900; font-size: 1.2rem; text-align: center;}
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-/* 🌟 Emoji Picker 修復 */
 .emoji-picker-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; max-height: 200px; overflow-y: auto; }
 .emoji-item { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border-radius: 12px; border: 2px solid transparent; transition: all 0.2s; }
 .emoji-item.selected { background: rgba(76, 175, 110, 0.2); border-color: var(--green); }
-/* ✅ 確保 AddThemeModal 永遠在最上層 */
 #addThemeModal { z-index: 5000 !important; }
 
-/* 🌟 Upload / Batch Item 完美排版 */
 .batch-results-container { display: none; max-height: 450px; overflow-y: auto; padding: 4px; margin-bottom: 20px; scrollbar-width: none; }
 .batch-item { margin-bottom: 14px; }
 .batch-confirm-box { background: rgba(255,255,255,0.6); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
 .batch-preview-box { background: rgba(245, 253, 248, 0.7); border: 1.5px solid var(--green-light); border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-/* 🌟 Edit Inputs (玻璃質感修復) */
 .edit-label { font-size: 0.85rem; font-weight: 800; color: var(--sub); margin-bottom: 8px; margin-left: 4px; text-align: left; display: block;}
 .edit-input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; flex-shrink:0; width: 100%;}
 .edit-text-input { width: 100%; padding: 16px; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; font-family: 'Noto Sans TC', sans-serif; font-size: 1rem; color: var(--text); font-weight: 800; background: rgba(255,255,255,0.6); outline: none; box-sizing: border-box; box-shadow: inset 0 2px 6px rgba(0,0,0,0.03); transition: background 0.2s;}
@@ -380,24 +364,18 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 #screen-gacha.active { display: flex; }
 .printer-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding-bottom: 72px; width: 100%; }
 
-/* 機器主體設計 */
 .printer-machine { position: relative; width: 300px; height: 440px; display: flex; flex-direction: column; align-items: center; border-radius: 32px; background: linear-gradient(180deg, #e4e7eb 0%, #c4c9d1 100px, #a3aab3 100px, #8d959f 100%); border: 1px solid #9fa6ae; box-shadow: 0 20px 50px rgba(0,0,0,0.15); flex-shrink: 0; }
 .printer-label { margin-top: 20px; text-align: center; color: #4a5568; z-index: 5; }
 .printer-logo { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px; }
 .printer-logo svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
 .printer-text { font-size: 0.75rem; font-weight: 800; line-height: 1.4; letter-spacing: 1px; }
 
-/* 出票口深色凹槽 (Z-index: 10) */
 .printer-slot-bg { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); width: 80%; height: 16px; background: #000; border-radius: 8px; z-index: 10; box-shadow: inset 0 4px 8px rgba(0,0,0,0.9);}
-
-/* 出票口上方遮罩 (Z-index: 40) */
 .printer-slot-top-lip { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); width: 80%; height: 4px; background: rgba(0,0,0,0.4); border-radius: 8px 8px 0 0; z-index: 40; pointer-events: none; }
 
-/* 🌟 卡片遮罩容器：確保卡片吐出時在最上層 (Z-index: 90) */
 .printer-card-container { position: absolute; top: 100px; left: 0; width: 100%; height: calc(100% - 100px); clip-path: inset(0 0 -1000px 0); z-index: 90; pointer-events: none; }
 .printer-card-container.zoomed-active { clip-path: none; z-index: 100000; }
 
-/* 🌟 真實明信片：圖層絕對最高 (Z-index: 100) */
 .printer-card { 
     position: absolute; 
     top: 0; left: 50%; 
@@ -425,7 +403,6 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
 .gacha-zoom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 99999; display: none; opacity: 0; transition: opacity 0.3s; pointer-events: auto; }
 .gacha-zoom-overlay.active { display: block; opacity: 1; }
 
-/* 🌟 真實金屬相機快門按鈕 */
 .action-area { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; width: 100%; z-index: 80; }
 .shutter-btn-outer { width: 72px; height: 72px; border-radius: 50%; background: #e0e5ec; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -6px -6px 12px rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s;}
 .shutter-btn-inner { width: 56px; height: 56px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #f4f6f8 0%, #d1d6de 100%); box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5); transition: all 0.15s; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; color: var(--sub);}
@@ -544,7 +521,6 @@ body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(2
                       <div class="map-detail-tags" id="gacha-result-tags"></div>
                       <div class="map-detail-footer" style="margin-top:auto;">
                           <div class="coord-btn" id="gacha-result-coord"></div>
-                          <button class="btn-route-add" id="gacha-add-route-btn" style="padding: 8px 16px; font-size: 0.85rem; flex-shrink: 0;"><span style="display:flex;align-items:center;"></span>加入目的地</button>
                       </div>
                   </div>
               </div>
@@ -664,7 +640,7 @@ const ICON_FLOWER = `<svg viewBox="0 0 24 24" width="24" height="24" fill="curre
 const ICON_MUSHROOM = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 12V10A8 8 0 0 0 4 10V12"></path><rect x="9" y="12" width="6" height="10" rx="2"></rect><circle cx="9" cy="8" r="1.5" fill="#fff"></circle><circle cx="15" cy="8" r="1.5" fill="#fff"></circle><circle cx="12" cy="5" r="1.5" fill="#fff"></circle></svg>`;
 const ICON_HIDDEN = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" fill="none" stroke-width="2.5"></path></svg>`;
 
-const apiKey = "";
+const apiKey = "AIzaSyA6pVGOf9J7O0yt8X2_snLKoHrs9ZF4g8U";
 const GOOGLE_CLIENT_ID = '860667269256-ndj7kvt7es64r5in4p5gm7cf6iact7m4.apps.googleusercontent.com'; 
 const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'; 
 
@@ -731,7 +707,6 @@ function applyFilter(cat, mode, val) {
     window.scrollTo(0, savedScrollY);
 }
 
-// 🌟 修正的文字切換複製功能
 function copyCoord(e, c) { 
     if(e) e.stopPropagation(); 
     const b = e.currentTarget; 
@@ -819,7 +794,7 @@ async function saveDataToLocal(skipCloud = false, isFromCloud = false) { try { c
 function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: SCOPES, callback: (resp) => { if (resp.error !== undefined) { return; } currentAccessToken = resp.access_token; localStorage.setItem('pikmin_access_token', currentAccessToken); localStorage.setItem('pikmin_token_expiry', Date.now() + 50 * 60 * 1000); showAppScreen(); fetchUserInfo().finally(() => { checkAndSyncDriveFile(); }); }, }); gisInited = true; if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) { const ls = document.getElementById('screen-login'); if(ls) ls.classList.remove('active'); goTo('home'); const nav = document.getElementById('global-nav'); if(nav) nav.style.display = 'flex'; setTimeout(() => { if(nav) nav.classList.remove('hidden-dock'); }, 50); fetchUserInfo().finally(() => { checkAndSyncDriveFile(); }); } else { showLoginScreen(); } }
 function showLoginScreen() { const ls = document.getElementById('screen-login'); if(ls) { ls.classList.remove('screen-transition-out'); ls.classList.add('active'); } const hs = document.getElementById('screen-home'); if(hs) hs.classList.remove('active'); const nav = document.getElementById('global-nav'); if(nav) { nav.classList.add('hidden-dock'); nav.style.display = 'none'; } }
 function showAppScreen() { const loginScreen = document.getElementById('screen-login'); const nav = document.getElementById('global-nav'); if(nav) nav.style.display = 'flex'; if (loginScreen && loginScreen.classList.contains('active')) { loginScreen.classList.add('screen-transition-out'); setTimeout(() => { loginScreen.classList.remove('active', 'screen-transition-out'); goTo('home'); if(nav) nav.classList.remove('hidden-dock'); }, 350); } else { goTo('home'); setTimeout(() => { if(nav) nav.classList.remove('hidden-dock'); }, 50); } }
-function handleAuthClick() { if (GOOGLE_CLIENT_ID.includes('你的_')) { showToast('⚠️ 請先填寫 Client ID'); return; } if (!gisInited) { return; } tokenClient.requestAccessToken(); }
+function handleAuthClick() { if (!gisInited) { return; } tokenClient.requestAccessToken(); }
 function handleLogout() { currentAccessToken = null; localStorage.removeItem('pikmin_access_token'); localStorage.removeItem('pikmin_token_expiry'); localStorage.removeItem('pikmin_driveFileId'); localStorage.removeItem('pikmin_lastUpdate'); userProfile = { name: '', email: '', picture: '', customNickname: '', customAvatar: '' }; flowerCards = []; mushroomCards = []; hiddenCards = []; customThemes = []; document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')); showLoginScreen(); showToast('🚪 已登出帳號'); }
 async function fetchUserInfo() { try { const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + currentAccessToken }}); if (!res.ok) { updateProfileUI(); return false; } const data = await res.json(); userProfile.email = data.email; userProfile.name = data.name; userProfile.picture = data.picture; updateProfileUI(); return true; } catch(e) { updateProfileUI(); return false; } }
 
@@ -974,7 +949,7 @@ function updateFolderPhotos() {
 function cardHTML(c, thumbClass, cat) {
   const starFill = c.favorite ? 'var(--star-gold)' : 'none'; const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : `<div style="display:flex;align-items:center;justify-content:center;color:var(--sub);">${cat==='flower'?ICON_FLOWER:(cat==='mushroom'?ICON_MUSHROOM:ICON_HIDDEN)}</div>`; const isOwnedClass = c.owned ? 'is-owned' : '';
   const themes = Array.isArray(c.themes) ? c.themes : ['未分類'];
-  return `<div class="postcard-wrapper animate-stagger-2"><div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除</div><div class="postcard ${isOwnedClass}" onclick="toggleOwned(event, '${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)"><div class="postcard-thumb ${thumbClass}">${thumbContent}<div class="image-time-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${getLocalTime(c.tz)}</div></div><div class="postcard-info"><div class="mac-btns-container"><button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button><button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button><button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></div><div class="postcard-name-row"><div class="postcard-name" title="${(c.name || '').replace(/"/g, '&quot;')}">${c.name || '未命名'}</div></div><div class="postcard-loc-row"><div class="postcard-loc"><svg viewBox="0 0 24 24" width="14" height="14" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg> <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${c.loc || '未知地點'}</span></div></div><div class="postcard-tags">${themes.map(t => `<span class="tag">${t}</span>`).join('')}</div><div class="postcard-footer"><div class="coord-btn" onclick="copyCoord(event,'${c.coord || ''}')">${c.coord || ''}</div>${c.owned ? '<div class="owned-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : ''}</div></div></div></div>`;
+  return `<div class="postcard-wrapper animate-stagger-2"><div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除</div><div class="postcard ${isOwnedClass}" onclick="toggleOwned(event, '${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)"><div class="postcard-thumb ${thumbClass}">${thumbContent}<div class="image-time-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${getLocalTime(c.tz)}</div></div><div class="postcard-info"><div class="mac-btns-container"><button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button><button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button><button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></div><div class="postcard-name-row"><div class="postcard-name" title="${(c.name || '').replace(/"/g, '"')}">${c.name || '未命名'}</div></div><div class="postcard-loc-row"><div class="postcard-loc"><svg viewBox="0 0 24 24" width="14" height="14" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg> <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${c.loc || '未知地點'}</span></div></div><div class="postcard-tags">${themes.map(t => `<span class="tag">${t}</span>`).join('')}</div><div class="postcard-footer"><div class="coord-btn" onclick="copyCoord(event,'${c.coord || ''}')">${c.coord || ''}</div>${c.owned ? '<div class="owned-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : ''}</div></div></div></div>`;
 }
 
 function toggleStackCard(cardEl) { const isExpanded = cardEl.classList.contains('expanded'); document.querySelectorAll('.stack-card.expanded').forEach(el => { if(el !== cardEl) el.classList.remove('expanded'); }); if(isExpanded) { cardEl.classList.remove('expanded'); } else { cardEl.classList.add('expanded'); } }
@@ -989,7 +964,7 @@ function stackCardHTML(c, cat) {
     <div class="stack-card animate-stagger-2" onclick="toggleStackCard(this)">
         <div class="stack-thumb" style="${bgStyle}" onclick="handleStackThumbClick(event, '${c.img || ''}', this)">
             ${innerThumb}
-            <div class="stack-title" title="${(c.name || '').replace(/"/g, '&quot;')}">${c.name || '未命名'}</div>
+            <div class="stack-title" title="${(c.name || '').replace(/"/g, '"')}">${c.name || '未命名'}</div>
             <div class="stack-time-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${getLocalTime(c.tz)}</div>
             <div class="stack-indicator"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
         </div>
@@ -1058,11 +1033,11 @@ function renderOwned() {
 function handleFiles(files) { document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0; if (files.length === 0) return; filesToCrop = Array.from(files); currentCropIndex = 0; tempBatchList = []; ocrCache = {}; startCropNext(); document.getElementById('file-input').value = ""; }
 async function resizeForOCR(imgUrl) { return new Promise((resolve) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); let cropTop = 0; let cropBottom = 0; let sourceHeight = img.height; if (img.height > img.width * 1.8) { cropTop = img.height * 0.22; cropBottom = img.height * 0.15; sourceHeight = img.height - cropTop - cropBottom; } else if (img.height > img.width * 1.3) { cropTop = img.height * 0.12; sourceHeight = img.height - cropTop; } const maxDim = 800; let scale = Math.min(maxDim / img.width, maxDim / sourceHeight); canvas.width = img.width * scale; canvas.height = sourceHeight * scale; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, cropTop, img.width, sourceHeight, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; img.src = imgUrl; }); }
 function startCropNext() { if (currentCropIndex >= filesToCrop.length) { openModal('uploadModal'); renderBatchItems(); return; } const file = filesToCrop[currentCropIndex]; const reader = new FileReader(); reader.onload = async (e) => { const originalImgUrl = e.target.result; const smallImgForOcr = await resizeForOCR(originalImgUrl); preloadOCR(currentCropIndex, smallImgForOcr); cropMode = 'upload'; const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); imageTarget.onload = () => { setTimeout(() => { if (cropperInstance) { cropperInstance.destroy(); } cropperInstance = new Cropper(imageTarget, { aspectRatio: 3 / 2, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false, checkCrossOrigin: false, restore: true }); }, 150); }; imageTarget.src = originalImgUrl; }; reader.readAsDataURL(file); }
-function confirmCrop() { if (!cropperInstance) return; if (cropMode === 'avatar') { const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 400, maxHeight: 400 }); userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85); const sap = document.getElementById('settings-avatar-preview'); if(sap) sap.src = userProfile.customAvatar; const da = document.getElementById('display-avatar'); if(da) { da.src = userProfile.customAvatar; da.style.display = 'flex'; } const daf = document.getElementById('display-avatar-fallback'); if(daf) daf.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 }); const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.92); const originalImgUrl = document.getElementById('crop-image-target').src; const currentCropData = { data: cropperInstance.getData(), canvasData: cropperInstance.getCanvasData(), cropBoxData: cropperInstance.getCropBoxData() }; if (cropMode === 'edit') { tempEditCropData = currentCropData; tempEditImg = croppedImgUrl; const imgPre = document.getElementById('edit-img-preview'); if (imgPre) { imgPre.src = tempEditImg; imgPre.style.display = 'inline-block'; } const btnRecrop = document.getElementById('btn-recrop-img'); if(btnRecrop) btnRecrop.style.display = 'flex'; const btnReplace = document.getElementById('btn-replace-edit-img'); if(btnReplace) btnReplace.style.display = 'flex'; const btnAdd = document.getElementById('btn-add-edit-img'); if(btnAdd) btnAdd.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const batchIdx = tempBatchList.length; tempBatchList.push({ name: '辨識中...', loc: '', coord: window.pendingContextCoord || '', favorite: false, status: 'ocr_detecting', img: croppedImgUrl, originalImg: originalImgUrl, cropData: currentCropData, tz: '', type: 'flower' }); if(window.pendingContextCoord) { const parts = window.pendingContextCoord.split(',').map(Number); fetchLocationForBatchItem(batchIdx, parts[0], parts[1]); window.pendingContextCoord = null; } closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; if(ocrCache[currentCropIndex]) { ocrCache[currentCropIndex].batchIdx = batchIdx; applyOcrToBatch(currentCropIndex); } currentCropIndex++; startCropNext(); }
+function confirmCrop() { if (!cropperInstance) return; if (cropMode === 'avatar') { const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 400, maxHeight: 400 }); userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85); const sap = document.getElementById('settings-avatar-preview'); if(sap) sap.src = userProfile.customAvatar; const da = document.getElementById('display-avatar'); if(da) { da.src = userProfile.customAvatar; da.style.display = 'flex'; } const daf = document.getElementById('display-avatar-fallback'); if(daf) daf.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 }); const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.92); const originalImgUrl = document.getElementById('crop-image-target').src; const currentCropData = { data: cropperInstance.getData(), canvasData: cropperInstance.getCanvasData(), cropBoxData: cropperInstance.getCropBoxData() }; if (cropMode === 'edit') { tempEditCropData = currentCropData; tempEditImg = croppedImgUrl; const imgPre = document.getElementById('edit-img-preview'); if (imgPre) { imgPre.src = tempEditImg; imgPre.style.display = 'inline-block'; } const btnRecrop = document.getElementById('btn-recrop-img'); if(btnRecrop) btnRecrop.style.display = 'flex'; const btnReplace = document.getElementById('btn-replace-edit-img'); if(btnReplace) btnReplace.style.display = 'flex'; const btnAdd = document.getElementById('btn-add-edit-img'); if(btnAdd) btnAdd.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const batchIdx = tempBatchList.length; tempBatchList.push({ name: '辨識中...', loc: '', coord: window.pendingContextCoord || '', favorite: false, status: 'ocr_detecting', img: croppedImgUrl, originalImg: originalImgUrl, cropData: currentCropData, tz: '', type: 'flower', theme: '🏞️ 自然景觀' }); if(window.pendingContextCoord) { const parts = window.pendingContextCoord.split(',').map(Number); fetchLocationForBatchItem(batchIdx, parts[0], parts[1]); window.pendingContextCoord = null; } closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; if(ocrCache[currentCropIndex]) { ocrCache[currentCropIndex].batchIdx = batchIdx; applyOcrToBatch(currentCropIndex); } currentCropIndex++; startCropNext(); }
 function cancelCrop() { closeModal('cropModal'); if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; } if (cropMode === 'edit' || cropMode === 'avatar') { cropMode = 'upload'; return; } currentCropIndex++; startCropNext(); }
 
 // 🌟 7. Gemini OCR 與批次處理
-async function preloadOCR(fileIndex, imgUrl, attempt = 1) { ocrCache[fileIndex] = { done: false, progress: 0 }; try { const base64Image = imgUrl.split(',')[1]; const promptText = "請分析這張明信片截圖，提取出最可能的地點名稱（name）與 GPS 座標（coord，格式為 '緯度, 經度'）。請忽略電池、訊號、時間或單純的UI文字。以嚴格的 JSON 格式回傳，只包含 'name' 與 'coord' 兩個鍵。若找不到則留空字串。"; const payload = { contents: [{ role: "user", parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: base64Image } } ] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('API Request Failed'); const data = await response.json(); const text = data.candidates?.[0]?.content?.parts?.[0]?.text; let parsed = { name: '未命名明信片', coord: '' }; if (text) { try { parsed = JSON.parse(text); } catch(e) {} } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = (parsed.name && parsed.name !== '未命名明信片') ? parsed.name.substring(0, 40) : '未命名明信片'; ocrCache[fileIndex].coord = parsed.coord || ''; applyOcrToBatch(fileIndex); } catch(e) { if (attempt < 3) { setTimeout(() => preloadOCR(fileIndex, imgUrl, attempt + 1), 2000 * attempt); return; } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '未命名明信片'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex); } }
+async function preloadOCR(fileIndex, imgUrl, attempt = 1) { ocrCache[fileIndex] = { done: false, progress: 0 }; try { const base64Image = imgUrl.split(',')[1]; const promptText = "請分析這張明信片截圖，提取出最可能的地點名稱（name）與 GPS 座標（coord，格式為 '緯度, 經度'）。請忽略電池、訊號、時間或單純的UI文字。以嚴格的 JSON 格式回傳，只包含 'name' 與 'coord' 兩個鍵。若找不到則留空字串。"; const payload = { contents: [{ role: "user", parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: base64Image } } ] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('API Request Failed'); const data = await response.json(); const text = data.candidates?.[0]?.content?.parts?.[0]?.text; let parsed = { name: '未命名明信片', coord: '' }; if (text) { try { parsed = JSON.parse(text); } catch(e) {} } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = (parsed.name && parsed.name !== '未命名明信片') ? parsed.name.substring(0, 40) : '未命名明信片'; ocrCache[fileIndex].coord = parsed.coord || ''; applyOcrToBatch(fileIndex); } catch(e) { if (attempt < 3) { setTimeout(() => preloadOCR(fileIndex, imgUrl, attempt + 1), 2000 * attempt); return; } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '未命名明信片'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex); } }
 function applyOcrToBatch(fileIndex) { const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return; const batchIdx = cache.batchIdx; if (cache.name && cache.name !== '未命名明信片') { tempBatchList[batchIdx].name = cache.name; } else if (tempBatchList[batchIdx].name === '辨識中...') { tempBatchList[batchIdx].name = '未命名明信片'; } if (cache.coord) { tempBatchList[batchIdx].coord = cache.coord; } tempBatchList[batchIdx].status = 'detecting'; renderBatchItems(); const finalCoord = tempBatchList[batchIdx].coord; if (finalCoord) { const parts = finalCoord.split(',').map(s => s.trim()); const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon); } }
 function updateBatchItem(idx, key, val) { tempBatchList[idx][key] = val; renderBatchItems(); }
 async function fetchTimeZone(lat, lon) { try { const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`); const data = await res.json(); if(data && data.timeZone) return data.timeZone; } catch(e) {} return null; }
@@ -1078,13 +1053,16 @@ function renderBatchItems() {
             return `<div class="batch-item"><div class="batch-confirm-box" style="display:flex; align-items:center; gap:16px; padding: 16px;"><img src="${item.img}" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><div style="flex:1; text-align:left;"><div style="font-weight: 800; font-size: 0.95rem;">雲端 AI 視覺辨識中...</div><div style="font-size: 0.75rem; color: var(--sub);">請稍後...</div></div></div></div>`; 
         } 
         if (item.status === 'detecting') { 
+            const allThemes = [...defaultThemes, ...customThemes];
+            const themeOptions = allThemes.map(t => `<option value="${t}" ${item.theme === t ? 'selected' : ''}>${t}</option>`).join('');
+
             return `
             <div class="batch-item">
                 <div class="batch-confirm-box" style="padding: 20px;">
                     <div style="display:flex; align-items:flex-start; gap:16px; margin-bottom: 20px; text-align: left;">
                         <img src="${item.img}" style="width: 72px; height: 72px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;">
                         <div style="flex:1; overflow:hidden;">
-                            <input type="text" value="${(item.name || '').replace(/"/g, '&quot;')}" oninput="tempBatchList[${index}].name = this.value" class="edit-text-input no-icon" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.95rem; margin-bottom: 8px; border-radius: 12px;" placeholder="明信片名稱">
+                            <input type="text" value="${(item.name || '').replace(/"/g, '"')}" oninput="tempBatchList[${index}].name = this.value" class="edit-text-input no-icon" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.95rem; margin-bottom: 8px; border-radius: 12px;" placeholder="明信片名稱">
                             <div style="display:flex; align-items:center; gap:4px; font-size: 0.75rem; color: var(--sub); margin-left: 4px; font-weight:600;">
                                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 
                                 <span id="batch-loc-preview-${index}">${item.loc || '輸入座標以自動偵測'}</span>
@@ -1094,7 +1072,14 @@ function renderBatchItems() {
                     </div>
                     
                     <div class="edit-input-wrapper" style="margin-bottom: 16px;">
-                        <input type="text" class="edit-text-input no-icon" style="text-align:center; font-family:monospace; font-size:1rem; padding:12px; border-radius:12px;" value="${(item.coord || '').replace(/"/g, '&quot;')}" placeholder="貼上座標" oninput="handleBatchCoordInput(${index}, this.value, this)">
+                        <input type="text" class="edit-text-input no-icon" style="text-align:center; font-family:monospace; font-size:1rem; padding:12px; border-radius:12px;" value="${(item.coord || '').replace(/"/g, '"')}" placeholder="貼上座標" oninput="handleBatchCoordInput(${index}, this.value, this)">
+                    </div>
+
+                    <div class="edit-input-wrapper" style="margin-bottom: 16px;">
+                        <select class="edit-text-input no-icon" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.95rem; border-radius: 12px; appearance: auto;" onchange="updateBatchItem(${index}, 'theme', this.value)">
+                            <option value="" disabled>請選擇主題...</option>
+                            ${themeOptions}
+                        </select>
                     </div>
                     
                     <div class="type-toggle" style="margin-bottom: 16px; gap:8px;">
@@ -1126,7 +1111,45 @@ function renderBatchItems() {
 
 function confirmBatchItem(index) { tempBatchList[index].status = 'confirmed'; renderBatchItems(); }
 function toggleBatchFav(index) { tempBatchList[index].favorite = !tempBatchList[index].favorite; renderBatchItems(); }
-function handleBatchSave() { tempBatchList.forEach(item => { const n = (item.name || '').toLowerCase(); let theme = '自然景觀'; if (n.includes('temple') || n.includes('shrine') || n.includes('palace') || n.includes('之家') || n.includes('mila') || n.includes('mural')) theme = '歷史古蹟'; if (item.themes && item.themes.length) theme = item.themes[0]; const locParts = (item.loc || '').split(/[,，]/); const country = locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc; const list = item.type === 'flower' ? flowerCards : (item.type === 'hidden' ? hiddenCards : mushroomCards); list.push({ id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000), name: item.name || '未命名', loc: item.loc || '未設定地點', country: country || '未設定國家', themes: [theme], coord: item.coord || '', icon: '', tz: item.tz || Intl.DateTimeFormat().resolvedOptions().timeZone, owned: false, favorite: item.favorite, img: item.img, originalImg: item.originalImg, cropData: item.cropData, type: item.type || 'flower' }); }); showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`); closeModal('uploadModal'); refreshCurrentView(); saveDataToLocal(); const sm = document.getElementById('screen-map'); if (sm && sm.classList.contains('active') && tempBatchList.length > 0) { const nc = tempBatchList[tempBatchList.length-1].coord; if(nc) { const p = nc.split(','); if(globalMap) { globalMap.flyTo([parseFloat(p[0]), parseFloat(p[1])], 16, {duration: 1.5}); setTimeout(() => { renderMapMarkers(); updateMapBottomSheet(); }, 300); } } } }
+function handleBatchSave() { 
+    tempBatchList.forEach(item => { 
+        const theme = item.theme || '🏞️ 自然景觀'; 
+        const locParts = (item.loc || '').split(/[,，]/); 
+        const country = locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc; 
+        const list = item.type === 'flower' ? flowerCards : (item.type === 'hidden' ? hiddenCards : mushroomCards); 
+        list.push({ 
+            id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000), 
+            name: item.name || '未命名', 
+            loc: item.loc || '未設定地點', 
+            country: country || '未設定國家', 
+            themes: [theme], 
+            coord: item.coord || '', 
+            icon: '', 
+            tz: item.tz || Intl.DateTimeFormat().resolvedOptions().timeZone, 
+            owned: false, 
+            favorite: item.favorite, 
+            img: item.img, 
+            originalImg: item.originalImg, 
+            cropData: item.cropData, 
+            type: item.type || 'flower' 
+        }); 
+    }); 
+    showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`); 
+    closeModal('uploadModal'); 
+    refreshCurrentView(); 
+    saveDataToLocal(); 
+    const sm = document.getElementById('screen-map'); 
+    if (sm && sm.classList.contains('active') && tempBatchList.length > 0) { 
+        const nc = tempBatchList[tempBatchList.length-1].coord; 
+        if(nc) { 
+            const p = nc.split(','); 
+            if(globalMap) { 
+                globalMap.flyTo([parseFloat(p[0]), parseFloat(p[1])], 16, {duration: 1.5}); 
+                setTimeout(() => { renderMapMarkers(); updateMapBottomSheet(); }, 300); 
+            } 
+        } 
+    } 
+}
 
 // 🌟 8. 主題與明信片編輯
 function openAddThemeModal() { editingThemeIndex = -1; const titleEl = document.getElementById('addThemeModalTitle'); if (titleEl) titleEl.innerHTML = '新增主題'; const btnEl = document.getElementById('addThemeModalBtn'); if (btnEl) btnEl.textContent = '確認新增'; const nameEl = document.getElementById('new-theme-name'); if (nameEl) nameEl.value = ''; currentNewThemeEmoji = ''; const gridEl = document.getElementById('emoji-grid'); if (gridEl) gridEl.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===''?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join(''); openModal('addThemeModal'); }
@@ -1272,14 +1295,12 @@ async function contextAddRoute() {
     const lat = menu.dataset.lat;
     const lon = menu.dataset.lon;
     
-    // 🌟 呼叫逆向地理編碼，將座標轉為真實地名
     let locName = '自訂地點';
     let subLoc = '';
     try {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-Hant,zh-TW,en`);
         const data = await res.json();
         if(data) {
-            // 🌟 修正：優先取得實際地標名稱 (data.name)，若無則強迫抓取 display_name 最具體的首段細節，不再直接妥協成城市名
             locName = data.name || (data.display_name ? data.display_name.split(',')[0].trim() : '選定位置');
             if (data.address && data.address.city && locName !== data.address.city) {
                 subLoc = data.address.city || data.address.town || '';
@@ -1303,7 +1324,6 @@ function contextAddPostcard() {
     menu.style.display = 'none';
     if(tempMapPin) { globalMap.removeLayer(tempMapPin); tempMapPin = null; }
     
-    // 🌟 在地圖頁面直接開啟上傳檔案！不再跳回首頁
     const fi = document.getElementById('file-input');
     if(fi) fi.click();
     window.pendingContextCoord = `${lat}, ${lon}`;
@@ -1347,14 +1367,12 @@ function locateMeOnMap() {
 async function handleMapSearch(q) { 
     if (!q) { renderMapMarkers(); updateMapBottomSheet(); return; } 
     
-    // 每次新搜尋前，先清掉舊的搜尋虛擬大頭針
     customMapPins = customMapPins.filter(c => !c.id.startsWith('dummy_search_'));
     
     mapMarkers.forEach(m => globalMap.removeLayer(m)); mapMarkers = []; 
     const allCards = [...flowerCards, ...mushroomCards, ...hiddenCards]; 
     const filtered = allCards.filter(c => (c.name || '').toLowerCase().includes(q.toLowerCase()) || (c.loc || '').toLowerCase().includes(q.toLowerCase()) || (c.coord || '').includes(q) || (c.themes || []).some(t => t.toLowerCase().includes(q.toLowerCase())) ); 
     
-    // 如果本地明信片有結果，就飛向第一個結果
     if(filtered.length > 0 && filtered[0].coord) {
         const parts = filtered[0].coord.split(',').map(s => parseFloat(s.trim()));
         if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
@@ -1363,7 +1381,6 @@ async function handleMapSearch(q) {
         renderMapMarkers(); 
         updateMapBottomSheet(filtered); 
     } else {
-        // 如果是座標格式，直接飛向該座標
         const parts = q.split(',').map(s => parseFloat(s.trim()));
         if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
             globalMap.flyTo([parts[0], parts[1]], 15, { duration: 1.5 });
@@ -1374,7 +1391,6 @@ async function handleMapSearch(q) {
             renderMapMarkers(); 
             updateMapBottomSheet([dummyCard]); 
         } else {
-            // 🌟 啟動外部圖資智能搜尋
             showToast('🔍 尋找外部圖資...');
             try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&accept-language=zh-Hant,zh-TW,en`);
@@ -1717,7 +1733,7 @@ function openMapDetailCard(cardData) {
             starBtn.style.display = 'flex';
             starBtn.onclick = (e) => { 
                 toggleFavorite(e, cardData.type, cardData.id); 
-                cardData.favorite = !cardData.favorite; 
+                // 只依據正確的 cardData.favorite 屬性變更外觀
                 if (cardData.favorite) { starBtn.classList.add('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'var(--star-gold)'); } 
                 else { starBtn.classList.remove('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'none'); } 
             }; 
@@ -1792,6 +1808,7 @@ function executePrintAnimation(allCards, card) {
         setTimeout(() => flash.classList.remove('flash-active'), 50); 
     } 
     const result = allCards[Math.floor(Math.random() * allCards.length)]; 
+    
     const gImg = document.getElementById('gacha-result-img'); 
     if(gImg) gImg.src = result.img || result.originalImg || ''; 
     const gTitle = document.getElementById('gacha-result-title'); 
@@ -1815,14 +1832,7 @@ function executePrintAnimation(allCards, card) {
     const gTags = document.getElementById('gacha-result-tags');
     if(gTags) gTags.innerHTML = themes.map(t => `<span class="tag" style="background:#f0f4f2; border:none; font-size:0.75rem; font-weight:800; color:#4a5568;">${t}</span>`).join('');
     
-    // 設定加入目的地功能
-    const btnAddRoute = document.getElementById('gacha-add-route-btn');
-    if(btnAddRoute) {
-        btnAddRoute.onclick = (e) => {
-            e.stopPropagation();
-            addCardToRoute(result.id);
-        };
-    }
+    // 注意：這裡已經依照您的需求，把「加入路線」按鈕的綁定邏輯徹底移除了！
     
     requestAnimationFrame(() => { 
         setTimeout(() => { 
