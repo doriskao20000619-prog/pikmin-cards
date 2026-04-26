@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pikmin Bloom 明信片記錄</title>
 
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Pikmin%20Postcards%22%2C%22short_name%22%3A%22Pikmin%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ecfef3%22%2C%22theme_color%22%3A%22%234caf6e%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdib3g9IjAgMCAyNCAyNCIgZmlsbD0iIzRjYWY2ZSI%2BPHBhdGggZD0iTTIxIDEwYzAgNy05IDEzLTkgMTNzLTktNi05LTEzYTkgOSAwIDAgMSAxOCAwem0tOSAwYTMgMyAwIDEgMC02IDAgMyAzIDAgMCAwIDYgMHoiLz48L3N2Zz4%3D%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D'>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -13,16 +13,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-        navigator.serviceWorker.register('sw.js').catch(err => console.warn(err));
-      }
-    });
-  }
-</script>
-<script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
 <style>
 /* ── BASE & VARIABLES ── */
@@ -410,7 +401,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .camera-flash-overlay { position: fixed; inset: 0; background: #ffffff; z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.8s ease-out; }
 .camera-flash-overlay.flash-active { opacity: 1; transition: none; }
 </style>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body onclick="resetSwipes()">
 
@@ -1071,7 +1061,7 @@ function confirmCrop() { if (!cropperInstance) return; if (cropMode === 'avatar'
 function cancelCrop() { closeModal('cropModal'); if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; } if (cropMode === 'edit' || cropMode === 'avatar') { cropMode = 'upload'; return; } currentCropIndex++; startCropNext(); }
 
 // 🌟 7. Gemini OCR 與批次處理
-async function preloadOCR(fileIndex, imgUrl, attempt = 1) { if(!ocrCache[fileIndex]) ocrCache[fileIndex] = { done: false, progress: 0 }; try { const base64Image = imgUrl.split(',')[1]; const promptText = "請分析這張遊戲截圖或明信片圖片，優先提取出畫面左上角或明信片左上方的地點名稱（name），與畫面中的 GPS 座標（coord，格式為 '緯度, 經度'）。請忽略電池、訊號、時間或單純的UI文字。以嚴格的 JSON 格式回傳，只包含 'name' 與 'coord' 兩個鍵。若找不到則留空字串。"; const payload = { contents: [{ role: "user", parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: base64Image } } ] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('API Request Failed'); const data = await response.json(); const text = data.candidates?.[0]?.content?.parts?.[0]?.text; let parsed = { name: '未命名明信片', coord: '' }; if (text) { try { const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim(); parsed = JSON.parse(cleanText); } catch(e) {} } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = (parsed.name && parsed.name !== '未命名明信片') ? parsed.name.substring(0, 40) : '未命名明信片'; ocrCache[fileIndex].coord = parsed.coord || ''; applyOcrToBatch(fileIndex); } catch(e) { if (attempt < 3) { setTimeout(() => preloadOCR(fileIndex, imgUrl, attempt + 1), 2000 * attempt); return; } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '未命名明信片'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex); } }
+async function preloadOCR(fileIndex, imgUrl, attempt = 1) { if(!ocrCache[fileIndex]) ocrCache[fileIndex] = { done: false, progress: 0 }; try { const base64Image = imgUrl.split(',')[1]; const promptText = "請嚴格分析這張 Pikmin Bloom 明信片圖片，優先提取出明信片畫面『最左上角的第一行文字』作為地點名稱（name），以及畫面右下角的 GPS 座標（coord，格式為 '緯度, 經度'）。\\n\\n【重要提取規則】\\n1. 地點名稱通常位在左上角文字區塊的「上方第一行」且字體較大。\\n2. 絕對不要把下方的區域或次要資訊（如里、區等）合併進 name 裡面。例如看到「西門紅樓\\n西門里 萬華區」，name 只能填「西門紅樓」。\\n3. 忽略手機的電池、訊號、時間等系統文字。\\n4. 務必以嚴格的 JSON 格式回傳，只包含 'name' 與 'coord' 兩個鍵。若找不到則留空字串。"; const payload = { contents: [{ role: "user", parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: base64Image } } ] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('API Request Failed'); const data = await response.json(); const text = data.candidates?.[0]?.content?.parts?.[0]?.text; let parsed = { name: '未命名明信片', coord: '' }; if (text) { try { const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim(); parsed = JSON.parse(cleanText); } catch(e) {} } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = (parsed.name && parsed.name !== '未命名明信片') ? parsed.name.substring(0, 40) : '未命名明信片'; ocrCache[fileIndex].coord = parsed.coord || ''; applyOcrToBatch(fileIndex); } catch(e) { if (attempt < 3) { setTimeout(() => preloadOCR(fileIndex, imgUrl, attempt + 1), 2000 * attempt); return; } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '未命名明信片'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex); } }
 function applyOcrToBatch(fileIndex) { const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return; const batchIdx = cache.batchIdx; if (cache.name && cache.name !== '未命名明信片') { tempBatchList[batchIdx].name = cache.name; } else if (tempBatchList[batchIdx].name === '辨識中...') { tempBatchList[batchIdx].name = '未命名明信片'; } if (cache.coord) { tempBatchList[batchIdx].coord = cache.coord; } tempBatchList[batchIdx].status = 'detecting'; renderBatchItems(); const finalCoord = tempBatchList[batchIdx].coord; if (finalCoord) { const parts = finalCoord.split(',').map(s => s.trim()); const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon); } }
 function updateBatchItem(idx, key, val) { tempBatchList[idx][key] = val; renderBatchItems(); }
 async function fetchTimeZone(lat, lon) { try { const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`); const data = await res.json(); if(data && data.timeZone) return data.timeZone; } catch(e) {} return null; }
@@ -1890,6 +1880,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     initModalDrag(); 
 });
 </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
