@@ -38,7 +38,6 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; margin: 0; }
-body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 9999; }
 
 /* ── LAYOUT & ANIMATIONS ── */
 .screen { display: none; min-height: 100vh; width: 100%; position: absolute; top: 0; left: 0; }
@@ -782,7 +781,6 @@ const idb = {
 
 async function loadDataFromLocal() { 
     try { 
-        // 🌟 強制確保載入舊資料時自動加上 type 屬性，避免地圖上跑掉
         const localFlower = await idb.get('pikmin_flowerCards'); if (localFlower) flowerCards = JSON.parse(localFlower).map(c => ({...c, type: 'flower'})); 
         const localMushroom = await idb.get('pikmin_mushroomCards'); if (localMushroom) mushroomCards = JSON.parse(localMushroom).map(c => ({...c, type: 'mushroom'})); 
         const localHidden = await idb.get('pikmin_hiddenCards'); if (localHidden) hiddenCards = JSON.parse(localHidden).map(c => ({...c, type: 'hidden'})); 
@@ -817,7 +815,6 @@ async function downloadFromDrive() {
         if (localTime > cloudTime) { 
             uploadToCloud(); 
         } else { 
-            // 🌟 強制確保載入舊資料時自動加上 type 屬性，避免地圖上跑掉
             if(dataObj.flowerCards) flowerCards = dataObj.flowerCards.map(c => ({...c, type: 'flower'})); 
             if(dataObj.mushroomCards) mushroomCards = dataObj.mushroomCards.map(c => ({...c, type: 'mushroom'})); 
             if(dataObj.hiddenCards) hiddenCards = dataObj.hiddenCards.map(c => ({...c, type: 'hidden'})); 
