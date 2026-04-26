@@ -707,6 +707,7 @@ function applyFilter(cat, mode, val) {
     window.scrollTo(0, savedScrollY);
 }
 
+// 🌟 修正的文字切換複製功能
 function copyCoord(e, c) { 
     if(e) e.stopPropagation(); 
     const b = e.currentTarget; 
@@ -794,7 +795,7 @@ async function saveDataToLocal(skipCloud = false, isFromCloud = false) { try { c
 function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: SCOPES, callback: (resp) => { if (resp.error !== undefined) { return; } currentAccessToken = resp.access_token; localStorage.setItem('pikmin_access_token', currentAccessToken); localStorage.setItem('pikmin_token_expiry', Date.now() + 50 * 60 * 1000); showAppScreen(); fetchUserInfo().finally(() => { checkAndSyncDriveFile(); }); }, }); gisInited = true; if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) { const ls = document.getElementById('screen-login'); if(ls) ls.classList.remove('active'); goTo('home'); const nav = document.getElementById('global-nav'); if(nav) nav.style.display = 'flex'; setTimeout(() => { if(nav) nav.classList.remove('hidden-dock'); }, 50); fetchUserInfo().finally(() => { checkAndSyncDriveFile(); }); } else { showLoginScreen(); } }
 function showLoginScreen() { const ls = document.getElementById('screen-login'); if(ls) { ls.classList.remove('screen-transition-out'); ls.classList.add('active'); } const hs = document.getElementById('screen-home'); if(hs) hs.classList.remove('active'); const nav = document.getElementById('global-nav'); if(nav) { nav.classList.add('hidden-dock'); nav.style.display = 'none'; } }
 function showAppScreen() { const loginScreen = document.getElementById('screen-login'); const nav = document.getElementById('global-nav'); if(nav) nav.style.display = 'flex'; if (loginScreen && loginScreen.classList.contains('active')) { loginScreen.classList.add('screen-transition-out'); setTimeout(() => { loginScreen.classList.remove('active', 'screen-transition-out'); goTo('home'); if(nav) nav.classList.remove('hidden-dock'); }, 350); } else { goTo('home'); setTimeout(() => { if(nav) nav.classList.remove('hidden-dock'); }, 50); } }
-function handleAuthClick() { if (!gisInited) { return; } tokenClient.requestAccessToken(); }
+function handleAuthClick() { if (GOOGLE_CLIENT_ID.includes('你的_')) { showToast('⚠️ 請先填寫 Client ID'); return; } if (!gisInited) { return; } tokenClient.requestAccessToken(); }
 function handleLogout() { currentAccessToken = null; localStorage.removeItem('pikmin_access_token'); localStorage.removeItem('pikmin_token_expiry'); localStorage.removeItem('pikmin_driveFileId'); localStorage.removeItem('pikmin_lastUpdate'); userProfile = { name: '', email: '', picture: '', customNickname: '', customAvatar: '' }; flowerCards = []; mushroomCards = []; hiddenCards = []; customThemes = []; document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')); showLoginScreen(); showToast('🚪 已登出帳號'); }
 async function fetchUserInfo() { try { const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + currentAccessToken }}); if (!res.ok) { updateProfileUI(); return false; } const data = await res.json(); userProfile.email = data.email; userProfile.name = data.name; userProfile.picture = data.picture; updateProfileUI(); return true; } catch(e) { updateProfileUI(); return false; } }
 
@@ -1733,7 +1734,7 @@ function openMapDetailCard(cardData) {
             starBtn.style.display = 'flex';
             starBtn.onclick = (e) => { 
                 toggleFavorite(e, cardData.type, cardData.id); 
-                // 只依據正確的 cardData.favorite 屬性變更外觀
+                // 修正：狀態只被切換一次，UI 正常跟隨變色
                 if (cardData.favorite) { starBtn.classList.add('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'var(--star-gold)'); } 
                 else { starBtn.classList.remove('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'none'); } 
             }; 
@@ -1832,7 +1833,7 @@ function executePrintAnimation(allCards, card) {
     const gTags = document.getElementById('gacha-result-tags');
     if(gTags) gTags.innerHTML = themes.map(t => `<span class="tag" style="background:#f0f4f2; border:none; font-size:0.75rem; font-weight:800; color:#4a5568;">${t}</span>`).join('');
     
-    // 注意：這裡已經依照您的需求，把「加入路線」按鈕的綁定邏輯徹底移除了！
+    // 🌟 已徹底移除加入路線綁定邏輯
     
     requestAnimationFrame(() => { 
         setTimeout(() => { 
@@ -1843,8 +1844,11 @@ function executePrintAnimation(allCards, card) {
     }); 
 }
 
-// 系統初始化
-document.addEventListener('DOMContentLoaded', () => { initModalDrag(); });
+// 🌟 系統初始化 (已補上 await loadDataFromLocal() 以確保資料不丟失)
+document.addEventListener('DOMContentLoaded', async () => { 
+    await loadDataFromLocal();
+    initModalDrag(); 
+});
 </script>
 </body>
 </html>
