@@ -1,0 +1,7 @@
+{
+  "name": "Pikmin Bloom 明信片記錄",
+  "description": "用來整理、搜尋與匯出每日收集到的明信片，支持 OCR 辨識與地圖導航功能。",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
