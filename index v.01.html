@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pikmin Bloom 明信片記錄</title>
+
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+        navigator.serviceWorker.register('sw.js').catch(err => console.warn(err));
+      }
+    });
+  }
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
+
+<style>
+/* ── BASE & VARIABLES ── */
+:root {
+  --green: #4caf6e; --green-light: #a8ddb8; --green-dark: #2e7d4f;
+  --mushroom: #f5a623; --mushroom-light: #fde0a0; --mushroom-dark: #b8710a;
+  --flower: #e96fad; --flower-light: #f9c8e3; --flower-dark: #b0457e;
+  --bg: #ecfef3; --card: #ffffff; --text: #111111; --sub: #6b8c76; --border: #e2e8e4;
+  --danger: #FF3B30; --star-gold: #FFCC00; 
+  --dock-icon-inactive: #a0a0a0; --dock-icon-active: #111111;
+  --dock-add-bg: linear-gradient(135deg, #c4fc62, #a8ff4a);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; margin: 0; }
+body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 9999; }
+
+/* ── LAYOUT & ANIMATIONS ── */
+.screen { display: none; min-height: 100vh; width: 100%; position: absolute; top: 0; left: 0; }
+.screen.active { display: block; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); transform: none !important; }
+@keyframes screenFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes springUp { 0% { opacity: 0; transform: translateY(35px) scale(0.96); } 60% { transform: translateY(-4px) scale(1.01); opacity: 1; } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+.animate-stagger-1 { animation: springUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both; }
+.animate-stagger-2 { animation: springUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s both; }
+.animate-stagger-3 { animation: springUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s both; }
+.screen-transition-out { opacity: 0 !important; transform: scale(0.98) !important; pointer-events: none; transition: all 0.3s ease !important; }
+
+/* ── BUTTONS ── */
+.btn-primary, .btn-login, .btn-confirm-yes { width: 100%; background: rgba(76, 175, 110, 0.85); backdrop-filter: blur(16px); border: 1.5px solid rgba(255, 255, 255, 0.45); box-shadow: 0 8px 24px rgba(76, 175, 110, 0.25); color: #fff; border-radius: 20px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; transition: transform 0.2s; }
+.btn-primary:active, .btn-login:active, .btn-confirm-yes:active { transform: scale(0.96); }
+.btn-danger { width: 100%; background: linear-gradient(135deg, rgba(234, 67, 53, 0.9), rgba(217, 48, 37, 1)); backdrop-filter: blur(16px); border: 1.5px solid rgba(255, 255, 255, 0.3); color: #fff; border-radius: 20px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 8px 24px rgba(234, 67, 53, 0.3); transition: transform 0.2s; }
+.btn-danger:active { transform: scale(0.96); }
+.btn-danger-ghost { width: 100%; background: rgba(234, 67, 53, 0.1); border: 1.5px solid rgba(234, 67, 53, 0.4); color: #d93025; border-radius: 20px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; transition: transform 0.2s; }
+.btn-danger-ghost:active { transform: scale(0.96); background: rgba(234, 67, 53, 0.2); }
+/* 🌟 次要按鈕樣式 (無背景、綠框、綠字) */
+.btn-secondary { width: 100%; background: transparent; border: 1.5px solid var(--green); color: var(--green-dark); border-radius: 20px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:active { transform: scale(0.96); background: rgba(76, 175, 110, 0.1); }
+.btn-cancel { background: rgba(255,255,255,0.6); color: var(--sub); border: none; border-radius: 20px; padding: 16px 24px; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+
+/* ── LOGIN ── */
+#screen-login { background: #f0f7f2; z-index: 1000; }
+#screen-login.active { display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+.login-art { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.login-box { width: 100%; padding: 40px 30px max(40px, env(safe-area-inset-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(76, 175, 110, 0.08); text-align: center; }
+.login-title { font-family: 'Nunito', sans-serif; font-size: 2.4rem; font-weight: 900; margin-bottom: 8px; color: #111; letter-spacing: -0.5px; }
+
+/* ── HOME HEADER & FOLDERS ── */
+.home-header { padding: max(32px, env(safe-area-inset-top)) 24px 20px; display: flex; justify-content: space-between; align-items: center; }
+.home-greeting { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+.home-email { font-size: 0.85rem; font-weight: 700; color: var(--sub); }
+.home-avatar-container { position: relative; cursor: pointer; }
+.home-avatar { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2.5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #e0e0e0; display: flex; align-items: center; justify-content: center;}
+.sync-indicator { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; border: 3px solid #d1fadd; transition: opacity 0.3s; z-index: 2; opacity: 0; }
+.sync-indicator.syncing { opacity: 1; background: transparent; border-top-color: var(--green); border-right-color: var(--green); border-bottom-color: var(--green); border-left-color: transparent; animation: spin 0.8s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.home-body { padding: 10px 20px 140px; } 
+.category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+.folder-container { display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 100%; }
+.folder-wrapper { position: relative; width: 100%; aspect-ratio: 1.35 / 1; max-width: 150px; margin-bottom: 12px; transition: transform 0.2s; }
+.folder-container:active .folder-wrapper { transform: scale(0.95); }
+.folder-tab { position: absolute; top: 0; left: 8%; width: 40%; height: 30%; background: rgba(255,255,255,0.6); border-radius: 10px 10px 0 0; backdrop-filter: blur(10px); }
+.folder-back-main { position: absolute; top: 20%; left: 0; width: 100%; height: 80%; background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-radius: 12px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4); }
+.folder-photos { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; }
+
+/* 🌟 完美置中的資料夾相片 */
+.folder-photo { position: absolute; top: 50%; left: 50%; margin-top: -32%; margin-left: -32%; width: 64%; aspect-ratio: 1; border-radius: 8px; border: 3px solid #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover; transition: transform 0.4s; transform-origin: bottom center; background: #f0f2f5; }
+.folder-photo:nth-child(1) { transform: rotate(-10deg) translate(-15%, -15%) scale(0.9); z-index: 1; }
+.folder-photo:nth-child(2) { transform: rotate(10deg) translate(15%, -15%) scale(0.9); z-index: 2; }
+.folder-photo:nth-child(3) { transform: rotate(0deg) translate(0%, -20%) scale(1); z-index: 3; }
+.folder-container:hover .folder-photo:nth-child(1) { transform: rotate(-22deg) translate(-25%, -25%) scale(0.95); z-index: 4; }
+.folder-container:hover .folder-photo:nth-child(2) { transform: rotate(22deg) translate(25%, -25%) scale(0.95); z-index: 4; }
+.folder-container:hover .folder-photo:nth-child(3) { transform: rotate(0deg) translate(0%, -35%) scale(1.05); z-index: 5; }
+
+.folder-front { position: absolute; bottom: 0; left: 0; width: 100%; height: 75%; background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.7) 100%); backdrop-filter: blur(12px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 12px; }
+.folder-stickers { position: absolute; top: 15px; left: 15px; }
+.folder-sticker { width: 32px; height: 32px; background: #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+.folder-sticker svg { width: 18px; height: 18px; }
+.folder-info { text-align: center; }
+.folder-label { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.05rem; color: #333; }
+.folder-count { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.75rem; color: var(--sub); background: rgba(255,255,255,0.6); padding: 2px 10px; border-radius: 99px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.8); display: inline-block;}
+
+/* ── SEARCH BAR ── */
+.search-wrapper { position: relative; width: 100%; margin-bottom: 20px; display: flex; align-items: center; }
+.search-input { width: 100%; padding: 16px 16px 16px 48px; border-radius: 20px; border: 1.5px solid #fff; background: rgba(240, 247, 242, 0.8); font-size: 0.95rem; font-weight: 700; color: var(--text); outline: none; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); transition: background 0.2s; }
+.search-input::placeholder { color: #8e9a92; font-weight: 600; }
+.search-input:focus { background: #fff; }
+.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); pointer-events: none; width: 20px; height: 20px;}
+
+/* ── CATEGORY & FILTERS ── */
+.cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-top: max(20px, env(safe-area-inset-top)); }
+.cat-topbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px 16px; }
+.back-btn { background: none; border: none; cursor: pointer; color: var(--text); padding: 4px; display: flex; align-items: center; justify-content: center; }
+.back-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;}
+.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; } 
+.sub-tabs { display: flex; padding: 0 16px; gap: 8px; margin-bottom: 12px; }
+.sub-tab { flex: 1; padding: 12px 8px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: #8e9a92; cursor: pointer; border-radius: 16px; transition: all 0.2s; }
+.sub-tab.active { background: #ffffff; color: var(--green-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+/* 🌟 已徹底移除 scroll-behavior: smooth 確保無縫紀錄 */
+.quick-filter-wrapper { display: flex; gap: 10px; padding: 4px 16px 16px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.quick-filter-wrapper::-webkit-scrollbar { display: none; }
+.filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: none; background: #ffffff; color: var(--sub); font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+.filter-pill.active { background: var(--green); color: #ffffff; }
+.add-theme-btn { padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: rgba(255,255,255,0.5); color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+.cat-body { padding: 16px 16px 140px; }
+.group-section { margin-bottom: 24px; }
+.group-header { font-weight: 900; font-size: 0.85rem; color: var(--sub); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.group-count { background: rgba(0,0,0,0.06); color: var(--sub); border-radius: 99px; padding: 2px 10px; font-size: 0.7rem; }
+
+/* ── POSTCARDS LIST ── */
+.postcard-wrapper { position: relative; margin-bottom: 16px; border-radius: 24px; background: var(--danger); overflow: hidden; }
+.delete-action { position: absolute; top: 0; right: 0; bottom: 0; width: 75px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; }
+.postcard { background: #ffffff; border-radius: 24px; border: 1px solid #eef2ef; display: flex; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); cursor: pointer; transition: transform 0.3s; position: relative; z-index: 2; }
+.postcard.swiped { transform: translateX(-75px); }
+.postcard.is-owned { background: #ffffff !important; border: 1.5px solid var(--green) !important; box-shadow: 0 6px 20px rgba(76, 175, 110, 0.1) !important;}
+.postcard-thumb { width: 140px; min-width: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1px solid #eef2ef; position: relative; background: #f5f5f5; }
+.postcard-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.image-time-badge { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+
+.postcard-info { flex: 1; padding: 16px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.mac-btns-container { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 10; }
+.mac-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(142, 142, 147, 0.1); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: transform 0.2s; }
+.mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; pointer-events: none; }
+.mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
+.postcard-name { font-weight: 800; font-size: 1.05rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 80px; margin-bottom: 4px; display: block; }
+.postcard-loc { font-size: 0.8rem; color: var(--sub); font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px;}
+.postcard-loc svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0;}
+.postcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.tag { background: rgba(255,255,255,0.7); color: var(--sub); font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.9); display: inline-flex; width: max-content; align-items: center; gap: 4px; }
+.postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+
+/* 🌟 坐標按鈕 (乾淨極簡的單行設計) */
+.coord-btn { background: rgba(240, 247, 242, 0.8); border: 1.5px solid var(--green-light); font-size: 0.8rem; font-weight: 800; color: var(--green-dark); cursor: pointer; padding: 6px 16px; border-radius: 99px; font-family: 'Nunito', monospace; display: block; text-align: center; transition: transform 0.2s; white-space: nowrap; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.coord-btn:active { transform: scale(0.95); }
+.owned-badge { background: var(--green); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* ── STACK CARDS (Collection Page Restoration) ── */
+.postcard-stack { display: flex; flex-direction: column; padding: 10px 0 100px; gap: 0; }
+.stack-card { border-radius: 32px; background: #ffffff; box-shadow: 0 -12px 30px rgba(0,0,0,0.08); position: relative; transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1); cursor: pointer; overflow: hidden; border: 1px solid #eef2ef; margin-top: -120px; z-index: 1; }
+.stack-card:first-child { margin-top: 0; }
+.stack-card.expanded { margin-top: 20px; margin-bottom: 20px; border: 1px solid #fff; box-shadow: 0 16px 40px rgba(0,0,0,0.12); z-index: 10; }
+.stack-card.expanded + .stack-card { margin-top: 20px; }
+.stack-thumb { height: 200px; width: 100%; background-size: cover; background-position: center 20%; position: relative; transition: height 0.5s; display: flex; align-items: center; justify-content: center; }
+.stack-card.expanded .stack-thumb { height: 260px; cursor: zoom-in; }
+.stack-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.3) 100%); pointer-events: none; }
+.stack-title { position: absolute; top: 24px; left: 24px; right: 60px; color: #fff; font-weight: 900; font-size: 1.4rem; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+/* 🌟 修復 Stack Card 內部時間標籤的絕對定位 */
+.stack-time-badge { position: absolute; bottom: 16px; right: 24px; background: rgba(255,255,255,0.9); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px;}
+.stack-time-badge svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5;}
+
+.stack-indicator { position: absolute; top: 20px; right: 20px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: #fff; transition: transform 0.5s; }
+.stack-card.expanded .stack-indicator { transform: rotate(180deg); }
+.stack-info { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+.stack-info-inner { overflow: hidden; opacity: 0; transition: opacity 0.4s; padding: 0; position: relative;}
+.stack-card.expanded .stack-info { grid-template-rows: 1fr; }
+.stack-card.expanded .stack-info-inner { padding: 24px; opacity: 1; }
+
+.res-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.res-main-title { font-size: 0.95rem; color: var(--sub); display: flex; align-items: center; gap: 6px; font-weight: 800; }
+.res-main-title svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0;}
+
+/* ── DOCK NAV ── */
+.dock-nav { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 440px; height: 72px; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 36px; display: flex; align-items: center; justify-content: space-evenly; z-index: 9000; box-shadow: 0 20px 40px rgba(0,0,0,0.08); transition: transform 0.4s; padding: 0 12px; }
+.dock-nav.hidden-dock { transform: translate(-50%, 150%); }
+.dock-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; color: var(--dock-icon-inactive); }
+.nav-label { font-size: 0.65rem; font-weight: 800; font-family: 'Nunito', sans-serif; transition: color 0.3s; margin-top: 4px; }
+.nav-icon { width: 24px; height: 24px; stroke-width: 2.2; transition: all 0.3s; fill: none; }
+.dock-item.active { color: var(--dock-icon-active); }
+.dock-item.active .nav-icon { stroke-width: 0; fill: currentColor; }
+.dock-item.active .nav-icon .cutout { fill: var(--bg); }
+.dock-add-wrapper { width: 72px; display: flex; justify-content: center; }
+.dock-add-btn { width: 56px; height: 56px; background: var(--dock-add-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; box-shadow: 0 8px 24px rgba(168, 255, 74, 0.4); margin-top: -24px; border: 4px solid #fff; cursor: pointer; transition: transform 0.2s; }
+.dock-add-btn:active { transform: translateY(-24px) scale(0.9); }
+
+/* ── 🗺️ NEW MAP SCREEN ── */
+#screen-map { background: var(--bg); display: none; flex-direction: column; height: 100vh; overflow-y: auto; padding-bottom: 100px; }
+#screen-map.active { display: flex; }
+.map-box { position: relative; width: calc(100% - 32px); height: 60vh; margin: max(16px, env(safe-area-inset-top)) auto 0; flex-shrink: 0; border-radius: 32px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 10; background: #eef2ef; }
+#map-container { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+
+.map-floating-header { position: absolute; top: 16px; left: 0; width: 100%; z-index: 2000; padding: 16px; pointer-events: none; }
+.map-search-row { display: flex; gap: 12px; margin-bottom: 16px; pointer-events: auto; }
+/* 🌟 搜尋框淺色內陰影質感 */
+.map-search-bar { flex: 1; background: #f2f7f4; border-radius: 99px; display: flex; align-items: center; padding: 12px 20px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.08); border: 1.5px solid #fff; pointer-events: auto; }
+.map-search-bar input { background: transparent; border: none; color: #111; width: 100%; font-size: 1rem; font-weight: 700; outline: none; margin-left: 12px; }
+.map-search-bar input::placeholder { color: #8e9a92; font-weight: 600;}
+.map-search-bar svg { stroke: #6b8c76; fill: none; stroke-width: 2.5; width: 20px; height: 20px; flex-shrink: 0; }
+.map-nav-btn { width: 48px; height: 48px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex-shrink: 0; cursor: pointer; pointer-events: auto; transition: transform 0.2s;}
+.map-nav-btn:active { transform: scale(0.9); }
+.map-nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+.map-filters { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; pointer-events: auto; padding-bottom: 10px; }
+.map-filters::-webkit-scrollbar { display: none; }
+.map-filter-pill { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); padding: 10px 16px; border-radius: 99px; font-size: 0.85rem; font-weight: 800; color: #555; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.map-filter-pill svg { width: 16px; height: 16px; fill: currentColor; }
+.map-filter-pill.active { background: #111; color: #fff; border-color: #111; }
+.map-filter-pill.active svg { fill: var(--green); } 
+
+.route-fab { position: absolute; bottom: 30px; right: 20px; background: #111; color: #fff; padding: 12px 20px; border-radius: 99px; font-weight: 900; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); cursor: pointer; z-index: 2000; pointer-events: auto; transition: transform 0.2s; border: 2px solid rgba(255,255,255,0.2); }
+.route-fab:active { transform: scale(0.95); }
+.route-fab svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round;}
+.route-fab-badge { background: var(--green); color: #fff; padding: 2px 8px; border-radius: 99px; font-size: 0.8rem; }
+
+.custom-photo-pin { display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s; cursor: pointer; }
+.custom-photo-pin.active { transform: scale(1.2); z-index: 1000 !important; }
+.custom-photo-pin-img { width: 52px; height: 52px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 6px 12px rgba(0,0,0,0.2); object-fit: cover; aspect-ratio: 1/1; background: #eee; display: flex; align-items: center; justify-content: center; }
+.custom-photo-pin-label { font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 900; color: #111; text-shadow: 0 1px 2px #fff, 0 -1px 2px #fff, 1px 0 2px #fff,-1px 0 2px #fff; white-space: nowrap; margin-top: 4px; }
+.custom-photo-pin-img.empty { background: linear-gradient(135deg, #007AFF, #5AC8FA); color: #fff; font-size: 1.2rem; }
+.custom-photo-pin-img.empty svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5;}
+
+.map-bottom-section { padding: 24px 0 0; display: flex; flex-direction: column; }
+.sheet-title { padding: 0 24px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #111; margin-bottom: 16px; }
+.sheet-cards-scroll { display: flex; gap: 16px; padding: 0 24px 20px; overflow-x: auto; scrollbar-width: none; }
+.sheet-cards-scroll::-webkit-scrollbar { display: none; }
+.sheet-card { position: relative; width: 140px; height: 180px; border-radius: 16px; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.sheet-card:active { transform: scale(0.96); }
+.sheet-card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #fff; }
+.sheet-card-icon-badge { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 5; color: var(--text); }
+.sheet-card-icon-badge svg { width: 16px; height: 16px; fill: currentColor; }
+.sheet-card-title { font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.sheet-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+.sheet-card-tag { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.4); padding: 2px 8px; border-radius: 99px; font-size: 0.65rem; font-weight: 800; white-space: nowrap; }
+.sheet-card-loc { font-size: 0.7rem; font-weight: 700; opacity: 0.8; display: flex; align-items: center; gap: 4px;}
+.sheet-card-loc svg { width: 10px; height: 10px; fill: currentColor;}
+
+/* MAP DETAIL & ROUTE PANEL */
+.map-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 99999; display: none; opacity: 0; transition: opacity 0.3s; align-items: center; justify-content: center; padding: 20px; }
+.map-detail-overlay.open { display: flex; opacity: 1; }
+.map-detail-card { width: 100%; max-width: 360px; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden; transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; position: relative; }
+.map-detail-overlay.open .map-detail-card { transform: scale(1); }
+.map-detail-img-wrapper { position: relative; width: 100%; height: 260px; background: #f5f5f5; }
+.map-detail-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.map-detail-img-gradient { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.1) 100%); pointer-events: none; }
+.map-detail-title { position: absolute; top: 20px; left: 20px; right: 70px; font-family: 'Nunito', sans-serif; font-size: 1.4rem; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.6); line-height: 1.2;}
+.map-detail-time { position: absolute; bottom: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 6px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; color: var(--green-dark); display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; }
+.map-detail-icon-badge { position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 10;}
+.map-detail-icon-badge svg { width: 22px; height: 22px; fill: currentColor;}
+
+.map-detail-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.map-detail-row-actions { display: flex; justify-content: space-between; gap: 12px; }
+.map-detail-loc { font-size: 1.05rem; font-weight: 800; color: var(--green-dark); display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;}
+.map-detail-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.map-detail-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.map-detail-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px;}
+.btn-route-add { background: rgba(76, 175, 110, 0.85); backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 99px; font-weight: 800; font-size: 0.95rem; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 16px rgba(76, 175, 110, 0.3); transition: transform 0.2s; flex-shrink: 0;}
+.btn-route-add:active { transform: scale(0.95); }
+
+/* 🌟 長按/右鍵 Context Menu */
+#map-context-menu { display:none; position:absolute; background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:3000; flex-direction:column; overflow:hidden; }
+.context-menu-item { display: flex; align-items: center; gap: 12px; padding:16px 24px; border:none; background:transparent; font-weight:800; font-size:1rem; cursor:pointer; color:var(--text); transition:background 0.2s; white-space:nowrap;}
+.context-menu-item svg { stroke: var(--green-dark); fill: none; stroke-width: 2.5;}
+.context-menu-item:hover { background: #f5f5f5; }
+.context-menu-item:first-child { border-bottom:1px solid #eee; }
+
+/* 🌟 路線規劃 Panel Overlay */
+.route-panel-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100000; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); }
+.route-panel-overlay.open { display: flex; }
+.route-panel { background: #fff; width: 100%; max-width: 480px; border-radius: 32px 32px 0 0; padding: 24px 20px 40px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); display: flex; flex-direction: column; max-height: 85vh;}
+.route-panel-overlay.open .route-panel { transform: translateY(0); }
+.route-header { display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
+.route-title { font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;}
+.route-title svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round;}
+.route-close { background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; transition: background 0.2s;}
+.route-close:hover { background: #e0e0e0; }
+.route-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+.route-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; padding: 4px; }
+.route-item { display: flex; align-items: center; gap: 12px; background: #f9fbf9; border: 1px solid #e2e8e4; padding: 12px; border-radius: 16px; }
+.route-item-icon { width: 36px; height: 36px; background: #e2e8e4; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.route-item-icon svg { width: 18px; height: 18px; fill: currentColor;}
+.route-item-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+.route-item-content { flex: 1; overflow: hidden; }
+.route-item-title { font-weight: 800; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.route-item-sub { font-size: 0.75rem; color: var(--sub); display: flex; align-items: center; gap: 4px;}
+.route-item-sub svg { width: 10px; height: 10px; fill: currentColor;}
+.route-item-del { background: none; border: none; color: var(--danger); cursor: pointer; padding: 8px; }
+.route-item-del svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+.route-start-box { display: flex; align-items: center; gap: 12px; background: #fff; border: 2px solid var(--green); padding: 12px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(76, 175, 110, 0.1); position: relative; }
+.route-start-input { flex: 1; border: none; outline: none; font-weight: 700; color: var(--green-dark); background: transparent; font-size:0.95rem; width: 100%;}
+.route-start-input::placeholder { color: #a8ddb8; }
+.route-locate-btn { background: var(--green-light); color: var(--green-dark); border: none; padding: 8px 12px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.route-locate-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+/* 🌟 自動完成選單 */
+.autocomplete-dropdown { position: absolute; top: calc(100% + 4px); left: 0; width: 100%; background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 10; max-height: 200px; overflow-y: auto; display: none; }
+.autocomplete-dropdown.show { display: block; }
+.autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; transition: background 0.2s; }
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: #f0f7f2; }
+.autocomplete-name { font-weight: 800; font-size: 0.9rem; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.autocomplete-address { font-size: 0.75rem; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── MODALS (完整修復版) ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 4000; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); }
+.modal-overlay.open { display: flex; }
+.modal { background: rgba(255,255,255,0.85); backdrop-filter: blur(30px); border-radius: 40px 40px 0 0; width: 100%; max-width: 480px; padding: 24px 20px 45px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); display: flex; flex-direction: column; }
+.modal-header { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 20px; cursor: grab; flex-shrink: 0; }
+.modal-handle { width: 45px; height: 5px; background: rgba(0,0,0,0.15); border-radius: 99px; margin-bottom: 20px; }
+.modal-title { font-weight: 900; font-size: 1.2rem; text-align: center;}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+
+/* 🌟 Emoji Picker 修復 */
+.emoji-picker-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; max-height: 200px; overflow-y: auto; }
+.emoji-item { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border-radius: 12px; border: 2px solid transparent; transition: all 0.2s; }
+.emoji-item.selected { background: rgba(76, 175, 110, 0.2); border-color: var(--green); }
+/* ✅ 確保 AddThemeModal 永遠在最上層 */
+#addThemeModal { z-index: 5000 !important; }
+
+/* 🌟 Upload / Batch Item 完美排版 */
+.batch-results-container { display: none; max-height: 450px; overflow-y: auto; padding: 4px; margin-bottom: 20px; scrollbar-width: none; }
+.batch-item { margin-bottom: 14px; }
+.batch-confirm-box { background: rgba(255,255,255,0.6); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+.batch-preview-box { background: rgba(245, 253, 248, 0.7); border: 1.5px solid var(--green-light); border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+/* 🌟 Edit Inputs (玻璃質感修復) */
+.edit-label { font-size: 0.85rem; font-weight: 800; color: var(--sub); margin-bottom: 8px; margin-left: 4px; text-align: left; display: block;}
+.edit-input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; flex-shrink:0; width: 100%;}
+.edit-text-input { width: 100%; padding: 16px; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; font-family: 'Noto Sans TC', sans-serif; font-size: 1rem; color: var(--text); font-weight: 800; background: rgba(255,255,255,0.6); outline: none; box-sizing: border-box; box-shadow: inset 0 2px 6px rgba(0,0,0,0.03); transition: background 0.2s;}
+.edit-text-input:focus { background: #fff; border-color: var(--green-light);}
+.edit-coord-field { font-family: 'Courier New', Courier, monospace; color: var(--green-dark); padding-right: 50px; }
+.reset-input-btn { position: absolute; right: 8px; width: 36px; height: 36px; background: rgba(142, 142, 147, 0.15); border: none; border-radius: 10px; color: var(--sub); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; }
+.reset-input-btn:hover { background: rgba(142, 142, 147, 0.3); color: var(--text); }
+.reset-input-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+.type-toggle { display: flex; gap: 10px; width: 100%; margin-bottom: 20px; }
+.type-btn { flex: 1; padding: 14px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.6); background: rgba(255,255,255,0.4); color: var(--sub); font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; justify-content: center; align-items: center; }
+.type-btn.flower.active { background: rgba(253, 242, 248, 0.8); border-color: var(--flower); color: var(--flower-dark); }
+.type-btn.mushroom.active { background: rgba(255, 252, 242, 0.8); border-color: var(--mushroom); color: var(--mushroom-dark); }
+.type-btn.hidden-cat.active { background: rgba(240, 244, 248, 0.8); border-color: #6b7280; color: #374151; }
+.type-btn svg { width: 22px; height: 22px; fill: currentColor;}
+
+.theme-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; max-height: 180px; overflow-y: auto; scrollbar-width: none; align-content: flex-start; }
+.theme-option { padding: 8px 16px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; background: rgba(255,255,255,0.6); color: var(--sub); transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.theme-option.selected { background: rgba(76, 175, 110, 0.8); color: #fff; border-color: rgba(76, 175, 110, 0.9); }
+.custom-theme-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 300px; margin-bottom: 20px; padding: 4px;}
+.custom-theme-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; background: rgba(255,255,255,0.6); font-weight: 800; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+
+/* Global Utilities */
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(26, 46, 34, 0.9); color: #fff; padding: 14px 28px; border-radius: 99px; font-weight: 700; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 6000; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.lightbox-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
+.lightbox-overlay.open { display: flex; }
+.lightbox-frame { width: 92vw; max-width: 600px; aspect-ratio: 1.4 / 1; }
+.lightbox-img { width: 100%; height: 100%; object-fit: contain; }
+.crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
+.crop-modal-overlay.open { display: flex; }
+.crop-header { display: flex; justify-content: space-between; padding: max(24px, env(safe-area-inset-top)) 20px 20px; }
+.crop-container { flex: 1; position: relative; overflow: hidden; width: 100%; }
+.global-dropzone { display: none; position: fixed; inset: 0; background: rgba(240, 247, 242, 0.8); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+.global-dropzone.active { display: flex; }
+.dropzone-box { border: 2px dashed var(--green); border-radius: 32px; padding: 60px 40px; text-align: center; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 16px 40px rgba(76,175,110,0.15);}
+
+/* 🖨️ 🌟 GACHA PRINTER */
+#screen-gacha { display: none; flex-direction: column; min-height: 100vh; background: var(--bg); }
+#screen-gacha.active { display: flex; }
+.printer-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position: relative; padding-top: max(40px, 8vh); padding-bottom: 120px; overflow-y: auto; width: 100%; margin-top: -60px; }
+
+/* 機器主體設計 */
+.printer-machine { position: relative; width: 300px; height: 440px; display: flex; flex-direction: column; align-items: center; border-radius: 32px; background: linear-gradient(180deg, #e4e7eb 0%, #c4c9d1 100px, #a3aab3 100px, #8d959f 100%); border: 1px solid #9fa6ae; box-shadow: 0 20px 50px rgba(0,0,0,0.15); flex-shrink: 0; }
+.printer-label { margin-top: 20px; text-align: center; color: #4a5568; z-index: 5; }
+.printer-logo { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px; }
+.printer-logo svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+.printer-text { font-size: 0.75rem; font-weight: 800; line-height: 1.4; letter-spacing: 1px; }
+
+/* 出票口深色凹槽 (Z-index: 10) */
+.printer-slot-bg { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); width: 80%; height: 16px; background: #000; border-radius: 8px; z-index: 10; box-shadow: inset 0 4px 8px rgba(0,0,0,0.9);}
+
+/* 出票口上方遮罩 (Z-index: 40) */
+.printer-slot-top-lip { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); width: 80%; height: 4px; background: rgba(0,0,0,0.4); border-radius: 8px 8px 0 0; z-index: 40; pointer-events: none; }
+
+/* 🌟 卡片遮罩容器：確保卡片吐出時在最上層 (Z-index: 90) */
+.printer-card-container { position: absolute; top: 100px; left: 0; width: 100%; height: calc(100% - 100px); clip-path: inset(0 0 -1000px 0); z-index: 90; pointer-events: none; }
+.printer-card-container.zoomed-active { clip-path: none; z-index: 100000; }
+
+/* 🌟 真實明信片：圖層絕對最高 (Z-index: 100) */
+.printer-card { position: absolute; top: 0; left: 50%; transform: translate(-50%, -100%); width: 210px; height: 260px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 0; display: flex; flex-direction: column; overflow: hidden; pointer-events: auto; transition: transform 0.5s; z-index: 100;}
+.printer-card.printed { transform: translate(-50%, 15px) rotate(-1.5deg); transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.3, 1); cursor: zoom-in; }
+.printer-card.dropped { transform: translate(-50%, 100vh) rotate(-15deg); transition: transform 0.6s cubic-bezier(0.4, 0, 1, 1); }
+.printer-card.zoomed { position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -60px) scale(1.35) rotate(0deg) !important; cursor: zoom-out !important; box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; z-index: 100000 !important; }
+
+.printer-card-thumb { width: 100%; height: 130px; background: #f5f5f5; position: relative; }
+.printer-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.printer-card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.printer-card-title { font-weight: 900; font-size: 0.95rem; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;}
+.gacha-zoom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 99999; display: none; opacity: 0; transition: opacity 0.3s; pointer-events: auto; }
+.gacha-zoom-overlay.active { display: block; opacity: 1; }
+
+/* 🌟 真實金屬相機快門按鈕 */
+.action-area { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; width: 100%; z-index: 80; }
+.shutter-btn-outer { width: 72px; height: 72px; border-radius: 50%; background: #e0e5ec; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -6px -6px 12px rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s;}
+.shutter-btn-inner { width: 56px; height: 56px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #f4f6f8 0%, #d1d6de 100%); box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5); transition: all 0.15s; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; color: var(--sub);}
+.shutter-btn-outer:active .shutter-btn-inner { box-shadow: inset 6px 6px 12px rgba(0,0,0,0.15), inset -6px -6px 12px rgba(255,255,255,0.5); transform: scale(0.95); }
+
+.camera-flash-overlay { position: fixed; inset: 0; background: #ffffff; z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.8s ease-out; }
+.camera-flash-overlay.flash-active { opacity: 1; transition: none; }
+</style>
+</head>
+<body onclick="resetSwipes()">
+
+<div class="camera-flash-overlay" id="camera-flash"></div>
+
+<div id="shared-preview-container" style="display: none; position: fixed; top: env(safe-area-inset-top); left: 0; width: 100%; padding: 20px; z-index: 9999; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center;">
+  <p style="font-weight: 900; font-family: 'Nunito', sans-serif; color: var(--green-dark); margin-bottom: 12px;">📥 接收到分享圖片</p>
+  <img id="preview" style="max-height: 200px; max-width: 100%; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 16px; object-fit: contain;" />
+  <div style="display: flex; gap: 10px; justify-content: center;">
+      <button onclick="clearSharedPreview()" class="btn-cancel">取消</button>
+      <button class="btn-primary" style="width: auto; padding: 10px 24px;" onclick="processSharedImage()">開始匯入</button>
+  </div>
+</div>
+
+<div id="global-dropzone" class="global-dropzone" onclick="closeDropzone(event)">
+  <div class="dropzone-box">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" style="margin-bottom: 16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      <div style="font-weight:900;font-size:1.2rem;color:var(--green-dark);">拖曳圖片到此處</div>
+      <button class="btn-primary" style="margin-top:24px;width:auto;" onclick="document.getElementById('file-input').click()">選擇圖片</button>
+  </div>
+</div>
+
+<div class="crop-modal-overlay" id="cropModal">
+  <div class="crop-header"><button class="btn-cancel" style="width:auto;color:#fff;" onclick="cancelCrop()">取消</button><button class="btn-primary" style="width:auto;" onclick="confirmCrop()">確認</button></div>
+  <div class="crop-container"><img id="crop-image-target" src=""></div>
+</div>
+
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()"><div class="lightbox-frame"><img src="" class="lightbox-img" id="lightbox-img"></div></div>
+
+<div class="screen active" id="screen-login">
+  <div class="login-art"><div style="font-size: 5rem;">💌</div><div class="login-title" style="margin-top:20px;color:var(--green-dark);">Pikmin Postcards</div></div>
+  <div class="login-box"><h1 class="login-title">Doing good<br><span style="color:#4caf6e;">feels good.</span></h1><button class="btn-login" onclick="handleAuthClick()">Get Started</button><button style="width:100%;background:transparent;color:var(--sub);border:none;font-size:1rem;margin-top:16px;font-weight:700;" onclick="bypassLoginForPreview()">略過登入 (預覽模式)</button></div>
+</div>
+
+<div class="screen" id="screen-home">
+  <div class="home-header animate-stagger-1"><div><div class="home-greeting">Hi, <span id="display-name">Explorer</span></div><div class="home-email" id="display-email">Loading...</div></div><div class="home-avatar-container" onclick="openSettingsModal()"><img id="display-avatar" src="" class="home-avatar" style="display:none;"><div id="display-avatar-fallback" class="home-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;"><circle cx="12" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path></svg></div><div id="sync-status-indicator" class="sync-indicator"></div></div></div>
+  <div class="home-body">
+    <div class="category-grid animate-stagger-2">
+      <div class="folder-container" onclick="goTo('flower')"><div class="folder-wrapper"><div class="folder-tab"></div><div class="folder-back-main"></div><div class="folder-photos" id="folder-photos-flower"></div><div class="folder-front"><div class="folder-stickers" id="folder-icon-flower"></div></div></div><div class="folder-info"><div class="folder-label">Flower</div><div class="folder-count" id="stat-f-total">0</div></div></div>
+      <div class="folder-container" onclick="goTo('mushroom')"><div class="folder-wrapper"><div class="folder-tab"></div><div class="folder-back-main"></div><div class="folder-photos" id="folder-photos-mushroom"></div><div class="folder-front"><div class="folder-stickers" id="folder-icon-mushroom"></div></div></div><div class="folder-info"><div class="folder-label">Mushroom</div><div class="folder-count" id="stat-m-total">0</div></div></div>
+      <div class="folder-container" onclick="goTo('hidden')"><div class="folder-wrapper"><div class="folder-tab"></div><div class="folder-back-main"></div><div class="folder-photos" id="folder-photos-hidden"></div><div class="folder-front"><div class="folder-stickers" id="folder-icon-hidden"></div></div></div><div class="folder-info"><div class="folder-label">Hidden</div><div class="folder-count" id="stat-h-total">0</div></div></div>
+    </div>
+    <div class="search-wrapper animate-stagger-3">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" class="search-input" id="global-search" placeholder="搜尋地點或主題..." oninput="handleGlobalSearch(this.value)">
+    </div>
+    <div id="search-results-section" style="display:none;" class="animate-stagger-3"></div>
+  </div>
+  <input type="file" id="file-input" multiple accept="image/*" style="display:none;" onchange="handleFiles(this.files)">
+</div>
+
+<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div>
+<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div>
+<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div>
+
+<div class="screen" id="screen-map">
+  <div class="map-box">
+      <div class="map-floating-header">
+          <div class="map-search-row">
+              <div class="map-search-bar">
+                  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <input type="text" id="map-search-input" placeholder="輸入地點並按下 Enter 搜尋..." onkeydown="handleMapSearchEnter(event)">
+              </div>
+              <button class="map-nav-btn" onclick="locateMeOnMap()"><svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg></button>
+          </div>
+          <div class="map-filters" id="map-filter-container">
+              <div class="map-filter-pill active" id="map-filter-all" onclick="setMapFilter('all')"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg> discover</div>
+              <div class="map-filter-pill" id="map-filter-flower" onclick="setMapFilter('flower')"><div id="filter-icon-flower" style="width:16px;height:16px;"></div> flower</div>
+              <div class="map-filter-pill" id="map-filter-mushroom" onclick="setMapFilter('mushroom')"><div id="filter-icon-mushroom" style="width:16px;height:16px;"></div> mushroom</div>
+              <div class="map-filter-pill" id="map-filter-favorite" onclick="setMapFilter('favorite')"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> favorite</div>
+              <div class="map-filter-pill" id="map-filter-hidden" onclick="setMapFilter('hidden')"><div id="filter-icon-hidden" style="width:16px;height:16px;"></div> hidden</div>
+          </div>
+      </div>
+      <button class="route-fab" onclick="openRoutePanel()"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 路線 <span class="route-fab-badge" id="route-count-badge">0</span></button>
+      <div id="map-container" style="z-index: 1;"></div>
+      
+      <div id="map-context-menu">
+        <button class="context-menu-item" onclick="contextAddRoute()"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 加入路線</button>
+        <button class="context-menu-item" onclick="contextAddPostcard()"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> 新增明信片</button>
+      </div>
+  </div>
+  <div class="map-bottom-section"><h3 class="sheet-title">curations for you</h3><div class="sheet-cards-scroll" id="map-sheet-cards"></div></div>
+</div>
+
+<div class="screen" id="screen-gacha">
+  <div class="cat-screen-header" style="background:transparent; padding-bottom: 0;"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button></div></div>
+  <div class="gacha-zoom-overlay" id="gacha-zoom-overlay" onclick="toggleZoomGachaCard()"></div>
+  <div class="printer-viewport">
+      <div class="printer-machine" id="printer-machine">
+          <div class="printer-label"><div class="printer-logo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Pikmin</div><div class="printer-text">PHOTOS DELIVERED HERE<br>⬇</div></div>
+          <div class="printer-slot-bg"></div>
+          <div class="action-area">
+              <button class="shutter-btn-outer" onclick="spinPrinterGacha()">
+                  <div class="shutter-btn-inner"></div>
+              </button>
+          </div>
+          <div class="printer-card-container" id="printer-card-container">
+              <div class="printer-card" id="printer-card" onclick="toggleZoomGachaCard()">
+                  <div class="printer-card-thumb"><img id="gacha-result-img" src=""></div>
+                  <div class="printer-card-info">
+                      <div><div class="printer-card-title" id="gacha-result-title"></div><div class="postcard-loc" id="gacha-result-loc" style="margin-top:4px;"></div></div>
+                      <div class="postcard-footer"><div class="coord-btn" id="gacha-result-coord"></div></div>
+                  </div>
+              </div>
+          </div>
+          <div class="printer-slot-top-lip"></div>
+      </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-owned"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">我的收藏</div></div></div><div class="cat-body" id="owned-body"></div></div>
+
+<div class="dock-nav hidden-dock" id="global-nav">
+  <div class="dock-item nav-fill active" onclick="goTo('home')"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="nav-label">Home</span></div>
+  <div class="dock-item" onclick="goTo('gacha')"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg><span class="nav-label">Gacha</span></div>
+  <div class="dock-add-wrapper"><div class="dock-add-btn" onclick="showDropzone()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div></div>
+  <div class="dock-item" onclick="goTo('map')"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle class="cutout" cx="12" cy="10" r="3"></circle></svg><span class="nav-label">Map</span></div>
+  <div class="dock-item nav-fill" onclick="goTo('owned')"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg><span class="nav-label">Folder</span></div>
+</div>
+
+<div class="modal-overlay" id="uploadModal" onclick="closeModalOutside(event, 'uploadModal')">
+    <div class="modal">
+        <div class="modal-header"><div class="modal-handle"></div><div class="modal-title">批次匯入</div></div>
+        <div class="batch-results-container" id="batch-container" style="display:block;"></div>
+        <button id="btn-batch-save" class="btn-primary" style="display:none;" onclick="handleBatchSave()">儲存入庫</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
+<div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list" id="custom-theme-list"></div><button class="add-theme-btn" style="width:100%;margin-bottom:16px;padding:14px;" onclick="openAddThemeModal()">＋ 新增主題</button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
+
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div></div></div></div>
+
+<div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
+  <div class="modal" style="padding: 0; max-height: 85vh;">
+    <div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title">修改資訊</div></div>
+    <div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;">
+      <div id="edit-img-section" style="position:relative; width:120px; height:120px; margin: 10px auto 24px; cursor: pointer;">
+        <img id="edit-img-preview" src="" style="width:100%;height:100%;object-fit:cover;border-radius:20px;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.08);" onclick="startEditCrop()">
+        <button id="btn-add-edit-img" onclick="document.getElementById('edit-file-input').click()" style="width:100%;height:100%;border-radius:20px;border:2px dashed rgba(0,0,0,0.2);background:rgba(0,0,0,0.02);display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:800;color:var(--sub);">加圖</button>
+        <button id="btn-replace-edit-img" onclick="event.stopPropagation(); document.getElementById('edit-file-input').click()" style="position:absolute;top:-8px;left:-8px;width:32px;height:32px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);"><svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2.5" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></button>
+        <button id="btn-recrop-img" onclick="event.stopPropagation(); startEditCrop()" style="position:absolute;top:-8px;right:-8px;width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5" style="width:14px;height:14px;"><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+        <input type="file" id="edit-file-input" accept="image/*" style="display:none;" onchange="handleEditFileUpload(this.files)">
+      </div>
+      <div class="edit-label">明信片名稱：</div>
+      <div class="edit-input-wrapper"><input type="text" id="edit-name-input" class="edit-text-input no-icon" placeholder="名稱"></div>
+      <div class="edit-label">地點 (城市，國家)：</div>
+      <div class="edit-input-wrapper"><input type="text" id="edit-loc-input" class="edit-text-input no-icon" placeholder="地點"></div>
+      <div class="edit-label">點位類型：</div>
+      <div class="type-toggle" id="edit-type-container">
+        <button id="edit-type-flower" class="type-btn flower" onclick="setEditType('flower')"></button>
+        <button id="edit-type-mushroom" class="type-btn mushroom" onclick="setEditType('mushroom')"></button>
+        <button id="edit-type-hidden" class="type-btn hidden-cat" onclick="setEditType('hidden')"></button>
+      </div>
+      <div class="edit-label">座標：</div>
+      <div class="edit-input-wrapper">
+        <input type="text" id="edit-coord-input" class="edit-text-input edit-coord-field" placeholder="座標">
+        <button class="reset-input-btn" onclick="resetEditInput()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 10h10a5 5 0 0 1 0 10H11M3 10l4-4M3 10l4 4"/></svg></button>
+      </div>
+      <div class="edit-label">主題分類 (可多選)：</div>
+      <div class="theme-selector" id="edit-theme-selector" style="margin-bottom: 24px;"></div>
+      <button class="btn-primary" onclick="saveEdit()">儲存修改</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">取消收藏</div></div><button class="btn-danger" onclick="executeCancelOwned()">確定移除</button></div></div>
+<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">刪除明信片</div></div><button class="btn-danger" onclick="executeHardDelete()">確定刪除</button></div></div>
+
+<div class="map-detail-overlay" id="map-detail-overlay" onclick="closeMapDetail(event)">
+    <div class="map-detail-card" onclick="event.stopPropagation()">
+        <div class="map-detail-img-wrapper">
+            <img id="detail-img" src="">
+            <div class="map-detail-img-gradient"></div>
+            <div class="map-detail-title" id="detail-title"></div>
+            <div class="map-detail-time" id="detail-time"></div>
+            <div class="map-detail-icon-badge" id="detail-top-icon"></div>
+        </div>
+        <div class="map-detail-body">
+            <div class="map-detail-row-actions">
+                <div class="map-detail-loc" id="detail-loc"></div>
+                <div class="map-detail-actions">
+                    <button class="mac-btn star-btn" id="detail-star-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
+                    <button class="mac-btn del-btn" id="detail-del-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                    <button class="mac-btn edit-btn" id="detail-edit-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                </div>
+            </div>
+            <div class="map-detail-tags" id="detail-tags"></div>
+            <div class="map-detail-footer">
+                <div class="coord-btn" id="detail-coord"></div>
+                <button class="btn-route-add" id="detail-add-route-btn"><span id="detail-add-icon" style="display:flex;align-items:center;"></span>加入目的地</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="route-panel-overlay" id="route-panel-overlay" onclick="closeRoutePanel(event)">
+    <div class="route-panel" onclick="event.stopPropagation()">
+        <div class="route-header"><div class="route-title"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 路線規劃</div><button class="route-close" onclick="closeRoutePanel()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+        <div class="route-start-box">
+            <div class="route-item-icon" style="background:var(--green);color:#fff;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg></div>
+            <div style="flex:1; position:relative;">
+                <input type="text" class="route-start-input" id="route-start-input" placeholder="選擇出發點..." oninput="handleAutocomplete(this.value)" autocomplete="off">
+                <div class="autocomplete-dropdown" id="route-autocomplete-list"></div>
+            </div>
+            <button class="route-locate-btn" onclick="locateUserRoute()"><svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>定位</button>
+        </div>
+        <div class="route-list" id="route-destinations-list"></div>
+        <button class="btn-primary" onclick="openGoogleMapsRoute()">開啟導航</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 🌟 1. 核心 ICON 常數定義 (純 SVG 無 Emoji)
+const ICON_FLOWER = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="12" cy="7" r="4.5"></circle><circle cx="16.76" cy="10.45" r="4.5"></circle><circle cx="14.94" cy="16.05" r="4.5"></circle><circle cx="9.06" cy="16.05" r="4.5"></circle><circle cx="7.24" cy="10.45" r="4.5"></circle><circle cx="12" cy="12" r="2" fill="#fff"></circle></svg>`;
+const ICON_MUSHROOM = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 12V10A8 8 0 0 0 4 10V12"></path><rect x="9" y="12" width="6" height="10" rx="2"></rect><circle cx="9" cy="8" r="1.5" fill="#fff"></circle><circle cx="15" cy="8" r="1.5" fill="#fff"></circle><circle cx="12" cy="5" r="1.5" fill="#fff"></circle></svg>`;
+const ICON_HIDDEN = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" fill="none" stroke-width="2.5"></path></svg>`;
+
+const apiKey = "";
+const GOOGLE_CLIENT_ID = '860667269256-ndj7kvt7es64r5in4p5gm7cf6iact7m4.apps.googleusercontent.com'; 
+const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'; 
+
+let tokenClient; let gisInited = false;
+let currentAccessToken = localStorage.getItem('pikmin_access_token') || null; 
+let tokenExpiry = localStorage.getItem('pikmin_token_expiry') || null;
+let driveFileId = localStorage.getItem('pikmin_driveFileId') || null;
+
+let defaultThemes = ['🏞️ 自然景觀', '🏛️ 歷史古蹟', '⛩️ 神社', '🏛️ 博物館', '⛪ 教堂', '🌌 極光', '🗼 城市地標', '🖼️ 壁畫'];
+let customThemes = [];
+let flowerCards = []; let mushroomCards = []; let hiddenCards = []; 
+let userProfile = { name: '', email: '', picture: '', customNickname: '', customAvatar: '' };
+
+let activeSubTabs = { flower: 'country', mushroom: 'country', hidden: 'country' };
+let activeFilters = { flower: '全部', mushroom: '全部', hidden: '全部' };
+let pendingRemoveCard = null; let hideOwnedState = { flower: false, mushroom: false, hidden: false };
+let tempBatchList = []; let currentEditCat = ''; let currentEditId = ''; let currentEditType = ''; let originalCoordBeforeEdit = ""; let tempEditThemes = [];
+let editingThemeIndex = -1; let currentEditCountry = ''; let currentEditTz = ''; 
+let filesToCrop = []; let currentCropIndex = 0; let cropperInstance = null; let cropMode = 'upload';
+let tempEditImg = null; let tempEditOriginalImg = null; let tempEditCropData = null; let isEditImgDeleted = false;
+let dragStartX = 0; let dragStartY = 0; let isSwiping = false; let swipeDirection = null; let ocrCache = {};
+let currentPeekCard = null; let dragCounter = 0; let coordDebounceTimer; let batchDebounceTimers = {};
+
+let globalMap = null; let mapMarkers = []; let currentMapFilter = 'all';
+let routeDestinations = []; let routeLineFeature = null; let currentLocLatLng = null; let gachaIsSpinning = false;
+let sharedFileBlob = null; let tempMapPin = null; let customMapPins = []; 
+
+let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵','❄️','⛄','🧊','🌲','🌊','♨️','🚂','🚢','🌉','🏰'];
+let currentNewThemeEmoji = '✨';
+
+let autocompleteTimer = null;
+
+// 🌟 2. 基礎共用函數
+function showToast(m) { const t = document.getElementById('toast'); if(t) { t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); } }
+function openModal(id) { const el = document.getElementById(id); if(el) el.classList.add('open'); const nav = document.getElementById('global-nav'); if(nav) nav.classList.add('hidden-dock'); document.body.style.overflow = 'hidden'; }
+function closeModal(id) { 
+    const el = document.getElementById(id); 
+    if(el) el.classList.remove('open'); 
+    const openOverlays = document.querySelectorAll('.modal-overlay.open, .route-panel-overlay.open, .lightbox-overlay.open, .crop-modal-overlay.open');
+    if (openOverlays.length === 0) { 
+        const nav = document.getElementById('global-nav'); 
+        if(nav) nav.classList.remove('hidden-dock'); 
+        document.body.style.overflow = ''; 
+    } 
+    if(id==='confirmModal') pendingRemoveCard = null; 
+}
+function closeModalOutside(e, id) { if(e && e.target && e.target.id === id) closeModal(id); }
+function showLightbox(imgSrc) { if (!imgSrc) return; const el = document.getElementById('lightbox'); if(el) el.classList.add('open'); const imgEl = document.getElementById('lightbox-img'); if(imgEl) imgEl.src = imgSrc; }
+function closeLightbox() { const el = document.getElementById('lightbox'); if(el) el.classList.remove('open'); }
+function cleanLocText(text) { if (!text) return ''; const parts = text.split(';'); return parts.pop().trim(); }
+function showDropzone() { const el = document.getElementById('global-dropzone'); if(el) el.classList.add('active'); }
+function closeDropzone(e) { if (e && e.target && e.target.id === 'global-dropzone') { document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0; } }
+function switchSubTab(cat, tab, el) { const s = document.getElementById('screen-'+cat); if(s) { s.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active')); } if(el) el.classList.add('active'); activeSubTabs[cat] = tab; activeFilters[cat] = '全部'; refreshCurrentView(); }
+
+function applyFilter(cat, mode, val) { 
+    const fw = document.getElementById(cat + '-filters');
+    const savedScrollX = fw ? fw.scrollLeft : 0;
+    const savedScrollY = window.scrollY;
+
+    activeFilters[cat] = val; 
+    refreshCurrentView(); 
+
+    if(fw) { fw.scrollLeft = savedScrollX; }
+    window.scrollTo(0, savedScrollY);
+}
+
+// 🌟 修正的文字切換複製功能
+function copyCoord(e, c) { 
+    if(e) e.stopPropagation(); 
+    const b = e.currentTarget; 
+    const originalText = b.textContent;
+    if (navigator.clipboard && window.isSecureContext) { 
+        navigator.clipboard.writeText(c).then(() => { 
+            b.textContent = '✅ 已複製！'; 
+            showToast('✅ 座標已複製！'); 
+            setTimeout(() => { if(b) b.textContent = originalText; }, 2000); 
+        }).catch(() => fallbackCopy(b, c, originalText)); 
+    } else { 
+        fallbackCopy(b, c, originalText); 
+    } 
+}
+function fallbackCopy(btn, text, originalText) { 
+    let textArea = document.createElement("textarea"); 
+    textArea.value = text; 
+    textArea.style.position = "fixed"; 
+    textArea.style.left = "-999999px"; 
+    textArea.style.top = "-999999px"; 
+    document.body.appendChild(textArea); 
+    textArea.focus(); textArea.select(); 
+    try { 
+        document.execCommand('copy'); 
+        if(btn) btn.textContent = '✅ 已複製！'; 
+        showToast('✅ 座標已複製！'); 
+        setTimeout(() => { if(btn) btn.textContent = originalText; }, 2000); 
+    } catch (err) { 
+        showToast('⚠️ 複製失敗'); 
+    } 
+    textArea.remove(); 
+}
+
+function getLocalTime(tz) { try { const now = new Date(); const locDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }).format(now); const tgtDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(now); const tgtTimeStr = new Intl.DateTimeFormat('zh-TW', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(now); let prefix = ""; if (locDateStr === tgtDateStr) { prefix = "今日 "; } else { const lD = new Date(locDateStr); const tD = new Date(tgtDateStr); const diff = (tD - lD) / 86400000; if (diff === 1) prefix = "明日 "; else if (diff === -1) prefix = "昨日 "; else prefix = tgtDateStr.substring(5).replace('-','/') + " "; } return prefix + tgtTimeStr; } catch(e) { return '--:--'; } }
+
+function bypassLoginForPreview() { 
+    userProfile = { name: 'Designer', email: 'preview@design.studio', picture: '', customNickname: 'UI/UX Designer', customAvatar: '' }; 
+    updateProfileUI(); 
+    generateMockData(); 
+    const loginScreen = document.getElementById('screen-login'); 
+    if(loginScreen) loginScreen.classList.add('screen-transition-out'); 
+    const nav = document.getElementById('global-nav'); 
+    if(nav) nav.style.display = 'flex'; 
+    setTimeout(() => { 
+        if(loginScreen) loginScreen.classList.remove('active', 'screen-transition-out'); 
+        goTo('home'); 
+        if(nav) nav.classList.remove('hidden-dock'); 
+        showToast('✨ 已進入設計預覽模式'); 
+    }, 350); 
+}
+
+function generateMockData() {
+    const mocks = [
+        { id: 'm1', name: 'Tokyo Tower', loc: 'Tokyo, Japan', country: 'Japan', themes: ['🗼 城市地標'], coord: '35.6586, 139.7454', img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80', owned: true, favorite: true, type: 'flower', tz: 'Asia/Tokyo' },
+        { id: 'm2', name: 'Kyoto Shrine', loc: 'Kyoto, Japan', country: 'Japan', themes: ['⛩️ 神社'], coord: '35.0116, 135.7680', img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80', owned: true, favorite: false, type: 'mushroom', tz: 'Asia/Tokyo' },
+        { id: 'm3', name: 'Eiffel Tower', loc: 'Paris, France', country: 'France', themes: ['🗼 城市地標'], coord: '48.8584, 2.2945', img: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80', owned: true, favorite: true, type: 'flower', tz: 'Europe/Paris' },
+        { id: 'm4', name: 'Louvre Museum', loc: 'Paris, France', country: 'France', themes: ['🏛️ 博物館'], coord: '48.8606, 2.3376', img: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80', owned: false, favorite: false, type: 'mushroom', tz: 'Europe/Paris' },
+        { id: 'm5', name: 'Taipei 101', loc: 'Taipei, Taiwan', country: 'Taiwan', themes: ['🗼 城市地標'], coord: '25.0339, 121.5644', img: 'https://images.unsplash.com/photo-1470004914212-05527e49370b?w=400&q=80', owned: true, favorite: true, type: 'flower', tz: 'Asia/Taipei' },
+        { id: 'm6', name: 'Secret Beach', loc: 'Okinawa, Japan', country: 'Japan', themes: ['🏖️', '🏝️'], coord: '26.2124, 127.6809', img: 'https://images.unsplash.com/photo-1542640244-7e672d6cb466?w=400&q=80', owned: true, favorite: true, type: 'hidden', tz: 'Asia/Tokyo' },
+        { id: 'm7', name: 'Central Park', loc: 'New York, USA', country: 'USA', themes: ['🌳', '🏞️ 自然景觀'], coord: '40.7812, -73.9665', img: 'https://images.unsplash.com/photo-1500916434205-0c77489c6cf7?w=400&q=80', owned: false, favorite: true, type: 'flower', tz: 'America/New_York' },
+    ];
+    flowerCards = mocks.filter(m => m.type === 'flower'); mushroomCards = mocks.filter(m => m.type === 'mushroom'); hiddenCards = mocks.filter(m => m.type === 'hidden');
+}
+
+// 🌟 3. DB 與同步系統
+const idb = {
+  db: null,
+  init() { return new Promise((resolve, reject) => { if (this.db) return resolve(this.db); const req = indexedDB.open('PikminDB', 1); req.onupgradeneeded = e => { e.target.result.createObjectStore('store'); }; req.onsuccess = e => { this.db = e.target.result; resolve(this.db); }; req.onerror = e => reject(e.error); }); },
+  async get(key) { const db = await this.init(); return new Promise(resolve => { const req = db.transaction('store', 'readonly').objectStore('store').get(key); req.onsuccess = () => resolve(req.result); req.onerror = () => resolve(null); }); },
+  async set(key, val) { const db = await this.init(); return new Promise((resolve, reject) => { const tx = db.transaction('store', 'readwrite'); tx.objectStore('store').put(val, key); tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); }); }
+};
+
+async function loadDataFromLocal() { 
+    try { 
+        // 🌟 強制確保載入舊資料時自動加上 type 屬性，避免地圖上跑掉
+        const localFlower = await idb.get('pikmin_flowerCards'); if (localFlower) flowerCards = JSON.parse(localFlower).map(c => ({...c, type: 'flower'})); 
+        const localMushroom = await idb.get('pikmin_mushroomCards'); if (localMushroom) mushroomCards = JSON.parse(localMushroom).map(c => ({...c, type: 'mushroom'})); 
+        const localHidden = await idb.get('pikmin_hiddenCards'); if (localHidden) hiddenCards = JSON.parse(localHidden).map(c => ({...c, type: 'hidden'})); 
+        const localCustomThemes = await idb.get('pikmin_customThemes'); if (localCustomThemes) customThemes = JSON.parse(localCustomThemes); 
+        const localProfile = await idb.get('pikmin_userProfile'); if (localProfile) userProfile = JSON.parse(localProfile); 
+        refreshCurrentView(); updateProfileUI(); 
+    } catch (e) {} 
+}
+async function saveDataToLocal(skipCloud = false, isFromCloud = false) { try { const localFlower = flowerCards.map(c => ({...c, originalImg: null})); const localMushroom = mushroomCards.map(c => ({...c, originalImg: null})); const localHidden = hiddenCards.map(c => ({...c, originalImg: null})); await idb.set('pikmin_flowerCards', JSON.stringify(localFlower)); await idb.set('pikmin_mushroomCards', JSON.stringify(localMushroom)); await idb.set('pikmin_hiddenCards', JSON.stringify(localHidden)); await idb.set('pikmin_customThemes', JSON.stringify(customThemes)); await idb.set('pikmin_userProfile', JSON.stringify(userProfile)); if (!isFromCloud) { localStorage.setItem('pikmin_lastUpdate', Date.now().toString()); } if(!skipCloud) { uploadToCloud(); } } catch (e) {} }
+
+function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: SCOPES, callback: (resp) => { if (resp.error !== undefined) { return; } currentAccessToken = resp.access_token; localStorage.setItem('pikmin_access_token', currentAccessToken); localStorage.setItem('pikmin_token_expiry', Date.now() + 50 * 60 * 1000); showAppScreen(); fetchUserInfo().finally(() => { checkAndSyncDriveFile(); }); }, }); gisInited = true; if (currentAccessToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) { const ls = document.getElementById('screen-login'); if(ls) ls.classList.remove('active'); goTo('home'); const nav = document.getElementById('global-nav'); if(nav) nav.style.display = 'flex'; setTimeout(() => { if(nav) nav.classList.remove('hidden-dock'); }, 50); fetchUserInfo().finally(() => { checkAndSyncDriveFile(); }); } else { showLoginScreen(); } }
+function showLoginScreen() { const ls = document.getElementById('screen-login'); if(ls) { ls.classList.remove('screen-transition-out'); ls.classList.add('active'); } const hs = document.getElementById('screen-home'); if(hs) hs.classList.remove('active'); const nav = document.getElementById('global-nav'); if(nav) { nav.classList.add('hidden-dock'); nav.style.display = 'none'; } }
+function showAppScreen() { const loginScreen = document.getElementById('screen-login'); const nav = document.getElementById('global-nav'); if(nav) nav.style.display = 'flex'; if (loginScreen && loginScreen.classList.contains('active')) { loginScreen.classList.add('screen-transition-out'); setTimeout(() => { loginScreen.classList.remove('active', 'screen-transition-out'); goTo('home'); if(nav) nav.classList.remove('hidden-dock'); }, 350); } else { goTo('home'); setTimeout(() => { if(nav) nav.classList.remove('hidden-dock'); }, 50); } }
+function handleAuthClick() { if (GOOGLE_CLIENT_ID.includes('你的_')) { showToast('⚠️ 請先填寫 Client ID'); return; } if (!gisInited) { return; } tokenClient.requestAccessToken(); }
+function handleLogout() { currentAccessToken = null; localStorage.removeItem('pikmin_access_token'); localStorage.removeItem('pikmin_token_expiry'); localStorage.removeItem('pikmin_driveFileId'); localStorage.removeItem('pikmin_lastUpdate'); userProfile = { name: '', email: '', picture: '', customNickname: '', customAvatar: '' }; flowerCards = []; mushroomCards = []; hiddenCards = []; customThemes = []; document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')); showLoginScreen(); showToast('🚪 已登出帳號'); }
+async function fetchUserInfo() { try { const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + currentAccessToken }}); if (!res.ok) { updateProfileUI(); return false; } const data = await res.json(); userProfile.email = data.email; userProfile.name = data.name; userProfile.picture = data.picture; updateProfileUI(); return true; } catch(e) { updateProfileUI(); return false; } }
+
+function updateProfileUI() { const displayName = userProfile.customNickname || userProfile.name || 'Explorer'; const displayAvatar = userProfile.customAvatar || userProfile.picture; const dn = document.getElementById('display-name'); if(dn) dn.innerText = displayName; const de = document.getElementById('display-email'); if(de) de.innerText = userProfile.email || '未綁定信箱'; const sn = document.getElementById('settings-nickname'); if(sn) sn.value = userProfile.customNickname || ''; const se = document.getElementById('settings-email-display'); if(se) se.innerText = userProfile.email || '未綁定信箱'; const avatarEl = document.getElementById('display-avatar'); const fallbackEl = document.getElementById('display-avatar-fallback'); const settingsAvatarEl = document.getElementById('settings-avatar-preview'); if (displayAvatar) { if(avatarEl) { avatarEl.src = displayAvatar; avatarEl.style.display = 'block'; } if(settingsAvatarEl) settingsAvatarEl.src = displayAvatar; if(fallbackEl) fallbackEl.style.display = 'none'; } else { if(avatarEl) avatarEl.style.display = 'none'; if(fallbackEl) fallbackEl.style.display = 'flex'; if(settingsAvatarEl) settingsAvatarEl.src = ''; } }
+function openSettingsModal() { updateProfileUI(); openModal('settingsModal'); }
+function saveSettings() { const sn = document.getElementById('settings-nickname'); if(sn) userProfile.customNickname = sn.value.trim(); updateProfileUI(); saveDataToLocal(); closeModal('settingsModal'); showToast('✅ 設定已儲存'); }
+function showSyncing(isSyncing) { const ind = document.getElementById('sync-status-indicator'); if(ind) { if(isSyncing) ind.classList.add('syncing'); else { ind.classList.remove('syncing'); const now = new Date(); const settingsLastSync = document.getElementById('settings-last-sync'); if(settingsLastSync) settingsLastSync.innerText = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0'); } } }
+function forceSync() { closeModal('settingsModal'); checkAndSyncDriveFile(); }
+async function checkAndSyncDriveFile() { try { showSyncing(true); const response = await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='pikmin_data_v1.json'&fields=files(id,name)`, { headers: { 'Authorization': 'Bearer ' + currentAccessToken } }); if (!response.ok) throw new Error('Network error'); const data = await response.json(); const files = data.files; if (files && files.length > 0) { driveFileId = files[0].id; localStorage.setItem('pikmin_driveFileId', driveFileId); await downloadFromDrive(); } else { await createInDrive(); } showSyncing(false); } catch (err) { showSyncing(false); } }
+async function downloadFromDrive() { 
+    try { 
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, { headers: { 'Authorization': 'Bearer ' + currentAccessToken } }); 
+        if (!response.ok) throw new Error('Download failed'); 
+        const dataObj = await response.json(); 
+        const localTime = parseInt(localStorage.getItem('pikmin_lastUpdate') || '0'); 
+        let cloudTime = parseInt(dataObj.lastUpdate || '0'); 
+        if (isNaN(cloudTime) && typeof dataObj.lastUpdate === 'string') { cloudTime = new Date(dataObj.lastUpdate).getTime(); } 
+        if (localTime > cloudTime) { 
+            uploadToCloud(); 
+        } else { 
+            // 🌟 強制確保載入舊資料時自動加上 type 屬性，避免地圖上跑掉
+            if(dataObj.flowerCards) flowerCards = dataObj.flowerCards.map(c => ({...c, type: 'flower'})); 
+            if(dataObj.mushroomCards) mushroomCards = dataObj.mushroomCards.map(c => ({...c, type: 'mushroom'})); 
+            if(dataObj.hiddenCards) hiddenCards = dataObj.hiddenCards.map(c => ({...c, type: 'hidden'})); 
+            if(dataObj.customThemes) customThemes = dataObj.customThemes; 
+            if(dataObj.userProfile) { userProfile.customNickname = dataObj.userProfile.customNickname || ''; userProfile.customAvatar = dataObj.userProfile.customAvatar || ''; } 
+            localStorage.setItem('pikmin_lastUpdate', cloudTime.toString()); 
+            saveDataToLocal(true, true); updateProfileUI(); refreshCurrentView(); 
+        } 
+    } catch (err) {} 
+}
+async function uploadToCloud() { if (!driveFileId || !currentAccessToken) return; showSyncing(true); let localTime = localStorage.getItem('pikmin_lastUpdate'); if (!localTime) { localTime = Date.now().toString(); localStorage.setItem('pikmin_lastUpdate', localTime); } const fileContent = JSON.stringify({ flowerCards, mushroomCards, hiddenCards, customThemes, userProfile: { customNickname: userProfile.customNickname, customAvatar: userProfile.customAvatar }, lastUpdate: localTime }); const file = new Blob([fileContent], {type: 'application/json'}); const form = new FormData(); form.append('metadata', new Blob([JSON.stringify({mimeType: 'application/json'})], {type: 'application/json'})); form.append('file', file); try { await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`, { method: 'PATCH', headers: new Headers({ 'Authorization': 'Bearer ' + currentAccessToken }), body: form }); showSyncing(false); } catch (err) { showSyncing(false); } }
+async function createInDrive() { if (!currentAccessToken) return; showSyncing(true); let localTime = localStorage.getItem('pikmin_lastUpdate'); if (!localTime) { localTime = Date.now().toString(); localStorage.setItem('pikmin_lastUpdate', localTime); } const fileContent = JSON.stringify({ flowerCards, mushroomCards, hiddenCards, customThemes, userProfile: { customNickname: '', customAvatar: '' }, lastUpdate: localTime }); const file = new Blob([fileContent], {type: 'application/json'}); const metadata = { name: 'pikmin_data_v1.json', parents: ['appDataFolder'], mimeType: 'application/json' }; const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'})); form.append('file', file); try { const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: new Headers({ 'Authorization': 'Bearer ' + currentAccessToken }), body: form }); const data = await res.json(); driveFileId = data.id; localStorage.setItem('pikmin_driveFileId', driveFileId); showSyncing(false); } catch (err) { showSyncing(false); } }
+
+// 🌟 4. 畫面切換與導覽列互動
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+  const targetScreen = document.getElementById('screen-' + screen);
+  if(targetScreen) targetScreen.classList.add('active');
+
+  const dockItems = document.querySelectorAll('.dock-nav > .dock-item');
+  dockItems.forEach(nav => {
+      nav.classList.remove('active');
+      const icon = nav.querySelector('svg');
+      if(icon) { icon.setAttribute('fill', 'none'); icon.setAttribute('stroke', 'currentColor'); }
+  });
+
+  const screenToIndex = { 'home': 0, 'gacha': 1, 'map': 2, 'owned': 3 }; 
+  const activeIndex = screenToIndex[screen];
+  
+  const setNavActive = (idx) => {
+      if(dockItems[idx]) {
+          dockItems[idx].classList.add('active');
+          const icon = dockItems[idx].querySelector('svg');
+          if(icon) { icon.setAttribute('fill', 'currentColor'); icon.setAttribute('stroke', 'none'); }
+      }
+  };
+
+  if (activeIndex !== undefined) { 
+      setNavActive(activeIndex);
+  } else if (['flower', 'mushroom', 'hidden'].includes(screen)) {
+      setNavActive(0); 
+  }
+
+  if (screen === 'map') {
+      setTimeout(() => { if (globalMap) { globalMap.invalidateSize(); renderMapMarkers(); } else { initMap(); } }, 100);
+  }
+  refreshCurrentView(); window.scrollTo(0, 0);
+}
+
+function refreshCurrentView() {
+  if (document.getElementById('screen-flower')?.classList.contains('active')) renderCat('flower', activeSubTabs.flower);
+  if (document.getElementById('screen-mushroom')?.classList.contains('active')) renderCat('mushroom', activeSubTabs.mushroom);
+  if (document.getElementById('screen-hidden')?.classList.contains('active')) renderCat('hidden', activeSubTabs.hidden);
+  if (document.getElementById('screen-owned')?.classList.contains('active')) renderOwned();
+  
+  const searchInput = document.getElementById('global-search');
+  if (document.getElementById('screen-home')?.classList.contains('active') && searchInput) handleGlobalSearch(searchInput.value);
+  
+  const totalF = document.getElementById('stat-f-total'); if(totalF) totalF.textContent = flowerCards.length + ' photos';
+  const totalM = document.getElementById('stat-m-total'); if(totalM) totalM.textContent = mushroomCards.length + ' photos';
+  const totalH = document.getElementById('stat-h-total'); if(totalH) totalH.textContent = hiddenCards.length + ' photos';
+  
+  const fIconFlower = document.getElementById('folder-icon-flower'); if(fIconFlower) fIconFlower.innerHTML = `<div class="folder-sticker" style="color:var(--flower-dark)">${ICON_FLOWER}</div>`;
+  const fIconMushroom = document.getElementById('folder-icon-mushroom'); if(fIconMushroom) fIconMushroom.innerHTML = `<div class="folder-sticker" style="color:var(--mushroom-dark)">${ICON_MUSHROOM}</div>`;
+  const fIconHidden = document.getElementById('folder-icon-hidden'); if(fIconHidden) fIconHidden.innerHTML = `<div class="folder-sticker" style="color:#555">${ICON_HIDDEN}</div>`;
+
+  updateFolderPhotos(); 
+  enableDragScroll(); 
+}
+
+function initModalDrag() {
+    document.querySelectorAll('.modal-header').forEach(handle => {
+        let startY = 0; let currentY = 0; const modal = handle.closest('.modal'); const overlay = handle.closest('.modal-overlay');
+        if(!modal || !overlay) return;
+        handle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; currentY = startY; modal.style.transition = 'none'; }, {passive: true});
+        handle.addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY; const dy = currentY - startY; if (dy > 0) { e.preventDefault(); modal.style.transform = `translateY(${dy}px)`; } }, {passive: false});
+        handle.addEventListener('touchend', () => { const dy = currentY - startY; modal.style.transition = 'transform 0.3s ease'; if (dy > 80) { closeModal(overlay.id); setTimeout(() => { modal.style.transform = ''; }, 300); } else { modal.style.transform = ''; } });
+    });
+}
+
+function enableDragScroll() {
+  const sliders = document.querySelectorAll('.quick-filter-wrapper, .theme-selector, .sheet-cards-scroll');
+  sliders.forEach(slider => {
+    if (slider.dataset.dragBound === 'true') return;
+    slider.dataset.dragBound = 'true';
+    let isDown = false; let startX; let scrollLeft; let isDragging = false; 
+    slider.addEventListener('mousedown', (e) => { isDown = true; isDragging = false; slider.style.cursor = 'grabbing'; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+    slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+    slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; setTimeout(() => { isDragging = false; }, 0); });
+    slider.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 1.5; if (Math.abs(walk) > 3) isDragging = true; slider.scrollLeft = scrollLeft - walk; });
+    slider.addEventListener('click', (e) => { if (isDragging) { e.preventDefault(); e.stopPropagation(); } }, true);
+    slider.addEventListener('wheel', (e) => { if (e.deltaY !== 0) { e.preventDefault(); slider.scrollLeft += e.deltaY > 0 ? 40 : -40; } }, { passive: false });
+  });
+}
+
+function resetSwipes() { document.querySelectorAll('.postcard.swiped').forEach(el => el.classList.remove('swiped')); }
+
+function handleDragStart(e) { isSwiping = false; swipeDirection = null; dragStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].screenX; dragStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].screenY; }
+function handleDragMove(e) { if (!dragStartX || !e.touches) return; let dx = e.touches[0].screenX - dragStartX; let dy = e.touches[0].screenY - dragStartY; if (!swipeDirection) { if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) swipeDirection = 'h'; else if (Math.abs(dy) > 10) swipeDirection = 'v'; } if (swipeDirection === 'h') { if (e.cancelable) e.preventDefault(); } }
+function handleDragEnd(e, el) { if (!dragStartX) return; let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX; let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { isSwiping = true; if (dx < -40) { resetSwipes(); el.classList.add('swiped'); } else if (dx > 40) { el.classList.remove('swiped'); } } dragStartX = 0; dragStartY = 0; }
+
+function toggleOwned(e, cat, id) { if (e && e.target && (e.target.closest('.mac-btns-container') || e.target.closest('.coord-btn'))) return; if(isSwiping) { isSwiping = false; return; } const list = cat === 'flower' ? flowerCards : (cat === 'hidden' ? hiddenCards : mushroomCards); const c = list.find(x => x.id == id); if(c){ if(c.owned){ pendingRemoveCard = c; openModal('confirmModal'); } else { c.owned = true; showToast('✅ 標記為已擁有'); refreshCurrentView(); saveDataToLocal(); } } }
+function executeToggleOwnedBtn(e, cat, id) { e.stopPropagation(); const list = cat === 'flower' ? flowerCards : (cat === 'hidden' ? hiddenCards : mushroomCards); const c = list.find(x => x.id == id); if(c) { pendingRemoveCard = c; openModal('confirmModal'); } }
+function executeCancelOwned() { if(pendingRemoveCard) { pendingRemoveCard.owned = false; refreshCurrentView(); saveDataToLocal(); } closeModal('confirmModal'); }
+function executeHardDelete() { if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); else if (currentDelCat === 'hidden') hiddenCards = hiddenCards.filter(x => x.id != currentDelId); else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); refreshCurrentView(); closeModal('deleteConfirmModal'); saveDataToLocal(); }
+function toggleFavorite(e, cat, id) { e.stopPropagation(); const list = cat==='flower'?flowerCards:(cat==='hidden'?hiddenCards:mushroomCards); const card = list.find(x => x.id == id); if(card){ card.favorite = !card.favorite; showToast(card.favorite?'⭐ 已加入最愛':'⚪ 已取消最愛'); refreshCurrentView(); saveDataToLocal(); } }
+function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
+
+// 🌟 5. 渲染視圖 (Folders, Cards)
+function updateFolderPhotos() {
+    const renderPhotos = (cards, containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const photos = cards.filter(c => c.img || c.originalImg).sort((a,b) => b.id.localeCompare(a.id)).slice(0, 3);
+        let html = '';
+        const sortedForRender = [];
+        if(photos.length > 0) sortedForRender[2] = photos[0]; 
+        if(photos.length > 1) sortedForRender[0] = photos[1]; 
+        if(photos.length > 2) sortedForRender[1] = photos[2]; 
+        for(let i = 0; i < 3; i++) {
+            const p = sortedForRender[i];
+            if (p) html += `<img src="${p.img || p.originalImg}" class="folder-photo">`;
+            else html += `<div class="folder-photo empty-photo"></div>`;
+        }
+        container.innerHTML = html;
+    };
+    renderPhotos(flowerCards, 'folder-photos-flower');
+    renderPhotos(mushroomCards, 'folder-photos-mushroom');
+    renderPhotos(hiddenCards, 'folder-photos-hidden');
+}
+
+function cardHTML(c, thumbClass, cat) {
+  const starFill = c.favorite ? 'var(--star-gold)' : 'none'; const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : `<div style="display:flex;align-items:center;justify-content:center;color:var(--sub);">${cat==='flower'?ICON_FLOWER:(cat==='mushroom'?ICON_MUSHROOM:ICON_HIDDEN)}</div>`; const isOwnedClass = c.owned ? 'is-owned' : '';
+  const themes = Array.isArray(c.themes) ? c.themes : ['未分類'];
+  return `<div class="postcard-wrapper animate-stagger-2"><div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除</div><div class="postcard ${isOwnedClass}" onclick="toggleOwned(event, '${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)"><div class="postcard-thumb ${thumbClass}">${thumbContent}<div class="image-time-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${getLocalTime(c.tz)}</div></div><div class="postcard-info"><div class="mac-btns-container"><button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button><button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button><button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></div><div class="postcard-name-row"><div class="postcard-name" title="${(c.name || '').replace(/"/g, '&quot;')}">${c.name || '未命名'}</div></div><div class="postcard-loc-row"><div class="postcard-loc"><svg viewBox="0 0 24 24" width="14" height="14" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg> <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${c.loc || '未知地點'}</span></div></div><div class="postcard-tags">${themes.map(t => `<span class="tag">${t}</span>`).join('')}</div><div class="postcard-footer"><div class="coord-btn" onclick="copyCoord(event,'${c.coord || ''}')">${c.coord || ''}</div>${c.owned ? '<div class="owned-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : ''}</div></div></div></div>`;
+}
+
+function toggleStackCard(cardEl) { const isExpanded = cardEl.classList.contains('expanded'); document.querySelectorAll('.stack-card.expanded').forEach(el => { if(el !== cardEl) el.classList.remove('expanded'); }); if(isExpanded) { cardEl.classList.remove('expanded'); } else { cardEl.classList.add('expanded'); } }
+function handleStackThumbClick(e, imgSrc, thumbEl) { if (e.target.closest('.stack-indicator') || e.target.closest('.stack-title') || e.target.closest('.stack-time-badge')) return; const card = thumbEl.closest('.stack-card'); if (card.classList.contains('expanded') && imgSrc && imgSrc !== 'null' && imgSrc !== '') { e.stopPropagation(); showLightbox(imgSrc); } }
+
+function stackCardHTML(c, cat) {
+  const starFill = c.favorite ? 'var(--star-gold)' : 'none'; 
+  const bgStyle = c.img ? `background-image: url('${c.img}');` : `background: ${cat==='flower'?'var(--flower-light)':'var(--mushroom-light)'};`; 
+  const innerThumb = c.img ? '' : `<div style="width:60px; height:60px; color:var(--sub);">${cat==='flower'?ICON_FLOWER:(cat==='mushroom'?ICON_MUSHROOM:ICON_HIDDEN)}</div>`;
+  const themes = Array.isArray(c.themes) ? c.themes : ['未分類'];
+  return `
+    <div class="stack-card animate-stagger-2" onclick="toggleStackCard(this)">
+        <div class="stack-thumb" style="${bgStyle}" onclick="handleStackThumbClick(event, '${c.img || ''}', this)">
+            ${innerThumb}
+            <div class="stack-title" title="${(c.name || '').replace(/"/g, '&quot;')}">${c.name || '未命名'}</div>
+            <div class="stack-time-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${getLocalTime(c.tz)}</div>
+            <div class="stack-indicator"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+        </div>
+        <div class="stack-info">
+            <div class="stack-info-inner" onclick="event.stopPropagation()">
+                <div class="res-title-row">
+                    <div class="res-main-title"><svg viewBox="0 0 24 24" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg> <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${c.loc || '未知地點'}</span></div>
+                    <div class="mac-btns-container" style="position:static; display:flex; gap:8px;">
+                        <button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
+                        <button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                        <button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                    </div>
+                </div>
+                <div class="postcard-tags" style="margin-bottom:12px;">${themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+                <div class="postcard-footer" style="margin-top:20px; border-top: 1.5px dashed rgba(0,0,0,0.1); padding-top:16px;">
+                    <div class="coord-btn" onclick="copyCoord(event,'${c.coord || ''}')">${c.coord || ''}</div>
+                    <button class="btn-danger" style="width:auto; padding:8px 24px; border-radius:99px; font-size:0.85rem; flex-shrink:0;" onclick="executeToggleOwnedBtn(event, '${cat}', '${c.id}')">取消收藏</button>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function handleGlobalSearch(val) {
+  const q = val ? val.toLowerCase() : ''; const res = document.getElementById('search-results-section');
+  if(!q){ res.style.display='none'; return; }
+  const all = [...flowerCards, ...mushroomCards, ...hiddenCards]; const filter = all.filter(c => (c.name || '').toLowerCase().includes(q) || (c.loc || '').toLowerCase().includes(q) || (c.themes || []).some(t => t.toLowerCase().includes(q)));
+  res.style.display='block'; res.innerHTML = filter.length > 0 ? filter.map(c => cardHTML(c, flowerCards.includes(c)?'':'mushroom-thumb', flowerCards.includes(c)?'flower':(hiddenCards.includes(c)?'hidden':'mushroom'))).join('') : '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
+}
+
+function renderCat(cat, mode) {
+  const raw = cat === 'flower' ? flowerCards : (cat === 'hidden' ? hiddenCards : mushroomCards); 
+  const body = document.getElementById(cat + '-body'); const fw = document.getElementById(cat + '-filters'); let processed = hideOwnedState[cat] ? raw.filter(x => !x.owned) : [...raw];
+  if (mode === 'favorite') { fw.style.display = 'none'; const favs = processed.filter(x => x.favorite); favs.sort((a,b) => a.owned - b.owned); body.innerHTML = favs.length > 0 ? favs.map(x => cardHTML(x, cat==='flower'?'':'mushroom-thumb', cat)).join('') : '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏的最愛喔</div>'; return; }
+  fw.style.display = 'flex'; const gs = {}; const allCurrentThemes = [...defaultThemes, ...customThemes];
+  if (mode === 'theme') { allCurrentThemes.forEach(t => { gs[t] = []; }); processed.forEach(x => { const themes = Array.isArray(x.themes) ? x.themes : ['未分類']; themes.forEach(t => { if(!gs[t]) gs[t] = []; gs[t].push(x); }); }); } else { processed.forEach(x => { const k = x.country || '未設定國家'; if(!gs[k]) gs[k] = []; gs[k].push(x); }); }
+  Object.keys(gs).forEach(key => { gs[key].sort((a, b) => { if (a.owned === b.owned) return 0; return a.owned ? 1 : -1; }); });
+  
+  const cf = activeFilters[cat] || '全部'; let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">全部</div>`;
+  Object.keys(gs).forEach(n => { fH += `<div class="filter-pill ${cf===n?'active':''}" onclick="applyFilter('${cat}','${mode}','${n}')">${n}</div>`; });
+  if (mode === 'theme') { fH += `<button class="add-theme-btn" style="margin-left: 6px;" onclick="openAddThemeModal()">＋</button><button class="add-theme-btn manage-theme-btn" style="margin-left: 6px;" onclick="openManageThemeModal()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`; }
+  
+  let savedScroll = fw ? fw.scrollLeft : 0;
+  if(fw) {
+      fw.innerHTML = fH;
+      fw.scrollLeft = savedScroll;
+  }
+  
+  let bH = '';
+  Object.entries(gs).forEach(([l, items]) => { if(cf === '全部' || cf === l) { if (items.length > 0) bH += `<div class="group-section"><div class="group-header animate-stagger-1">${l} <span class="group-count">${items.length}</span></div>${items.map(x => cardHTML(x, cat==='flower'?'':'mushroom-thumb', cat)).join('')}</div>`; else if (cf === l) bH = '<div style="text-align:center; padding:40px; color:var(--sub);">此分類尚無明信片</div>'; } });
+  if (cf === '全部' && bH === '') bH = '<div style="text-align:center; padding:40px; color:var(--sub);">快去收集明信片吧！</div>'; body.innerHTML = bH;
+}
+
+function renderOwned() {
+  const body = document.getElementById('owned-body'); 
+  const f = flowerCards.filter(x => x.owned); const m = mushroomCards.filter(x => x.owned); const h = hiddenCards.filter(x => x.owned);
+  if(!f.length && !m.length && !h.length) { body.innerHTML = '<div style="text-align:center; padding:60px 20px; color:var(--sub); font-weight:700;">尚無收藏的明信片</div>'; return; }
+  let html = '';
+  if (f.length) html += `<div class="group-section"><div class="group-header animate-stagger-1" style="padding:0 16px;">花點收藏 <span class="group-count">${f.length}</span></div><div class="postcard-stack">${f.map(x => stackCardHTML(x, 'flower')).join('')}</div></div>`;
+  if (m.length) html += `<div class="group-section"><div class="group-header animate-stagger-1" style="padding:0 16px;">菇點收藏 <span class="group-count">${m.length}</span></div><div class="postcard-stack">${m.map(x => stackCardHTML(x, 'mushroom')).join('')}</div></div>`;
+  if (h.length) html += `<div class="group-section"><div class="group-header animate-stagger-1" style="padding:0 16px;">隱藏收藏 <span class="group-count">${h.length}</span></div><div class="postcard-stack">${h.map(x => stackCardHTML(x, 'hidden')).join('')}</div></div>`;
+  body.innerHTML = html;
+}
+
+// 🌟 6. 檔案處理與裁切
+function handleFiles(files) { document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0; if (files.length === 0) return; filesToCrop = Array.from(files); currentCropIndex = 0; tempBatchList = []; ocrCache = {}; startCropNext(); document.getElementById('file-input').value = ""; }
+async function resizeForOCR(imgUrl) { return new Promise((resolve) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); let cropTop = 0; let cropBottom = 0; let sourceHeight = img.height; if (img.height > img.width * 1.8) { cropTop = img.height * 0.22; cropBottom = img.height * 0.15; sourceHeight = img.height - cropTop - cropBottom; } else if (img.height > img.width * 1.3) { cropTop = img.height * 0.12; sourceHeight = img.height - cropTop; } const maxDim = 800; let scale = Math.min(maxDim / img.width, maxDim / sourceHeight); canvas.width = img.width * scale; canvas.height = sourceHeight * scale; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, cropTop, img.width, sourceHeight, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; img.src = imgUrl; }); }
+function startCropNext() { if (currentCropIndex >= filesToCrop.length) { openModal('uploadModal'); renderBatchItems(); return; } const file = filesToCrop[currentCropIndex]; const reader = new FileReader(); reader.onload = async (e) => { const originalImgUrl = e.target.result; const smallImgForOcr = await resizeForOCR(originalImgUrl); preloadOCR(currentCropIndex, smallImgForOcr); cropMode = 'upload'; const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); imageTarget.onload = () => { setTimeout(() => { if (cropperInstance) { cropperInstance.destroy(); } cropperInstance = new Cropper(imageTarget, { aspectRatio: 3 / 2, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false, checkCrossOrigin: false, restore: true }); }, 150); }; imageTarget.src = originalImgUrl; }; reader.readAsDataURL(file); }
+function confirmCrop() { if (!cropperInstance) return; if (cropMode === 'avatar') { const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 400, maxHeight: 400 }); userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85); const sap = document.getElementById('settings-avatar-preview'); if(sap) sap.src = userProfile.customAvatar; const da = document.getElementById('display-avatar'); if(da) { da.src = userProfile.customAvatar; da.style.display = 'flex'; } const daf = document.getElementById('display-avatar-fallback'); if(daf) daf.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 }); const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.92); const originalImgUrl = document.getElementById('crop-image-target').src; const currentCropData = { data: cropperInstance.getData(), canvasData: cropperInstance.getCanvasData(), cropBoxData: cropperInstance.getCropBoxData() }; if (cropMode === 'edit') { tempEditCropData = currentCropData; tempEditImg = croppedImgUrl; const imgPre = document.getElementById('edit-img-preview'); if (imgPre) { imgPre.src = tempEditImg; imgPre.style.display = 'inline-block'; } const btnRecrop = document.getElementById('btn-recrop-img'); if(btnRecrop) btnRecrop.style.display = 'flex'; const btnReplace = document.getElementById('btn-replace-edit-img'); if(btnReplace) btnReplace.style.display = 'flex'; const btnAdd = document.getElementById('btn-add-edit-img'); if(btnAdd) btnAdd.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const batchIdx = tempBatchList.length; tempBatchList.push({ name: '辨識中...', loc: '', coord: window.pendingContextCoord || '', favorite: false, status: 'ocr_detecting', img: croppedImgUrl, originalImg: originalImgUrl, cropData: currentCropData, tz: '', type: 'flower' }); if(window.pendingContextCoord) { const parts = window.pendingContextCoord.split(',').map(Number); fetchLocationForBatchItem(batchIdx, parts[0], parts[1]); window.pendingContextCoord = null; } closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; if(ocrCache[currentCropIndex]) { ocrCache[currentCropIndex].batchIdx = batchIdx; applyOcrToBatch(currentCropIndex); } currentCropIndex++; startCropNext(); }
+function cancelCrop() { closeModal('cropModal'); if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; } if (cropMode === 'edit' || cropMode === 'avatar') { cropMode = 'upload'; return; } currentCropIndex++; startCropNext(); }
+
+// 🌟 7. Gemini OCR 與批次處理
+async function preloadOCR(fileIndex, imgUrl, attempt = 1) { ocrCache[fileIndex] = { done: false, progress: 0 }; try { const base64Image = imgUrl.split(',')[1]; if (!apiKey) { ocrCache[fileIndex] = { done: true, name: '未命名明信片', coord: '25.0339, 121.5644' }; applyOcrToBatch(fileIndex); return; } const promptText = "請分析這張明信片截圖，提取出最可能的地點名稱（name）與 GPS 座標（coord，格式為 '緯度, 經度'）。請忽略電池、訊號、時間或單純的UI文字。以嚴格的 JSON 格式回傳，只包含 'name' 與 'coord' 兩個鍵。若找不到則留空字串。"; const payload = { contents: [{ role: "user", parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: base64Image } } ] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('API Request Failed'); const data = await response.json(); const text = data.candidates?.[0]?.content?.parts?.[0]?.text; let parsed = { name: '未命名明信片', coord: '' }; if (text) { try { parsed = JSON.parse(text); } catch(e) {} } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = (parsed.name || '未命名明信片').substring(0, 40); ocrCache[fileIndex].coord = parsed.coord || ''; applyOcrToBatch(fileIndex); } catch(e) { if (attempt < 3) { setTimeout(() => preloadOCR(fileIndex, imgUrl, attempt + 1), 2000 * attempt); return; } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '雲端辨識失敗'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex); } }
+function applyOcrToBatch(fileIndex) { const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return; const batchIdx = cache.batchIdx; tempBatchList[batchIdx].name = cache.name; tempBatchList[batchIdx].coord = cache.coord; tempBatchList[batchIdx].status = 'detecting'; renderBatchItems(); if (cache.coord) { const parts = cache.coord.split(',').map(s => s.trim()); const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon); } }
+function updateBatchItem(idx, key, val) { tempBatchList[idx][key] = val; renderBatchItems(); }
+async function fetchTimeZone(lat, lon) { try { const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`); const data = await res.json(); if(data && data.timeZone) return data.timeZone; } catch(e) {} return null; }
+async function fetchLocationForBatchItem(index, lat, lon) { let locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '偵測地點與時區中...'; try { const [locRes, tz] = await Promise.all([ fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,en`), fetchTimeZone(lat, lon) ]); if (tz) tempBatchList[index].tz = tz; const data = await locRes.json(); if (data && data.address) { const addr = data.address; const country = cleanLocText(addr.country); const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || ''; const city = cleanLocText(cityRaw); tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country; locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = tempBatchList[index].loc; } else { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '無法辨識地點'; } } catch(e) { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '網路錯誤'; } }
+function handleBatchCoordInput(index, val, el) { el.value = val.replace(/[^0-9.,\- ]/g, ''); tempBatchList[index].coord = el.value; clearTimeout(batchDebounceTimers[index]); batchDebounceTimers[index] = setTimeout(() => { const parts = el.value.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(index, lat, lon); } }, 800); }
+
+function renderBatchItems() { 
+    const container = document.getElementById('batch-container'); 
+    if(!container) return;
+    
+    container.innerHTML = tempBatchList.map((item, index) => { 
+        if (item.status === 'ocr_detecting') { 
+            return `<div class="batch-item"><div class="batch-confirm-box" style="display:flex; align-items:center; gap:16px; padding: 16px;"><img src="${item.img}" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><div style="flex:1; text-align:left;"><div style="font-weight: 800; font-size: 0.95rem;">雲端 AI 視覺辨識中...</div><div style="font-size: 0.75rem; color: var(--sub);">請稍後...</div></div></div></div>`; 
+        } 
+        if (item.status === 'detecting') { 
+            return `
+            <div class="batch-item">
+                <div class="batch-confirm-box" style="padding: 20px;">
+                    <div style="display:flex; align-items:flex-start; gap:16px; margin-bottom: 20px; text-align: left;">
+                        <img src="${item.img}" style="width: 72px; height: 72px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;">
+                        <div style="flex:1; overflow:hidden;">
+                            <input type="text" value="${(item.name || '').replace(/"/g, '&quot;')}" oninput="tempBatchList[${index}].name = this.value" class="edit-text-input no-icon" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.95rem; margin-bottom: 8px; border-radius: 12px;" placeholder="明信片名稱">
+                            <div style="display:flex; align-items:center; gap:4px; font-size: 0.75rem; color: var(--sub); margin-left: 4px; font-weight:600;">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 
+                                <span id="batch-loc-preview-${index}">${item.loc || '輸入座標以自動偵測'}</span>
+                            </div>
+                        </div>
+                        <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" style="margin-top:4px;" onclick="toggleBatchFav(${index})"><svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
+                    </div>
+                    
+                    <div class="edit-input-wrapper" style="margin-bottom: 16px;">
+                        <input type="text" class="edit-text-input no-icon" style="text-align:center; font-family:monospace; font-size:1rem; padding:12px; border-radius:12px;" value="${(item.coord || '').replace(/"/g, '&quot;')}" placeholder="貼上座標" oninput="handleBatchCoordInput(${index}, this.value, this)">
+                    </div>
+                    
+                    <div class="type-toggle" style="margin-bottom: 16px; gap:8px;">
+                        <button class="type-btn flower ${item.type==='flower'?'active':''}" onclick="updateBatchItem(${index}, 'type', 'flower')">${ICON_FLOWER}</button>
+                        <button class="type-btn mushroom ${item.type==='mushroom'?'active':''}" onclick="updateBatchItem(${index}, 'type', 'mushroom')">${ICON_MUSHROOM}</button>
+                        <button class="type-btn hidden-cat ${item.type==='hidden'?'active':''}" onclick="updateBatchItem(${index}, 'type', 'hidden')">${ICON_HIDDEN}</button>
+                    </div>
+                    <button class="btn-primary" style="padding:14px; border-radius:12px;" onclick="confirmBatchItem(${index})">確認帶入</button>
+                </div>
+            </div>`; 
+        } 
+        
+        return `
+        <div class="batch-item">
+            <div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 16px;">
+                <img src="${item.img}" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                <div style="flex:1;">
+                    <div class="res-main-title" style="font-size:1.05rem;font-weight:900; margin-bottom:4px;">${item.name || '未命名'}</div>
+                    <div style="font-family:monospace;color:var(--sub);font-size:0.8rem; font-weight:700;">${item.coord || ''}</div>
+                </div>
+                <button class="mac-btn star-btn ${item.favorite ? 'is-favorite' : ''}" onclick="toggleBatchFav(${index})"><svg viewBox="0 0 24 24" fill="${item.favorite ? 'var(--star-gold)' : 'none'}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button>
+            </div>
+        </div>`; 
+    }).join(''); 
+    
+    const bbs = document.getElementById('btn-batch-save'); 
+    if(bbs) bbs.style.display = tempBatchList.every(item => item.status === 'confirmed') && tempBatchList.length > 0 ? 'block' : 'none'; 
+}
+
+function confirmBatchItem(index) { tempBatchList[index].status = 'confirmed'; renderBatchItems(); }
+function toggleBatchFav(index) { tempBatchList[index].favorite = !tempBatchList[index].favorite; renderBatchItems(); }
+function handleBatchSave() { tempBatchList.forEach(item => { const n = (item.name || '').toLowerCase(); let theme = '自然景觀'; if (n.includes('temple') || n.includes('shrine') || n.includes('palace') || n.includes('之家') || n.includes('mila') || n.includes('mural')) theme = '歷史古蹟'; if (item.themes && item.themes.length) theme = item.themes[0]; const locParts = (item.loc || '').split(/[,，]/); const country = locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc; const list = item.type === 'flower' ? flowerCards : (item.type === 'hidden' ? hiddenCards : mushroomCards); list.push({ id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000), name: item.name || '未命名', loc: item.loc || '未設定地點', country: country || '未設定國家', themes: [theme], coord: item.coord || '', icon: '', tz: item.tz || Intl.DateTimeFormat().resolvedOptions().timeZone, owned: false, favorite: item.favorite, img: item.img, originalImg: item.originalImg, cropData: item.cropData, type: item.type || 'flower' }); }); showToast(`✅ 已儲存 ${tempBatchList.length} 張明信片！`); closeModal('uploadModal'); refreshCurrentView(); saveDataToLocal(); const sm = document.getElementById('screen-map'); if (sm && sm.classList.contains('active') && tempBatchList.length > 0) { const nc = tempBatchList[tempBatchList.length-1].coord; if(nc) { const p = nc.split(','); if(globalMap) { globalMap.flyTo([parseFloat(p[0]), parseFloat(p[1])], 16, {duration: 1.5}); setTimeout(() => { renderMapMarkers(); updateMapBottomSheet(); }, 300); } } } }
+
+// 🌟 8. 主題與明信片編輯
+function openAddThemeModal() { editingThemeIndex = -1; const titleEl = document.getElementById('addThemeModalTitle'); if (titleEl) titleEl.innerHTML = '新增主題'; const btnEl = document.getElementById('addThemeModalBtn'); if (btnEl) btnEl.textContent = '確認新增'; const nameEl = document.getElementById('new-theme-name'); if (nameEl) nameEl.value = ''; currentNewThemeEmoji = ''; const gridEl = document.getElementById('emoji-grid'); if (gridEl) gridEl.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===''?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join(''); openModal('addThemeModal'); }
+function selectEmoji(el, e) { document.querySelectorAll('.emoji-item').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); currentNewThemeEmoji = e; }
+function saveThemeAction() { const name = document.getElementById('new-theme-name').value.trim(); if(!name) return; const fullTheme = currentNewThemeEmoji ? `${currentNewThemeEmoji} ${name}` : name; if (editingThemeIndex > -1) { const oldTheme = customThemes[editingThemeIndex]; customThemes[editingThemeIndex] = fullTheme; [...flowerCards, ...mushroomCards, ...hiddenCards].forEach(c => { const idx = (c.themes || []).indexOf(oldTheme); if (idx > -1) c.themes[idx] = fullTheme; }); showToast('主題已更新'); closeModal('addThemeModal'); openManageThemeModal(); refreshCurrentView(); } else { if (!defaultThemes.includes(fullTheme) && !customThemes.includes(fullTheme)) customThemes.push(fullTheme); document.getElementById('new-theme-name').value = ''; closeModal('addThemeModal'); refreshCurrentView(); showToast('主題已新增'); const em = document.getElementById('editModal'); if (em && em.classList.contains('open')) { if (!tempEditThemes.includes(fullTheme)) tempEditThemes.push(fullTheme); renderEditThemes(); } } saveDataToLocal(); }
+function openManageThemeModal() { const list = document.getElementById('custom-theme-list'); if (customThemes.length === 0) { list.innerHTML = '<div style="text-align:center; padding: 20px; color:var(--sub); font-weight:700;">尚無自訂主題</div>'; } else { list.innerHTML = customThemes.map((t, i) => `<div class="custom-theme-item"><span>${t}</span><div class="theme-action-group"><button class="mac-btn" onclick="openEditCustomTheme(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="mac-btn" style="color:var(--danger);" onclick="deleteCustomTheme(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div></div>`).join(''); } openModal('manageThemeModal'); }
+function openEditCustomTheme(idx) { editingThemeIndex = idx; const themeStr = customThemes[idx]; const spaceIdx = themeStr.indexOf(' '); const emoji = spaceIdx > -1 ? themeStr.substring(0, spaceIdx) : ''; const name = spaceIdx > -1 ? themeStr.substring(spaceIdx + 1) : themeStr; const tTitle = document.getElementById('addThemeModalTitle'); if(tTitle) tTitle.innerHTML = '修改主題'; const tBtn = document.getElementById('addThemeModalBtn'); if(tBtn) tBtn.textContent = '儲存修改'; const nInput = document.getElementById('new-theme-name'); if(nInput) nInput.value = name; currentNewThemeEmoji = emoji; const eGrid = document.getElementById('emoji-grid'); if(eGrid) eGrid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===emoji?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join(''); closeModal('manageThemeModal'); openModal('addThemeModal'); }
+function deleteCustomTheme(idx) { const t = customThemes[idx]; customThemes.splice(idx, 1); [...flowerCards, ...mushroomCards, ...hiddenCards].forEach(c => { const i = (c.themes || []).indexOf(t); if (i > -1) c.themes.splice(i, 1); if (!c.themes || c.themes.length === 0) c.themes = ['未分類']; }); showToast(`已移除 ${t}`); openManageThemeModal(); refreshCurrentView(); saveDataToLocal(); }
+
+function handleEditFileUpload(files) { if(files.length === 0) return; const file = files[0]; const reader = new FileReader(); reader.onload = (e) => { tempEditOriginalImg = e.target.result; tempEditCropData = null; cropMode = 'edit'; isEditImgDeleted = false; const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); imageTarget.onload = () => { setTimeout(() => { if (cropperInstance) cropperInstance.destroy(); cropperInstance = new Cropper(imageTarget, { aspectRatio: 3 / 2, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false }); }, 150); }; imageTarget.src = tempEditOriginalImg; }; reader.readAsDataURL(file); }
+function startEditCrop() { const list = currentEditCat === 'flower' ? flowerCards : (currentEditCat === 'hidden' ? hiddenCards : mushroomCards); const c = list.find(x => x.id == currentEditId); if (!c) return; const targetOriginal = tempEditOriginalImg || c.originalImg || c.img; if (!targetOriginal) return; cropMode = 'edit'; const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); imageTarget.onload = () => { setTimeout(() => { if (cropperInstance) cropperInstance.destroy(); cropperInstance = new Cropper(imageTarget, { aspectRatio: 3 / 2, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false }); }, 150); }; imageTarget.src = targetOriginal; }
+function setEditType(type) { currentEditType = type; const fEl = document.getElementById('edit-type-flower'); if(fEl) fEl.classList.toggle('active', type === 'flower'); const mEl = document.getElementById('edit-type-mushroom'); if(mEl) mEl.classList.toggle('active', type === 'mushroom'); const hEl = document.getElementById('edit-type-hidden'); if(hEl) hEl.classList.toggle('active', type === 'hidden'); }
+function promptEdit(e, cat, id) { 
+  if(e) e.stopPropagation(); currentEditCat = cat; currentEditId = id; 
+  const list = cat === 'flower' ? flowerCards : (cat === 'hidden' ? hiddenCards : mushroomCards); 
+  const c = list.find(x => x.id == id); if(!c) return; 
+  isEditImgDeleted = false; tempEditImg = c.img; tempEditOriginalImg = null; tempEditCropData = c.cropData || null; 
+  const imgPre = document.getElementById('edit-img-preview'); 
+  const btnAdd = document.getElementById('btn-add-edit-img');
+  const btnRecrop = document.getElementById('btn-recrop-img');
+  const btnReplace = document.getElementById('btn-replace-edit-img');
+  const editImgSection = document.getElementById('edit-img-section');
+  
+  if (editImgSection) {
+      if (c.img || c.originalImg) { 
+          if (imgPre) { imgPre.style.display = 'inline-block'; imgPre.src = c.img || c.originalImg; }
+          if (btnRecrop) btnRecrop.style.display = 'flex'; 
+          if (btnReplace) btnReplace.style.display = 'flex'; 
+          if (btnAdd) btnAdd.style.display = 'none'; 
+      } else { 
+          if (imgPre) imgPre.style.display = 'none'; 
+          if (btnRecrop) btnRecrop.style.display = 'none'; 
+          if (btnReplace) btnReplace.style.display = 'none'; 
+          if (btnAdd) btnAdd.style.display = 'flex'; 
+      } 
+  }
+  const nameInput = document.getElementById('edit-name-input'); if(nameInput) nameInput.value = c.name || ''; 
+  const locInput = document.getElementById('edit-loc-input'); if(locInput) locInput.value = c.loc || ''; 
+  currentEditCountry = c.country || ''; 
+  currentEditTz = c.tz || Intl.DateTimeFormat().resolvedOptions().timeZone; 
+  setEditType(cat); 
+  originalCoordBeforeEdit = c.coord || ''; 
+  const coordInput = document.getElementById('edit-coord-input'); if(coordInput) coordInput.value = c.coord || ''; 
+  tempEditThemes = Array.isArray(c.themes) ? [...c.themes] : ['未分類']; 
+  
+  const eFlower = document.getElementById('edit-type-flower'); if(eFlower) eFlower.innerHTML = ICON_FLOWER;
+  const eMushroom = document.getElementById('edit-type-mushroom'); if(eMushroom) eMushroom.innerHTML = ICON_MUSHROOM;
+  const eHidden = document.getElementById('edit-type-hidden'); if(eHidden) eHidden.innerHTML = ICON_HIDDEN;
+  
+  renderEditThemes(); openModal('editModal'); 
+}
+function renderEditThemes() { const allCurrentThemes = [...defaultThemes, ...customThemes]; const selector = document.getElementById('edit-theme-selector'); if(selector) selector.innerHTML = allCurrentThemes.map(t => `<div class="theme-option ${tempEditThemes.includes(t)?'selected':''}" onclick="toggleEditTheme('${t}')">${t}</div>`).join('') + `<div class="theme-option add-new-btn" onclick="openAddThemeModal()">＋ 新增主題</div>`; }
+function toggleEditTheme(t) { const i = tempEditThemes.indexOf(t); if(i > -1) tempEditThemes.splice(i, 1); else tempEditThemes.push(t); renderEditThemes(); }
+function resetEditInput() {
+    const editCoordInputEl = document.getElementById('edit-coord-input');
+    if(editCoordInputEl) editCoordInputEl.value = '';
+}
+
+const editCoordInputEl = document.getElementById('edit-coord-input');
+if(editCoordInputEl) {
+    editCoordInputEl.addEventListener('input', function() { this.value = this.value.replace(/[^0-9.,\- ]/g, ''); clearTimeout(coordDebounceTimer); const val = this.value; coordDebounceTimer = setTimeout(() => { const parts = val.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) { document.getElementById('edit-loc-input').value = '🔍 偵測中...'; fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,en`).then(r => r.json()).then(d => { if(d && d.address) { const c = cleanLocText(d.address.country); const city = cleanLocText(d.address.city || d.address.town || d.address.village || d.address.suburb || d.address.county || d.address.state || ''); document.getElementById('edit-loc-input').value = city && city !== c ? `${city}，${c}` : c; currentEditCountry = c; } else document.getElementById('edit-loc-input').value = '⚠️ 無法辨識'; }).catch(() => document.getElementById('edit-loc-input').value = '⚠️ 網路錯誤'); } } }, 800); });
+}
+function saveEdit() { const nc = document.getElementById('edit-coord-input').value; const nn = document.getElementById('edit-name-input').value.trim(); const nl = document.getElementById('edit-loc-input').value.trim(); if (!nc || !nn || !nl) { showToast('⚠️ 請填寫完整資訊'); return; } const oldList = currentEditCat === 'flower' ? flowerCards : (currentEditCat === 'hidden' ? hiddenCards : mushroomCards); const idx = oldList.findIndex(x => x.id == currentEditId); if(idx > -1){ const c = oldList[idx]; c.coord = nc; c.name = nn; c.loc = nl; c.tz = currentEditTz; if (isEditImgDeleted) { c.img = null; c.originalImg = null; c.cropData = null; } else { if (tempEditImg) c.img = tempEditImg; if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; if (tempEditCropData) c.cropData = tempEditCropData; } const locParts = nl.split(/[,，]/); c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl); c.themes = tempEditThemes.length > 0 ? [...tempEditThemes] : ['未分類']; c.type = currentEditType; if (currentEditCat !== currentEditType) { oldList.splice(idx, 1); const newList = currentEditType === 'flower' ? flowerCards : (currentEditType === 'hidden' ? hiddenCards : mushroomCards); newList.push(c); } refreshCurrentView(); } closeModal('editModal'); showToast('✅ 明信片已更新'); saveDataToLocal(); const sm = document.getElementById('screen-map'); if(sm && sm.classList.contains('active')) { const p = nc.split(','); if(globalMap) { globalMap.flyTo([parseFloat(p[0]), parseFloat(p[1])], 16, {duration: 1.5}); setTimeout(() => { renderMapMarkers(); updateMapBottomSheet(); }, 300); } } }
+
+// 🌟 4. 解決多層彈出視窗的 Enter 衝突
+document.addEventListener('keydown', (e) => { 
+    if (e.key === 'Escape') { 
+        const openModals = document.querySelectorAll('.modal-overlay.open, .route-panel-overlay.open'); 
+        if (openModals.length > 0) closeModal(openModals[openModals.length - 1].id); 
+        else if (document.getElementById('lightbox')?.classList.contains('open')) closeLightbox(); 
+    } else if (e.key === 'Enter') { 
+        if (e.target.tagName === 'TEXTAREA' || e.target.id === 'map-search-input' || e.target.id === 'route-start-input') return; 
+        
+        // 判斷目前最上層的 Modal 是哪一個
+        const isAddThemeOpen = document.getElementById('addThemeModal')?.classList.contains('open');
+        const isEditOpen = document.getElementById('editModal')?.classList.contains('open');
+        const isCropOpen = document.getElementById('cropModal')?.classList.contains('open');
+        const isSettingsOpen = document.getElementById('settingsModal')?.classList.contains('open');
+        
+        if (isAddThemeOpen) {
+            saveThemeAction();
+            e.preventDefault();
+        } else if (isEditOpen) {
+            saveEdit();
+        } else if (isCropOpen) {
+            confirmCrop();
+        } else if (isSettingsOpen) {
+            saveSettings();
+        } else if (document.getElementById('confirmModal')?.classList.contains('open')) {
+            executeCancelOwned();
+        } else if (document.getElementById('deleteConfirmModal')?.classList.contains('open')) {
+            executeHardDelete();
+        }
+    } 
+});
+
+// 🌟 10. 地圖與路線系統
+function initMap() { 
+    if (!globalMap) { 
+        globalMap = L.map('map-container', { zoomControl: false }).setView([23.5, 121], 7); 
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap contributors' }).addTo(globalMap); 
+        globalMap.on('moveend', () => { updateMapBottomSheet(); }); 
+        
+        // 🌟 長按事件 (地圖)
+        globalMap.on('contextmenu', (e) => {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            showMapContextMenu(lat, lon, e.containerPoint);
+        });
+        
+        globalMap.on('click', () => {
+            const menu = document.getElementById('map-context-menu');
+            if(menu) menu.style.display = 'none';
+            if(tempMapPin) { globalMap.removeLayer(tempMapPin); tempMapPin = null; }
+            document.getElementById('route-autocomplete-list').classList.remove('show');
+        });
+    } 
+    renderMapMarkers(); 
+    setTimeout(() => updateMapBottomSheet(), 300); 
+}
+
+function showMapContextMenu(lat, lon, point, createPin = true) {
+    if(tempMapPin) { globalMap.removeLayer(tempMapPin); tempMapPin = null; }
+    
+    if (createPin) {
+        const dummyIcon = L.divIcon({ className: 'custom-photo-pin', html: `<div class="custom-photo-pin-img empty"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span class="custom-photo-pin-label">選定位置</span>`, iconSize: [56, 80], iconAnchor: [28, 40] });
+        tempMapPin = L.marker([lat, lon], { icon: dummyIcon }).addTo(globalMap);
+    }
+    
+    const menu = document.getElementById('map-context-menu');
+    if(menu) {
+        menu.style.display = 'flex';
+        menu.style.left = point.x + 'px';
+        menu.style.top = (point.y + 10) + 'px'; 
+        menu.dataset.lat = lat;
+        menu.dataset.lon = lon;
+    }
+}
+
+async function contextAddRoute() {
+    const menu = document.getElementById('map-context-menu');
+    if(!menu) return;
+    const lat = menu.dataset.lat;
+    const lon = menu.dataset.lon;
+    
+    // 🌟 呼叫逆向地理編碼，將座標轉為真實地名
+    let locName = '自訂地點';
+    let subLoc = '';
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-Hant,zh-TW,en`);
+        const data = await res.json();
+        if(data) {
+            // 🌟 修正：優先取得實際地標名稱 (data.name)，若無則強迫抓取 display_name 最具體的首段細節，不再直接妥協成城市名
+            locName = data.name || (data.display_name ? data.display_name.split(',')[0].trim() : '選定位置');
+            if (data.address && data.address.city && locName !== data.address.city) {
+                subLoc = data.address.city || data.address.town || '';
+            }
+        }
+    } catch(e) {}
+
+    const dummyCard = { id: 'dummy_' + Date.now(), name: locName, loc: subLoc, coord: `${parseFloat(lat).toFixed(5)}, ${parseFloat(lon).toFixed(5)}`, type: 'hidden', img: null, tz: Intl.DateTimeFormat().resolvedOptions().timeZone };
+    customMapPins.push(dummyCard);
+    addCardToRouteObj(dummyCard);
+    menu.style.display = 'none';
+    if(tempMapPin) { globalMap.removeLayer(tempMapPin); tempMapPin = null; }
+    renderMapMarkers();
+}
+
+function contextAddPostcard() {
+    const menu = document.getElementById('map-context-menu');
+    if(!menu) return;
+    const lat = parseFloat(menu.dataset.lat).toFixed(5);
+    const lon = parseFloat(menu.dataset.lon).toFixed(5);
+    menu.style.display = 'none';
+    if(tempMapPin) { globalMap.removeLayer(tempMapPin); tempMapPin = null; }
+    
+    // 🌟 在地圖頁面直接開啟上傳檔案！不再跳回首頁
+    const fi = document.getElementById('file-input');
+    if(fi) fi.click();
+    window.pendingContextCoord = `${lat}, ${lon}`;
+}
+
+function setMapFilter(filter) { 
+    currentMapFilter = filter; 
+    document.querySelectorAll('.map-filter-pill').forEach(el => el.classList.remove('active')); 
+    const fp = document.getElementById(`map-filter-${filter}`);
+    if(fp) fp.classList.add('active'); 
+    renderMapMarkers(); 
+    updateMapBottomSheet(); 
+}
+
+function handleMapSearchEnter(e) {
+    if(e.key === 'Enter') {
+        e.preventDefault();
+        const val = e.target.value;
+        handleMapSearch(val);
+    }
+}
+
+function locateMeOnMap() {
+    if(navigator.geolocation) {
+        showToast('📍 定位中...');
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                if(globalMap) {
+                    globalMap.flyTo([lat, lon], 14, { duration: 1.5 });
+                }
+            },
+            () => { showToast('⚠️ 無法獲取您的位置'); }
+        );
+    } else {
+        showToast('⚠️ 您的裝置不支援定位');
+    }
+}
+
+async function handleMapSearch(q) { 
+    if (!q) { renderMapMarkers(); updateMapBottomSheet(); return; } 
+    
+    // 每次新搜尋前，先清掉舊的搜尋虛擬大頭針
+    customMapPins = customMapPins.filter(c => !c.id.startsWith('dummy_search_'));
+    
+    mapMarkers.forEach(m => globalMap.removeLayer(m)); mapMarkers = []; 
+    const allCards = [...flowerCards, ...mushroomCards, ...hiddenCards]; 
+    const filtered = allCards.filter(c => (c.name || '').toLowerCase().includes(q.toLowerCase()) || (c.loc || '').toLowerCase().includes(q.toLowerCase()) || (c.coord || '').includes(q) || (c.themes || []).some(t => t.toLowerCase().includes(q.toLowerCase())) ); 
+    
+    // 如果本地明信片有結果，就飛向第一個結果
+    if(filtered.length > 0 && filtered[0].coord) {
+        const parts = filtered[0].coord.split(',').map(s => parseFloat(s.trim()));
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            globalMap.flyTo([parts[0], parts[1]], 15, { duration: 1.5 });
+        }
+        renderMapMarkers(); 
+        updateMapBottomSheet(filtered); 
+    } else {
+        // 如果是座標格式，直接飛向該座標
+        const parts = q.split(',').map(s => parseFloat(s.trim()));
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            globalMap.flyTo([parts[0], parts[1]], 15, { duration: 1.5 });
+            const dummyCard = {
+                id: 'dummy_search_' + Date.now(), name: '搜尋座標', loc: '', coord: `${parts[0]}, ${parts[1]}`, type: 'hidden', img: null, tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+            customMapPins.push(dummyCard);
+            renderMapMarkers(); 
+            updateMapBottomSheet([dummyCard]); 
+        } else {
+            // 🌟 啟動外部圖資智能搜尋
+            showToast('🔍 尋找外部圖資...');
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&accept-language=zh-Hant,zh-TW,en`);
+                const data = await res.json();
+                if(data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    globalMap.flyTo([lat, lon], 15, { duration: 1.5 });
+                    
+                    let bestName = data[0].name || (data[0].display_name ? data[0].display_name.split(',')[0].trim() : q);
+                    let shortLoc = '';
+                    if (data[0].address) shortLoc = data[0].address.city || data[0].address.town || data[0].address.county || '';
+                    if (!shortLoc && data[0].display_name) shortLoc = data[0].display_name.split(',').pop().trim();
+                    
+                    const dummyCard = {
+                        id: 'dummy_search_' + Date.now(), name: bestName, loc: shortLoc, coord: `${lat.toFixed(5)}, ${lon.toFixed(5)}`, type: 'hidden', img: null, tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    };
+                    customMapPins.push(dummyCard);
+                    renderMapMarkers();
+                    updateMapBottomSheet([dummyCard]);
+                } else {
+                    showToast('⚠️ 找不到相關地點');
+                    updateMapBottomSheet([]);
+                }
+            } catch(e) {
+                showToast('⚠️ 網路錯誤');
+            }
+        }
+    }
+}
+
+function renderMapMarkers() { 
+    mapMarkers.forEach(m => globalMap.removeLayer(m)); mapMarkers = []; 
+    const allCards = [...flowerCards, ...mushroomCards, ...hiddenCards]; 
+    let filteredCards = allCards; 
+    if (currentMapFilter !== 'all') { 
+        if (currentMapFilter === 'favorite') filteredCards = allCards.filter(c => c.favorite); 
+        else filteredCards = allCards.filter(c => c.type === currentMapFilter); 
+    } 
+    const cardsToRender = [...filteredCards, ...customMapPins];
+    renderFilteredMarkers(cardsToRender); 
+}
+
+function renderFilteredMarkers(cards) { 
+    cards.forEach(c => { 
+        if (c.coord) { 
+            const parts = c.coord.split(',').map(s => parseFloat(s.trim())); 
+            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { 
+                const thumb = c.img || c.originalImg; 
+                const isDummy = c.id && c.id.startsWith('dummy_');
+                
+                let emptyIconSvg = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
+                if (!isDummy) {
+                    if (c.type === 'flower') emptyIconSvg = ICON_FLOWER;
+                    else if (c.type === 'mushroom') emptyIconSvg = ICON_MUSHROOM;
+                    else if (c.type === 'hidden') emptyIconSvg = ICON_HIDDEN;
+                }
+                
+                const imgContent = thumb ? `<img class="custom-photo-pin-img" src="${thumb}">` : `<div class="custom-photo-pin-img empty" style="color:#fff;">${emptyIconSvg}</div>`; 
+                const customIcon = L.divIcon({ className: 'custom-photo-pin', html: `${imgContent}<span class="custom-photo-pin-label">${c.name || '未命名'}</span>`, iconSize: [56, 80], iconAnchor: [28, 40] }); 
+                const marker = L.marker([parts[0], parts[1]], { icon: customIcon }).addTo(globalMap); 
+                marker.cardData = c; 
+                marker.on('click', () => { 
+                    globalMap.flyTo([parts[0], parts[1]], 14, { duration: 1 }); 
+                    document.querySelectorAll('.custom-photo-pin').forEach(el => { el.style.transform = 'scale(1)'; el.style.zIndex = 'auto'; }); 
+                    const iconEl = marker.getElement(); if (iconEl) { iconEl.style.transform = 'scale(1.2)'; iconEl.style.zIndex = '1000'; } 
+                    
+                    if (isDummy) {
+                        const point = globalMap.latLngToContainerPoint([parts[0], parts[1]]);
+                        showMapContextMenu(parts[0], parts[1], point, false);
+                    } else {
+                        openMapDetailCard(c);
+                    }
+                }); 
+                mapMarkers.push(marker); 
+            } 
+        } 
+    }); 
+}
+
+function triggerMapSearchHere() { updateMapBottomSheet(); }
+
+function handleSheetCardClick(cardId, el) {
+    const allCards = [...flowerCards, ...mushroomCards, ...hiddenCards, ...customMapPins];
+    const card = allCards.find(c => c.id === cardId);
+    if (card && card.coord) {
+        flyToCardOnMap(card.coord, el);
+        setTimeout(() => openMapDetailCard(card), 500);
+    }
+}
+
+function updateMapBottomSheet(forceCards = null) { 
+    if(!globalMap) return; 
+    const scrollContainer = document.getElementById('map-sheet-cards'); 
+    if (!scrollContainer) return; 
+    let visibleCards = []; 
+    if (forceCards) { 
+        visibleCards = forceCards; 
+    } else { 
+        const bounds = globalMap.getBounds(); 
+        mapMarkers.forEach(m => { if (bounds.contains(m.getLatLng())) visibleCards.push(m.cardData); }); 
+    } 
+    
+    let renderedHTML = visibleCards.map(c => { 
+        const isDummy = c.id && c.id.startsWith('dummy_');
+        if (isDummy) return ''; 
+        const thumb = c.img || c.originalImg || ''; 
+        const bgStyle = thumb ? `background-image: url('${thumb}');` : `background: var(--green-light);`; 
+        const theme = (c.themes && c.themes.length) ? c.themes[0] : '未分類'; 
+        let typeIcon = '';
+        if(c.type === 'flower') typeIcon = ICON_FLOWER;
+        else if (c.type === 'mushroom') typeIcon = ICON_MUSHROOM;
+        else typeIcon = ICON_HIDDEN;
+        
+        return `
+        <div class="sheet-card" onclick="handleSheetCardClick('${c.id}', this)">
+            <div style="position:absolute; inset:0; ${bgStyle} background-size:cover; background-position:center;"></div>
+            <div class="sheet-card-icon-badge" style="color: ${c.type === 'flower' ? 'var(--flower-dark)' : c.type === 'mushroom' ? 'var(--mushroom-dark)' : '#555'}">${typeIcon}</div>
+            <div class="sheet-card-overlay">
+                <div class="sheet-card-tags"><div class="sheet-card-tag">${theme}</div></div>
+                <div class="sheet-card-title">${(c.name || '未命名').replace(/"/g, '&quot;')}</div>
+                <div class="sheet-card-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${c.loc || '未知地點'}</div>
+            </div>
+        </div>`; 
+    }).join(''); 
+    
+    if (renderedHTML.trim() === '') { 
+        scrollContainer.innerHTML = `
+            <div style="padding: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+                <div style="color: var(--sub); font-weight: 800; font-size: 0.95rem;">在這個區域沒找到明信片喔！</div>
+                <button onclick="document.getElementById('map-search-input').focus()" style="background: var(--green-dark); color: #fff; border: none; padding: 12px 24px; border-radius: 99px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 16px rgba(46,125,79,0.3); display: flex; align-items: center; gap: 8px; transition: transform 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> 尋找相關明信片與座標
+                </button>
+            </div>
+        `; 
+    } else {
+        scrollContainer.innerHTML = renderedHTML;
+    }
+}
+
+function flyToCardOnMap(coordStr, el) { const parts = coordStr.split(',').map(s => parseFloat(s.trim())); if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { globalMap.flyTo([parts[0], parts[1]], 16, { duration: 1.5 }); document.querySelectorAll('.sheet-card').forEach(c => c.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'); el.style.boxShadow = '0 0 0 3px var(--green), 0 8px 24px rgba(76, 175, 110, 0.3)'; } }
+
+function openRoutePanel() { renderRouteList(); openModal('route-panel-overlay'); }
+function closeRoutePanel(e) { if(e && e.target.id === 'route-panel-overlay') closeModal('route-panel-overlay'); else if(!e) closeModal('route-panel-overlay'); document.getElementById('route-autocomplete-list').classList.remove('show'); }
+
+function addCardToRoute(cardId) { 
+    const allCards = [...flowerCards, ...mushroomCards, ...hiddenCards]; 
+    let card = allCards.find(c => c.id === cardId); 
+    if(!card && cardId.startsWith('dummy_')) {
+        card = customMapPins.find(m => m.id === cardId);
+    }
+    addCardToRouteObj(card);
+}
+
+function addCardToRouteObj(card) {
+    if(card && card.coord) { 
+        if(!routeDestinations.find(c => c.id === card.id)) { 
+            routeDestinations.push(card); 
+            showToast('📍 已加入路線'); 
+            closeMapDetail(); 
+            renderRouteList(); 
+            updateRouteOnMap(); 
+        } else { showToast('⚠️ 已經在路線中了'); } 
+    } else { showToast('⚠️ 該明信片無座標'); } 
+}
+
+function removeRouteItem(idx) { routeDestinations.splice(idx, 1); renderRouteList(); updateRouteOnMap(); }
+
+function handleRouteStartEnter(e) {
+    if(e.key === 'Enter') {
+        e.preventDefault();
+        const val = e.target.value;
+        if(val) selectAutocompleteRouteStart(val, val);
+    }
+}
+
+// 🌟 自動完成下拉選單 (Autocomplete)
+async function handleAutocomplete(val) {
+    const listEl = document.getElementById('route-autocomplete-list');
+    listEl.classList.remove('show');
+    clearTimeout(autocompleteTimer);
+    if (!val) return;
+    
+    autocompleteTimer = setTimeout(async () => {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&limit=5`);
+            const data = await res.json();
+            if(data && data.length > 0) {
+                listEl.innerHTML = data.map(item => `
+                    <div class="autocomplete-item" onclick="selectAutocompleteRouteStart('${item.name || val}', '${item.lat},${item.lon}')">
+                        <div class="autocomplete-name">${item.name || val}</div>
+                        <div class="autocomplete-address">${item.display_name}</div>
+                    </div>
+                `).join('');
+                listEl.classList.add('show');
+            }
+        } catch(e) {}
+    }, 400);
+}
+
+function selectAutocompleteRouteStart(name, coord) {
+    document.getElementById('route-start-input').value = name;
+    document.getElementById('route-autocomplete-list').classList.remove('show');
+    const parts = coord.split(',');
+    if(parts.length === 2) {
+        currentLocLatLng = [parseFloat(parts[0]), parseFloat(parts[1])];
+        updateRouteOnMap();
+        showToast('📍 已更新出發點');
+    }
+}
+
+function locateUserRoute() { 
+    if(navigator.geolocation) { 
+        document.getElementById('route-start-input').value = '定位中...'; 
+        navigator.geolocation.getCurrentPosition( 
+            (pos) => { 
+                currentLocLatLng = [pos.coords.latitude, pos.coords.longitude]; 
+                document.getElementById('route-start-input').value = '我的位置 (GPS)'; 
+                document.getElementById('route-autocomplete-list').classList.remove('show'); 
+                updateRouteOnMap(); 
+            }, 
+            () => { 
+                document.getElementById('route-start-input').value = ''; 
+                showToast('⚠️ 無法獲取位置'); 
+            } 
+        ); 
+    } else {
+        showToast('⚠️ 不支援定位');
+    }
+}
+
+function renderRouteList() { 
+    const listEl = document.getElementById('route-destinations-list'); 
+    const badge = document.getElementById('route-count-badge'); 
+    if(badge) badge.textContent = routeDestinations.length; 
+    if(!listEl) return;
+    if(routeDestinations.length === 0) { 
+        listEl.innerHTML = '<div style="text-align:center; padding:40px 0; color:var(--sub); font-size:0.9rem; font-weight:700;">目前沒有目的地<br>點擊地圖卡片加入吧！</div>'; 
+        return; 
+    } 
+    listEl.innerHTML = routeDestinations.map((c, i) => {
+        const imgHTML = (c.img || c.originalImg) ? `<img src="${c.img || c.originalImg}" class="route-item-img" onerror="this.style.display='none'">` : `<div class="route-item-icon" style="background:#fde0a0; color:#b8710a;"><svg viewBox="0 0 24 24" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>`;
+        return `<div class="route-item">${imgHTML}<div class="route-item-content"><div class="route-item-title">${c.name || '未命名'}</div><div class="route-item-sub">${c.loc || ''}</div></div><button class="route-item-del" onclick="removeRouteItem(${i})"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>`;
+    }).join(''); 
+}
+
+function updateRouteOnMap() { 
+    if(!globalMap) return; 
+    if(routeLineFeature) globalMap.removeLayer(routeLineFeature); 
+    const latlngs = []; 
+    if(currentLocLatLng) latlngs.push(currentLocLatLng); 
+    routeDestinations.forEach(c => { 
+        const p = c.coord.split(',').map(s => parseFloat(s.trim())); 
+        if(p.length === 2 && !isNaN(p[0])) latlngs.push([p[0], p[1]]); 
+    }); 
+    if(latlngs.length > 1) { 
+        routeLineFeature = L.polyline(latlngs, { color: 'var(--green-dark)', weight: 4, dashArray: '10, 10', opacity: 0.8 }).addTo(globalMap); 
+        globalMap.fitBounds(routeLineFeature.getBounds(), {padding: [50, 50]}); 
+    } else if (latlngs.length === 1 && currentLocLatLng) { 
+        globalMap.setView(currentLocLatLng, 15); 
+    } 
+}
+
+function openGoogleMapsRoute() { 
+    if(routeDestinations.length === 0) { 
+        showToast('請先加入目的地'); 
+        return; 
+    } 
+    let url = 'https://www.google.com/maps/dir/?api=1'; 
+    const startInput = document.getElementById('route-start-input').value; 
+    if (currentLocLatLng && startInput.includes('我的位置')) { 
+        url += `&origin=${currentLocLatLng[0]},${currentLocLatLng[1]}`; 
+    } else if (startInput) { 
+        url += `&origin=${encodeURIComponent(startInput)}`; 
+    } else { 
+        const first = routeDestinations[0].coord.replace(/\s/g, ''); 
+        url += `&origin=${encodeURIComponent(first)}`; 
+        if(routeDestinations.length === 1) { 
+            window.open(url + `&destination=${encodeURIComponent(first)}`, '_blank'); 
+            return; 
+        } 
+    } 
+    const lastDest = routeDestinations[routeDestinations.length - 1].coord.replace(/\s/g, ''); 
+    url += `&destination=${encodeURIComponent(lastDest)}`; 
+    if(routeDestinations.length > 1 || (startInput && routeDestinations.length > 0)) { 
+        const waypoints = []; 
+        const startIndex = (startInput && !startInput.includes('我的位置')) ? 0 : (startInput ? 0 : 1); 
+        const endIndex = routeDestinations.length - 1; 
+        for(let i = startIndex; i < endIndex; i++) waypoints.push(routeDestinations[i].coord.replace(/\s/g, '')); 
+        if(waypoints.length > 0) url += `&waypoints=${waypoints.map(w => encodeURIComponent(w)).join('|')}`; 
+    } 
+    window.open(url, '_blank'); 
+}
+
+function openMapDetailCard(cardData) { 
+    const overlay = document.getElementById('map-detail-overlay'); 
+    const isDummy = cardData.id && cardData.id.startsWith('dummy_');
+    const thumb = cardData.img || cardData.originalImg || '';
+    
+    const detailImg = document.getElementById('detail-img');
+    if(detailImg) { detailImg.src = thumb; detailImg.style.display = thumb ? 'block' : 'none'; }
+    const detailTitle = document.getElementById('detail-title');
+    if(detailTitle) detailTitle.textContent = cardData.name || '未命名'; 
+    const detailTime = document.getElementById('detail-time');
+    if(detailTime) detailTime.innerHTML = `${getLocalTime(cardData.tz)}`; 
+    const detailLoc = document.getElementById('detail-loc');
+    if(detailLoc) detailLoc.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg><span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${cardData.loc || '未知地點'}</span>`; 
+    
+    const detailCoord = document.getElementById('detail-coord');
+    if(detailCoord) { 
+        detailCoord.textContent = cardData.coord || '無座標';
+        detailCoord.onclick = (e) => { e.stopPropagation(); copyCoord(e, cardData.coord); };
+    }
+    
+    const themes = Array.isArray(cardData.themes) ? cardData.themes : ['未分類']; 
+    const detailTags = document.getElementById('detail-tags');
+    if(detailTags) detailTags.innerHTML = themes.map(t => `<span class="tag" style="background:#f0f4f2; border:none; font-size:0.75rem; font-weight:800; color:#4a5568;">${t}</span>`).join(''); 
+    
+    const btnAddRoute = document.getElementById('detail-add-route-btn');
+    if(btnAddRoute) btnAddRoute.onclick = () => addCardToRoute(cardData.id); 
+    
+    let typeIcon = '';
+    if(cardData.type === 'flower') typeIcon = `<span style="color: var(--flower-dark); display: flex;">${ICON_FLOWER}</span>`;
+    else if (cardData.type === 'mushroom') typeIcon = `<span style="color: var(--mushroom-dark); display: flex;">${ICON_MUSHROOM}</span>`;
+    else typeIcon = `<span style="color: #555; display: flex;">${ICON_HIDDEN}</span>`;
+    
+    const detailTopIcon = document.getElementById('detail-top-icon');
+    if(detailTopIcon) detailTopIcon.innerHTML = typeIcon;
+
+    const starBtn = document.getElementById('detail-star-btn'); 
+    const delBtn = document.getElementById('detail-del-btn');
+    const editBtn = document.getElementById('detail-edit-btn');
+
+    if (isDummy) {
+        if(starBtn) starBtn.style.display = 'none';
+        if(delBtn) delBtn.style.display = 'none';
+        if(editBtn) editBtn.style.display = 'none';
+    } else {
+        if(starBtn) {
+            starBtn.style.display = 'flex';
+            starBtn.onclick = (e) => { 
+                toggleFavorite(e, cardData.type, cardData.id); 
+                cardData.favorite = !cardData.favorite; 
+                if (cardData.favorite) { starBtn.classList.add('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'var(--star-gold)'); } 
+                else { starBtn.classList.remove('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'none'); } 
+            }; 
+            if (cardData.favorite) { starBtn.classList.add('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'var(--star-gold)'); } 
+            else { starBtn.classList.remove('is-favorite'); starBtn.querySelector('svg').setAttribute('fill', 'none'); } 
+        }
+        if(delBtn) {
+            delBtn.style.display = 'flex';
+            delBtn.onclick = (e) => { closeMapDetail(); promptHardDelete(e, cardData.type, cardData.id); }; 
+        }
+        if(editBtn) {
+            editBtn.style.display = 'flex';
+            editBtn.onclick = (e) => { closeMapDetail(); promptEdit(e, cardData.type, cardData.id); }; 
+        }
+    }
+    if(overlay) overlay.classList.add('open'); 
+}
+
+function closeMapDetail(e) { 
+    if(!e || e.target.id === 'map-detail-overlay') { 
+        const overlay = document.getElementById('map-detail-overlay'); 
+        if(overlay) overlay.classList.remove('open'); 
+    } 
+}
+
+// 🌟 11. 抽卡系統
+function toggleZoomGachaCard() { 
+    const card = document.getElementById('printer-card'); 
+    const container = document.getElementById('printer-card-container'); 
+    const overlay = document.getElementById('gacha-zoom-overlay'); 
+    if (!card || !card.classList.contains('printed')) return; 
+    if (card.classList.contains('zoomed')) { 
+        card.classList.remove('zoomed'); 
+        if(container) container.classList.remove('zoomed-active'); 
+        if(overlay) overlay.classList.remove('active'); 
+    } else { 
+        card.classList.add('zoomed'); 
+        if(container) container.classList.add('zoomed-active'); 
+        if(overlay) overlay.classList.add('active'); 
+    } 
+}
+
+function spinPrinterGacha() { 
+    if (gachaIsSpinning) return; 
+    const allCards = [...flowerCards, ...mushroomCards, ...hiddenCards]; 
+    if (allCards.length === 0) { 
+        showToast('請先新增一些明信片才能抽卡唷！'); 
+        return; 
+    } 
+    gachaIsSpinning = true; 
+    const card = document.getElementById('printer-card'); 
+    if (card && card.classList.contains('printed')) { 
+        if (card.classList.contains('zoomed')) toggleZoomGachaCard(); 
+        card.classList.remove('printed'); 
+        card.classList.add('dropped'); 
+        setTimeout(() => executePrintAnimation(allCards, card), 600); 
+    } else {
+        executePrintAnimation(allCards, card); 
+    }
+}
+
+function executePrintAnimation(allCards, card) { 
+    if(!card) return; 
+    const container = document.getElementById('printer-card-container'); 
+    card.classList.remove('dropped', 'printed', 'zoomed'); 
+    if(container) container.classList.remove('zoomed-active'); 
+    card.style.transition = 'none'; 
+    void card.offsetWidth; 
+    const flash = document.getElementById('camera-flash'); 
+    if(flash) { 
+        flash.classList.add('flash-active'); 
+        setTimeout(() => flash.classList.remove('flash-active'), 50); 
+    } 
+    const result = allCards[Math.floor(Math.random() * allCards.length)]; 
+    const gImg = document.getElementById('gacha-result-img'); 
+    if(gImg) gImg.src = result.img || result.originalImg || ''; 
+    const gTitle = document.getElementById('gacha-result-title'); 
+    if(gTitle) gTitle.textContent = result.name || '未命名'; 
+    const gLoc = document.getElementById('gacha-result-loc'); 
+    if(gLoc) gLoc.textContent = result.loc || '未知地點'; 
+    const coordEl = document.getElementById('gacha-result-coord'); 
+    if(coordEl) { 
+        coordEl.textContent = result.coord || '無座標'; 
+        coordEl.onclick = (e) => { e.stopPropagation(); if (result.coord) copyCoord(e, result.coord); }; 
+    } 
+    let iconStr = '🔒'; 
+    if (result.type === 'flower') iconStr = `<span style="color: var(--flower-dark); display: flex;">${ICON_FLOWER}</span>`; 
+    else if (result.type === 'mushroom') iconStr = `<span style="color: var(--mushroom-dark); display: flex;">${ICON_MUSHROOM}</span>`; 
+    else if (result.type === 'hidden') iconStr = `<span style="color: #555; display: flex;">${ICON_HIDDEN}</span>`; 
+    const gIcon = document.getElementById('detail-top-icon'); 
+    if(gIcon) gIcon.innerHTML = iconStr; 
+    requestAnimationFrame(() => { 
+        setTimeout(() => { 
+            card.style.transition = ''; 
+            card.classList.add('printed'); 
+            setTimeout(() => { gachaIsSpinning = false; }, 1800); 
+        }, 150); 
+    }); 
+}
+
+// 系統初始化
+document.addEventListener('DOMContentLoaded', () => { initModalDrag(); });
+</script>
+</body>
+</html>
