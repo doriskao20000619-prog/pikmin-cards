@@ -38,6 +38,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; margin: 0; }
+body::before { content: ""; position: fixed; inset: 0; border: 10px solid rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 9999; }
 
 /* ── LAYOUT & ANIMATIONS ── */
 .screen { display: none; min-height: 100vh; width: 100%; position: absolute; top: 0; left: 0; }
@@ -56,7 +57,6 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .btn-danger:active { transform: scale(0.96); }
 .btn-danger-ghost { width: 100%; background: rgba(234, 67, 53, 0.1); border: 1.5px solid rgba(234, 67, 53, 0.4); color: #d93025; border-radius: 20px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; transition: transform 0.2s; }
 .btn-danger-ghost:active { transform: scale(0.96); background: rgba(234, 67, 53, 0.2); }
-/* 🌟 次要按鈕樣式 (無背景、綠框、綠字) */
 .btn-secondary { width: 100%; background: transparent; border: 1.5px solid var(--green); color: var(--green-dark); border-radius: 20px; padding: 16px; font-weight: 900; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; }
 .btn-secondary:active { transform: scale(0.96); background: rgba(76, 175, 110, 0.1); }
 .btn-cancel { background: rgba(255,255,255,0.6); color: var(--sub); border: none; border-radius: 20px; padding: 16px 24px; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
@@ -361,7 +361,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .custom-theme-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; background: rgba(255,255,255,0.6); font-weight: 800; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
 /* Global Utilities */
-.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(26, 46, 34, 0.9); color: #fff; padding: 14px 28px; border-radius: 99px; font-weight: 700; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 6000; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(26, 46, 34, 0.9); color: #fff; padding: 14px 28px; border-radius: 99px; font-weight: 700; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 6000; box-shadow: 0 8px 24px rgba(0,0,0,0.2); white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .lightbox-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
 .lightbox-overlay.open { display: flex; }
@@ -378,7 +378,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 /* 🖨️ 🌟 GACHA PRINTER */
 #screen-gacha { display: none; flex-direction: column; min-height: 100vh; background: var(--bg); }
 #screen-gacha.active { display: flex; }
-.printer-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position: relative; padding-top: max(40px, 8vh); padding-bottom: 120px; overflow-y: auto; width: 100%; margin-top: -60px; }
+.printer-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding-bottom: 72px; width: 100%; }
 
 /* 機器主體設計 */
 .printer-machine { position: relative; width: 300px; height: 440px; display: flex; flex-direction: column; align-items: center; border-radius: 32px; background: linear-gradient(180deg, #e4e7eb 0%, #c4c9d1 100px, #a3aab3 100px, #8d959f 100%); border: 1px solid #9fa6ae; box-shadow: 0 20px 50px rgba(0,0,0,0.15); flex-shrink: 0; }
@@ -398,15 +398,30 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .printer-card-container.zoomed-active { clip-path: none; z-index: 100000; }
 
 /* 🌟 真實明信片：圖層絕對最高 (Z-index: 100) */
-.printer-card { position: absolute; top: 0; left: 50%; transform: translate(-50%, -100%); width: 210px; height: 260px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 0; display: flex; flex-direction: column; overflow: hidden; pointer-events: auto; transition: transform 0.5s; z-index: 100;}
-.printer-card.printed { transform: translate(-50%, 15px) rotate(-1.5deg); transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.3, 1); cursor: zoom-in; }
-.printer-card.dropped { transform: translate(-50%, 100vh) rotate(-15deg); transition: transform 0.6s cubic-bezier(0.4, 0, 1, 1); }
-.printer-card.zoomed { position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -60px) scale(1.35) rotate(0deg) !important; cursor: zoom-out !important; box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; z-index: 100000 !important; }
+.printer-card { 
+    position: absolute; 
+    top: 0; left: 50%; 
+    transform: translate(-50%, -100%) scale(0.8); 
+    transform-origin: top center; 
+    width: 320px; 
+    background: #fff; border-radius: 24px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 0; 
+    display: flex; flex-direction: column; overflow: hidden; 
+    pointer-events: auto; transition: transform 0.5s; z-index: 100;
+}
+.printer-card.printed { transform: translate(-50%, 15px) scale(0.7) rotate(-1.5deg); transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.3, 1); cursor: zoom-in; }
+.printer-card.dropped { transform: translate(-50%, 100vh) scale(0.7) rotate(-15deg); transition: transform 0.6s cubic-bezier(0.4, 0, 1, 1); }
+.printer-card.zoomed { 
+    position: fixed !important; 
+    top: 50% !important; left: 50% !important; 
+    transform: translate(-50%, -50%) scale(1) rotate(0deg) !important; 
+    transform-origin: center center;
+    cursor: zoom-out !important; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important; 
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
+    z-index: 100000 !important; 
+}
 
-.printer-card-thumb { width: 100%; height: 130px; background: #f5f5f5; position: relative; }
-.printer-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.printer-card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.printer-card-title { font-weight: 900; font-size: 0.95rem; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;}
 .gacha-zoom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 99999; display: none; opacity: 0; transition: opacity 0.3s; pointer-events: auto; }
 .gacha-zoom-overlay.active { display: block; opacity: 1; }
 
@@ -517,10 +532,20 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
           </div>
           <div class="printer-card-container" id="printer-card-container">
               <div class="printer-card" id="printer-card" onclick="toggleZoomGachaCard()">
-                  <div class="printer-card-thumb"><img id="gacha-result-img" src=""></div>
-                  <div class="printer-card-info">
-                      <div><div class="printer-card-title" id="gacha-result-title"></div><div class="postcard-loc" id="gacha-result-loc" style="margin-top:4px;"></div></div>
-                      <div class="postcard-footer"><div class="coord-btn" id="gacha-result-coord"></div></div>
+                  <div class="map-detail-img-wrapper">
+                      <img id="gacha-result-img" src="">
+                      <div class="map-detail-img-gradient"></div>
+                      <div class="map-detail-title" id="gacha-result-title"></div>
+                      <div class="map-detail-time" id="gacha-result-time"></div>
+                      <div class="map-detail-icon-badge" id="gacha-result-icon"></div>
+                  </div>
+                  <div class="map-detail-body" style="gap: 12px; padding: 16px;">
+                      <div class="map-detail-loc" id="gacha-result-loc" style="font-size:0.95rem;"></div>
+                      <div class="map-detail-tags" id="gacha-result-tags"></div>
+                      <div class="map-detail-footer" style="margin-top:auto;">
+                          <div class="coord-btn" id="gacha-result-coord"></div>
+                          <button class="btn-route-add" id="gacha-add-route-btn" style="padding: 8px 16px; font-size: 0.85rem; flex-shrink: 0;"><span style="display:flex;align-items:center;"></span>加入目的地</button>
+                      </div>
                   </div>
               </div>
           </div>
@@ -1037,8 +1062,8 @@ function confirmCrop() { if (!cropperInstance) return; if (cropMode === 'avatar'
 function cancelCrop() { closeModal('cropModal'); if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; } if (cropMode === 'edit' || cropMode === 'avatar') { cropMode = 'upload'; return; } currentCropIndex++; startCropNext(); }
 
 // 🌟 7. Gemini OCR 與批次處理
-async function preloadOCR(fileIndex, imgUrl, attempt = 1) { ocrCache[fileIndex] = { done: false, progress: 0 }; try { const base64Image = imgUrl.split(',')[1]; if (!apiKey) { ocrCache[fileIndex] = { done: true, name: '未命名明信片', coord: '25.0339, 121.5644' }; applyOcrToBatch(fileIndex); return; } const promptText = "請分析這張明信片截圖，提取出最可能的地點名稱（name）與 GPS 座標（coord，格式為 '緯度, 經度'）。請忽略電池、訊號、時間或單純的UI文字。以嚴格的 JSON 格式回傳，只包含 'name' 與 'coord' 兩個鍵。若找不到則留空字串。"; const payload = { contents: [{ role: "user", parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: base64Image } } ] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('API Request Failed'); const data = await response.json(); const text = data.candidates?.[0]?.content?.parts?.[0]?.text; let parsed = { name: '未命名明信片', coord: '' }; if (text) { try { parsed = JSON.parse(text); } catch(e) {} } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = (parsed.name || '未命名明信片').substring(0, 40); ocrCache[fileIndex].coord = parsed.coord || ''; applyOcrToBatch(fileIndex); } catch(e) { if (attempt < 3) { setTimeout(() => preloadOCR(fileIndex, imgUrl, attempt + 1), 2000 * attempt); return; } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '雲端辨識失敗'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex); } }
-function applyOcrToBatch(fileIndex) { const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return; const batchIdx = cache.batchIdx; tempBatchList[batchIdx].name = cache.name; tempBatchList[batchIdx].coord = cache.coord; tempBatchList[batchIdx].status = 'detecting'; renderBatchItems(); if (cache.coord) { const parts = cache.coord.split(',').map(s => s.trim()); const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon); } }
+async function preloadOCR(fileIndex, imgUrl, attempt = 1) { ocrCache[fileIndex] = { done: false, progress: 0 }; try { const base64Image = imgUrl.split(',')[1]; const promptText = "請分析這張明信片截圖，提取出最可能的地點名稱（name）與 GPS 座標（coord，格式為 '緯度, 經度'）。請忽略電池、訊號、時間或單純的UI文字。以嚴格的 JSON 格式回傳，只包含 'name' 與 'coord' 兩個鍵。若找不到則留空字串。"; const payload = { contents: [{ role: "user", parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: base64Image } } ] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('API Request Failed'); const data = await response.json(); const text = data.candidates?.[0]?.content?.parts?.[0]?.text; let parsed = { name: '未命名明信片', coord: '' }; if (text) { try { parsed = JSON.parse(text); } catch(e) {} } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = (parsed.name && parsed.name !== '未命名明信片') ? parsed.name.substring(0, 40) : '未命名明信片'; ocrCache[fileIndex].coord = parsed.coord || ''; applyOcrToBatch(fileIndex); } catch(e) { if (attempt < 3) { setTimeout(() => preloadOCR(fileIndex, imgUrl, attempt + 1), 2000 * attempt); return; } ocrCache[fileIndex].done = true; ocrCache[fileIndex].name = '未命名明信片'; ocrCache[fileIndex].coord = ''; applyOcrToBatch(fileIndex); } }
+function applyOcrToBatch(fileIndex) { const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return; const batchIdx = cache.batchIdx; if (cache.name && cache.name !== '未命名明信片') { tempBatchList[batchIdx].name = cache.name; } else if (tempBatchList[batchIdx].name === '辨識中...') { tempBatchList[batchIdx].name = '未命名明信片'; } if (cache.coord) { tempBatchList[batchIdx].coord = cache.coord; } tempBatchList[batchIdx].status = 'detecting'; renderBatchItems(); const finalCoord = tempBatchList[batchIdx].coord; if (finalCoord) { const parts = finalCoord.split(',').map(s => s.trim()); const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon); } }
 function updateBatchItem(idx, key, val) { tempBatchList[idx][key] = val; renderBatchItems(); }
 async function fetchTimeZone(lat, lon) { try { const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`); const data = await res.json(); if(data && data.timeZone) return data.timeZone; } catch(e) {} return null; }
 async function fetchLocationForBatchItem(index, lat, lon) { let locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '偵測地點與時區中...'; try { const [locRes, tz] = await Promise.all([ fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,en`), fetchTimeZone(lat, lon) ]); if (tz) tempBatchList[index].tz = tz; const data = await locRes.json(); if (data && data.address) { const addr = data.address; const country = cleanLocText(addr.country); const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || ''; const city = cleanLocText(cityRaw); tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country; locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = tempBatchList[index].loc; } else { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '無法辨識地點'; } } catch(e) { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '網路錯誤'; } }
@@ -1470,7 +1495,7 @@ function updateMapBottomSheet(forceCards = null) {
             <div class="sheet-card-icon-badge" style="color: ${c.type === 'flower' ? 'var(--flower-dark)' : c.type === 'mushroom' ? 'var(--mushroom-dark)' : '#555'}">${typeIcon}</div>
             <div class="sheet-card-overlay">
                 <div class="sheet-card-tags"><div class="sheet-card-tag">${theme}</div></div>
-                <div class="sheet-card-title">${(c.name || '未命名').replace(/"/g, '&quot;')}</div>
+                <div class="sheet-card-title">${(c.name || '未命名').replace(/"/g, '"')}</div>
                 <div class="sheet-card-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${c.loc || '未知地點'}</div>
             </div>
         </div>`; 
@@ -1772,7 +1797,7 @@ function executePrintAnimation(allCards, card) {
     const gTitle = document.getElementById('gacha-result-title'); 
     if(gTitle) gTitle.textContent = result.name || '未命名'; 
     const gLoc = document.getElementById('gacha-result-loc'); 
-    if(gLoc) gLoc.textContent = result.loc || '未知地點'; 
+    if(gLoc) gLoc.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg><span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${result.loc || '未知地點'}</span>`; 
     const coordEl = document.getElementById('gacha-result-coord'); 
     if(coordEl) { 
         coordEl.textContent = result.coord || '無座標'; 
@@ -1782,8 +1807,23 @@ function executePrintAnimation(allCards, card) {
     if (result.type === 'flower') iconStr = `<span style="color: var(--flower-dark); display: flex;">${ICON_FLOWER}</span>`; 
     else if (result.type === 'mushroom') iconStr = `<span style="color: var(--mushroom-dark); display: flex;">${ICON_MUSHROOM}</span>`; 
     else if (result.type === 'hidden') iconStr = `<span style="color: #555; display: flex;">${ICON_HIDDEN}</span>`; 
-    const gIcon = document.getElementById('detail-top-icon'); 
+    const gIcon = document.getElementById('gacha-result-icon'); 
     if(gIcon) gIcon.innerHTML = iconStr; 
+    
+    // 將主題標籤帶入抽卡明信片
+    const themes = Array.isArray(result.themes) ? result.themes : ['未分類'];
+    const gTags = document.getElementById('gacha-result-tags');
+    if(gTags) gTags.innerHTML = themes.map(t => `<span class="tag" style="background:#f0f4f2; border:none; font-size:0.75rem; font-weight:800; color:#4a5568;">${t}</span>`).join('');
+    
+    // 設定加入目的地功能
+    const btnAddRoute = document.getElementById('gacha-add-route-btn');
+    if(btnAddRoute) {
+        btnAddRoute.onclick = (e) => {
+            e.stopPropagation();
+            addCardToRoute(result.id);
+        };
+    }
+    
     requestAnimationFrame(() => { 
         setTimeout(() => { 
             card.style.transition = ''; 
