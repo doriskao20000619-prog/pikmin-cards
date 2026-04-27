@@ -101,10 +101,10 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 
 /* ── CATEGORY & FILTERS ── */
 .cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-top: max(20px, env(safe-area-inset-top)); }
-.cat-topbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px 16px; }
-.back-btn { background: none; border: none; cursor: pointer; color: var(--text); padding: 4px; display: flex; align-items: center; justify-content: center; }
-.back-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;}
-.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; flex: 1; text-align: center; } 
+.cat-topbar { display: flex; align-items: center; justify-content: center; padding: 10px 16px 16px; position: relative; }
+.back-btn { display: none; }
+.back-btn svg { display: none; }
+.cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; text-align: center; width: 100%; } 
 .sub-tabs { display: flex; padding: 0 16px; gap: 8px; margin-bottom: 12px; }
 .sub-tab { flex: 1; padding: 12px 8px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: #8e9a92; cursor: pointer; border-radius: 16px; transition: all 0.2s; }
 .sub-tab.active { background: #ffffff; color: var(--green-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
@@ -137,7 +137,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .postcard-loc { font-size: 0.8rem; color: var(--sub); font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px;}
 .postcard-loc svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0;}
 .postcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.tag { background: rgba(255,255,255,0.7); color: var(--sub); font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.9); display: inline-flex; width: max-content; align-items: center; gap: 4px; }
+.tag { background: #f3f7f4; color: var(--green-dark); font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.06); box-shadow: inset 0 2px 4px rgba(0,0,0,0.04); display: inline-flex; width: max-content; align-items: center; gap: 4px; }
 .postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
 .coord-btn { background: rgba(240, 247, 242, 0.8); border: 1.5px solid var(--green-light); font-size: 0.7rem; font-weight: 800; color: var(--green-dark); cursor: pointer; padding: 4px 12px; border-radius: 99px; font-family: 'Nunito', monospace; display: block; text-align: center; transition: transform 0.2s; white-space: nowrap; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: calc(100% - 36px); }
 .coord-btn:active { transform: scale(0.95); }
@@ -782,6 +782,20 @@ const idb = {
   async set(key, val) { const db = await this.init(); return new Promise((resolve, reject) => { const tx = db.transaction('store', 'readwrite'); tx.objectStore('store').put(val, key); tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); }); }
 };
 
+const S2TMAP = {"奥地利":"奧地利","塞浦路斯":"賽普勒斯","塞浦路斯共和国":"賽普勒斯","美国":"美國","德国":"德國","法国":"法國","英国":"英國","意大利":"義大利","西班牙":"西班牙","葡萄牙":"葡萄牙","荷兰":"荷蘭","比利时":"比利時","瑞士":"瑞士","瑞典":"瑞典","丹麦":"丹麥","挪威":"挪威","芬兰":"芬蘭","冰岛":"冰島","希腊":"希臘","俄罗斯":"俄羅斯","韩国":"韓國","朝鲜":"北韓","日本":"日本","中国":"中國","台湾":"台灣","香港":"香港","澳门":"澳門","新加坡":"新加坡","马来西亚":"馬來西亞","泰国":"泰國","越南":"越南","菲律宾":"菲律賓","印度尼西亚":"印尼","印度":"印度","澳大利亚":"澳洲","新西兰":"紐西蘭","加拿大":"加拿大","墨西哥":"墨西哥","巴西":"巴西","阿根廷":"阿根廷","智利":"智利","埃及":"埃及","南非":"南非","摩洛哥":"摩洛哥","土耳其":"土耳其","沙特阿拉伯":"沙烏地阿拉伯","阿联酋":"阿聯","圣安东尼奥":"聖安東尼奧","德克萨斯州":"德州","加利福尼亚州":"加州","纽约":"紐約","伦敦":"倫敦","巴黎":"巴黎","罗马":"羅馬","柏林":"柏林","东京":"東京","首尔":"首爾","曼谷":"曼谷","圣保罗":"聖保罗","巴塞罗那":"巴塞隆納","马德里":"馬德里","墨尔本":"墨爾本","悉尼":"雪梨","奥克兰":"奧克蘭","旧金山":"舊金山","洛杉矶":"洛杉磯","温哥华":"溫哥華","多伦多":"多倫多","马格德堡":"馬格德堡","萨克森-安哈尔特":"薩克森-安哈特","纽黑文":"紐哈芬","康涅狄格州":"康乃狄克州","黑森":"黑森","斯图加特":"司徒加特","维也纳":"維也納","新南威尔士州":"新南威爾斯州"};
+function s2t(str) { if(!str) return str; let res = str; for(let k in S2TMAP) { res = res.replace(new RegExp(k, 'g'), S2TMAP[k]); } return res; }
+
+function migrateSimplifiedChinese() {
+    let changed = false;
+    [flowerCards, mushroomCards, hiddenCards].forEach(list => {
+        list.forEach(c => {
+            if (c.country) { let tc = s2t(c.country); if (tc !== c.country) { c.country = tc; changed = true; } }
+            if (c.loc) { let tl = s2t(c.loc); if (tl !== c.loc) { c.loc = tl; changed = true; } }
+        });
+    });
+    if(changed) saveDataToLocal(true);
+}
+
 async function loadDataFromLocal() { 
     try { 
         const localFlower = await idb.get('pikmin_flowerCards'); if (localFlower) flowerCards = JSON.parse(localFlower).map(c => ({...c, type: 'flower'})); 
@@ -789,12 +803,10 @@ async function loadDataFromLocal() {
         const localHidden = await idb.get('pikmin_hiddenCards'); if (localHidden) hiddenCards = JSON.parse(localHidden).map(c => ({...c, type: 'hidden'})); 
         const localCustomThemes = await idb.get('pikmin_customThemes'); 
         if (localCustomThemes && localCustomThemes !== "undefined" && localCustomThemes !== "null") {
-            try {
-                const parsed = JSON.parse(localCustomThemes);
-                if (Array.isArray(parsed)) customThemes = parsed;
-            } catch(e) { customThemes = []; }
+            try { const parsed = JSON.parse(localCustomThemes); if (Array.isArray(parsed)) customThemes = parsed; } catch(e) { customThemes = []; }
         }
         repairThemes();
+        migrateSimplifiedChinese();
         const localProfile = await idb.get('pikmin_userProfile'); if (localProfile) userProfile = JSON.parse(localProfile); 
         isLocalDataLoaded = true;
         refreshCurrentView(); updateProfileUI(); 
@@ -1176,7 +1188,7 @@ async function preloadOCR(fileIndex, imgUrl, attempt = 1) {
 function applyOcrToBatch(fileIndex) { const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return; const batchIdx = cache.batchIdx; if (cache.name && cache.name !== '未命名明信片') { tempBatchList[batchIdx].name = cache.name; } else if (tempBatchList[batchIdx].name === '辨識中...') { tempBatchList[batchIdx].name = '未命名明信片'; } if (cache.coord) { tempBatchList[batchIdx].coord = cache.coord; } tempBatchList[batchIdx].status = 'detecting'; renderBatchItems(); const finalCoord = tempBatchList[batchIdx].coord; if (finalCoord) { const parts = finalCoord.split(',').map(s => s.trim()); const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon); } }
 function updateBatchItem(idx, key, val) { tempBatchList[idx][key] = val; renderBatchItems(); }
 async function fetchTimeZone(lat, lon) { try { const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`); const data = await res.json(); if(data && data.timeZone) return data.timeZone; } catch(e) {} return null; }
-async function fetchLocationForBatchItem(index, lat, lon) { let locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '偵測地點與時區中...'; try { const [locRes, tz] = await Promise.all([ fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,en`), fetchTimeZone(lat, lon) ]); if (tz) tempBatchList[index].tz = tz; const data = await locRes.json(); if (data && data.address) { const addr = data.address; const country = cleanLocText(addr.country); const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || ''; const city = cleanLocText(cityRaw); tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country; locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = tempBatchList[index].loc; } else { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '無法辨識地點'; } } catch(e) { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '網路錯誤'; } }
+async function fetchLocationForBatchItem(index, lat, lon) { let locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '偵測地點與時區中...'; try { const [locRes, tz] = await Promise.all([ fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW,en`), fetchTimeZone(lat, lon) ]); if (tz) tempBatchList[index].tz = tz; const data = await locRes.json(); if (data && data.address) { const addr = data.address; const country = cleanLocText(addr.country); const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || ''; const city = cleanLocText(cityRaw); tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country; locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = tempBatchList[index].loc; } else { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '無法辨識地點'; } } catch(e) { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '網路錯誤'; } }
 function handleBatchCoordInput(index, val, el) { el.value = val.replace(/[^0-9.,\- ]/g, ''); tempBatchList[index].coord = el.value; clearTimeout(batchDebounceTimers[index]); batchDebounceTimers[index] = setTimeout(() => { const parts = el.value.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(index, lat, lon); } }, 800); }
 
 function renderBatchItems() { 
@@ -1352,7 +1364,7 @@ function resetEditInput() {
 
 const editCoordInputEl = document.getElementById('edit-coord-input');
 if(editCoordInputEl) {
-    editCoordInputEl.addEventListener('input', function() { this.value = this.value.replace(/[^0-9.,\- ]/g, ''); clearTimeout(coordDebounceTimer); const val = this.value; coordDebounceTimer = setTimeout(() => { const parts = val.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) { document.getElementById('edit-loc-input').value = '🔍 偵測中...'; fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-Hant,zh-TW,en`).then(r => r.json()).then(d => { if(d && d.address) { const c = cleanLocText(d.address.country); const city = cleanLocText(d.address.city || d.address.town || d.address.village || d.address.suburb || d.address.county || d.address.state || ''); document.getElementById('edit-loc-input').value = city && city !== c ? `${city}，${c}` : c; currentEditCountry = c; } else document.getElementById('edit-loc-input').value = '⚠️ 無法辨識'; }).catch(() => document.getElementById('edit-loc-input').value = '⚠️ 網路錯誤'); } } }, 800); });
+    editCoordInputEl.addEventListener('input', function() { this.value = this.value.replace(/[^0-9.,\- ]/g, ''); clearTimeout(coordDebounceTimer); const val = this.value; coordDebounceTimer = setTimeout(() => { const parts = val.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) { document.getElementById('edit-loc-input').value = '🔍 偵測中...'; fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW,en`).then(r => r.json()).then(d => { if(d && d.address) { const c = cleanLocText(d.address.country); const city = cleanLocText(d.address.city || d.address.town || d.address.village || d.address.suburb || d.address.county || d.address.state || ''); document.getElementById('edit-loc-input').value = city && city !== c ? `${city}，${c}` : c; currentEditCountry = c; } else document.getElementById('edit-loc-input').value = '⚠️ 無法辨識'; }).catch(() => document.getElementById('edit-loc-input').value = '⚠️ 網路錯誤'); } } }, 800); });
 }
 function saveEdit() { const nc = document.getElementById('edit-coord-input').value; const nn = document.getElementById('edit-name-input').value.trim(); const nl = document.getElementById('edit-loc-input').value.trim(); if (!nc || !nn || !nl) { showToast('⚠️ 請填寫完整資訊'); return; } const oldList = currentEditCat === 'flower' ? flowerCards : (currentEditCat === 'hidden' ? hiddenCards : mushroomCards); const idx = oldList.findIndex(x => x.id == currentEditId); if(idx > -1){ const c = oldList[idx]; c.coord = nc; c.name = nn; c.loc = nl; c.tz = currentEditTz; if (isEditImgDeleted) { c.img = null; c.originalImg = null; c.cropData = null; } else { if (tempEditImg) c.img = tempEditImg; if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; if (tempEditCropData) c.cropData = tempEditCropData; } const locParts = nl.split(/[,，]/); c.country = currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : nl); c.themes = tempEditThemes.length > 0 ? [...tempEditThemes] : ['未分類']; c.type = currentEditType; if (currentEditCat !== currentEditType) { oldList.splice(idx, 1); const newList = currentEditType === 'flower' ? flowerCards : (currentEditType === 'hidden' ? hiddenCards : mushroomCards); newList.push(c); } refreshCurrentView(); } closeModal('editModal'); showToast('✅ 明信片已更新'); saveDataToLocal(); const sm = document.getElementById('screen-map'); if(sm && sm.classList.contains('active')) { const p = nc.split(','); if(globalMap) { globalMap.flyTo([parseFloat(p[0]), parseFloat(p[1])], 16, {duration: 1.5}); setTimeout(() => { renderMapMarkers(); updateMapBottomSheet(); }, 300); } } }
 
@@ -1440,7 +1452,7 @@ async function contextAddRoute() {
     let locName = '自訂地點';
     let subLoc = '';
     try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-Hant,zh-TW,en`);
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW,en`);
         const data = await res.json();
         if(data) {
             locName = data.name || (data.display_name ? data.display_name.split(',')[0].trim() : '選定位置');
@@ -1535,7 +1547,7 @@ async function handleMapSearch(q) {
         } else {
             showToast('🔍 尋找外部圖資...');
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&accept-language=zh-Hant,zh-TW,en`);
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&accept-language=zh-TW,en`);
                 const data = await res.json();
                 if(data && data.length > 0) {
                     const lat = parseFloat(data[0].lat);
@@ -1985,10 +1997,37 @@ function executePrintAnimation(allCards, card) {
     }); 
 }
 
+function initSwipeToBack() {
+    let screenTouchStartX = 0;
+    let screenTouchStartY = 0;
+    ['screen-flower', 'screen-mushroom', 'screen-hidden', 'screen-owned'].forEach(id => {
+        const screen = document.getElementById(id);
+        if (!screen) return;
+        screen.addEventListener('touchstart', e => {
+            if (e.changedTouches[0].clientX < 40) { 
+                screenTouchStartX = e.changedTouches[0].screenX;
+                screenTouchStartY = e.changedTouches[0].screenY;
+            } else {
+                screenTouchStartX = 0;
+                screenTouchStartY = 0;
+            }
+        }, {passive: true});
+        screen.addEventListener('touchend', e => {
+            if (!screenTouchStartX) return;
+            let dx = e.changedTouches[0].screenX - screenTouchStartX;
+            let dy = e.changedTouches[0].screenY - screenTouchStartY;
+            if (dx > 70 && Math.abs(dx) > Math.abs(dy)) {
+                goTo('home');
+            }
+        }, {passive: true});
+    });
+}
+
 // 🌟 系統初始化 (已補上 await loadDataFromLocal() 以確保資料不丟失)
 document.addEventListener('DOMContentLoaded', async () => { 
     await ensureLocalDataLoaded();
     initModalDrag(); 
+    initSwipeToBack();
 });
 </script>
 </body>
