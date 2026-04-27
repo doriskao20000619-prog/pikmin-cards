@@ -128,18 +128,18 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .postcard-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .image-time-badge { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
 
-.postcard-info { flex: 1; padding: 16px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-.mac-btns-container { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 10; }
+.postcard-info { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.mac-btns-container { position: absolute; top: 12px; right: 10px; display: flex; gap: 6px; z-index: 10; }
 .mac-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(142, 142, 147, 0.1); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: transform 0.2s; }
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
-.postcard-name { font-weight: 800; font-size: 1.05rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 80px; margin-bottom: 4px; display: block; }
+.postcard-name { font-weight: 800; font-size: 1.05rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 100px; margin-bottom: 4px; display: block; maxWidth: 100%; }
 .postcard-loc { font-size: 0.8rem; color: var(--sub); font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px;}
 .postcard-loc svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0;}
 .postcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .tag { background: rgba(255,255,255,0.7); color: var(--sub); font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.9); display: inline-flex; width: max-content; align-items: center; gap: 4px; }
 .postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-.coord-btn { background: rgba(240, 247, 242, 0.8); border: 1.5px solid var(--green-light); font-size: 0.8rem; font-weight: 800; color: var(--green-dark); cursor: pointer; padding: 6px 16px; border-radius: 99px; font-family: 'Nunito', monospace; display: block; text-align: center; transition: transform 0.2s; white-space: nowrap; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.coord-btn { background: rgba(240, 247, 242, 0.8); border: 1.5px solid var(--green-light); font-size: 0.7rem; font-weight: 800; color: var(--green-dark); cursor: pointer; padding: 4px 12px; border-radius: 99px; font-family: 'Nunito', monospace; display: block; text-align: center; transition: transform 0.2s; white-space: nowrap; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: calc(100% - 36px); }
 .coord-btn:active { transform: scale(0.95); }
 .owned-badge { background: var(--green); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
@@ -965,7 +965,29 @@ function toggleOwned(e, cat, id) { if (e && e.target && (e.target.closest('.mac-
 function executeToggleOwnedBtn(e, cat, id) { e.stopPropagation(); const list = cat === 'flower' ? flowerCards : (cat === 'hidden' ? hiddenCards : mushroomCards); const c = list.find(x => x.id == id); if(c) { pendingRemoveCard = c; openModal('confirmModal'); } }
 function executeCancelOwned() { if(pendingRemoveCard) { pendingRemoveCard.owned = false; refreshCurrentView(); saveDataToLocal(); } closeModal('confirmModal'); }
 function executeHardDelete() { if(currentDelCat === 'flower') flowerCards = flowerCards.filter(x => x.id != currentDelId); else if (currentDelCat === 'hidden') hiddenCards = hiddenCards.filter(x => x.id != currentDelId); else mushroomCards = mushroomCards.filter(x => x.id != currentDelId); refreshCurrentView(); closeModal('deleteConfirmModal'); saveDataToLocal(); }
-function toggleFavorite(e, cat, id) { e.stopPropagation(); const list = cat==='flower'?flowerCards:(cat==='hidden'?hiddenCards:mushroomCards); const card = list.find(x => x.id == id); if(card){ card.favorite = !card.favorite; showToast(card.favorite?'⭐ 已加入最愛':'⚪ 已取消最愛'); refreshCurrentView(); saveDataToLocal(); } }
+function toggleFavorite(e, cat, id) { 
+  e.stopPropagation(); 
+  const list = cat === 'flower' ? flowerCards : (cat === 'hidden' ? hiddenCards : mushroomCards); 
+  const card = list.find(x => x.id == id); 
+  if (card) { 
+    card.favorite = !card.favorite; 
+    showToast(card.favorite ? '⭐ 已加入最愛' : '⚪ 已取消最愛'); 
+    
+    // Update UI directly instead of full refresh
+    const btn = e.currentTarget;
+    if (card.favorite) {
+      btn.classList.add('is-favorite');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="var(--star-gold)" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg>`;
+    } else {
+      btn.classList.remove('is-favorite');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg>`;
+    }
+    
+    // If we are currently viewing the favorite tab, maybe fade out? Or leave it until refresh.
+    // Leaving it until refresh is standard for this type of UI to prevent accidental clicks breaking layout.
+    saveDataToLocal(); 
+  } 
+}
 function promptHardDelete(e, cat, id) { e.stopPropagation(); resetSwipes(); currentDelCat = cat; currentDelId = id; openModal('deleteConfirmModal'); }
 
 // 🌟 5. 渲染視圖 (Folders, Cards)
