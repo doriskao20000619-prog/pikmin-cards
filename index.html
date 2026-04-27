@@ -250,6 +250,10 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .btn-route-add { background: rgba(76, 175, 110, 0.85); backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 99px; font-weight: 800; font-size: 0.95rem; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 16px rgba(76, 175, 110, 0.3); transition: transform 0.2s; flex-shrink: 0;}
 .btn-route-add:active { transform: scale(0.95); }
 
+@media (max-width: 768px) {
+  .del-btn { display: none !important; }
+}
+
 #map-context-menu { display:none; position:absolute; background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:3000; flex-direction:column; overflow:hidden; }
 .context-menu-item { display: flex; align-items: center; gap: 12px; padding:16px 24px; border:none; background:transparent; font-weight:800; font-size:1rem; cursor:pointer; color:var(--text); transition:background 0.2s; white-space:nowrap;}
 .context-menu-item svg { stroke: var(--green-dark); fill: none; stroke-width: 2.5;}
@@ -465,9 +469,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   <input type="file" id="file-input" multiple accept="image/*" style="display:none;" onchange="handleFiles(this.files)">
 </div>
 
-<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div>
-<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div>
-<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div>
+<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div>
+<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div>
+<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="quick-filter-wrapper" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div>
 
 <div class="screen" id="screen-map">
   <div class="map-box">
@@ -499,7 +503,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 </div>
 
 <div class="screen" id="screen-gacha">
-  <div class="cat-screen-header" style="background:transparent; padding-bottom: 0;"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button></div></div>
+  <div class="cat-screen-header" style="background:transparent; padding-bottom: 0;"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button></div></div>
   <div class="gacha-zoom-overlay" id="gacha-zoom-overlay" onclick="toggleZoomGachaCard()"></div>
   <div class="gacha-flash-fX" id="gacha-flash-fX"></div>
   <div class="printer-viewport">
@@ -553,7 +557,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
   </div>
 </div>
 
-<div class="screen" id="screen-owned"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">我的收藏</div></div></div><div class="cat-body" id="owned-body"></div></div>
+<div class="screen" id="screen-owned"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">我的收藏</div></div></div><div class="cat-body" id="owned-body"></div></div>
 
 <div class="dock-nav hidden-dock" id="global-nav">
   <div class="dock-item nav-fill active" onclick="goTo('home')"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="nav-label">Home</span></div>
@@ -920,7 +924,29 @@ async function uploadToCloud() { if (isPreviewMode || !driveFileId || !currentAc
 async function createInDrive() { if (isPreviewMode || !currentAccessToken) return; showSyncing(true); let localTime = localStorage.getItem('pikmin_lastUpdate'); if (!localTime) { localTime = Date.now().toString(); localStorage.setItem('pikmin_lastUpdate', localTime); } const fileContent = JSON.stringify({ flowerCards, mushroomCards, hiddenCards, customThemes, userProfile: { customNickname: '', customAvatar: '' }, lastUpdate: localTime }); const file = new Blob([fileContent], {type: 'application/json'}); const metadata = { name: 'pikmin_data_v1.json', parents: ['appDataFolder'], mimeType: 'application/json' }; const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'})); form.append('file', file); try { const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: new Headers({ 'Authorization': 'Bearer ' + currentAccessToken }), body: form }); const data = await res.json(); driveFileId = data.id; localStorage.setItem('pikmin_driveFileId', driveFileId); showSyncing(false); } catch (err) { showSyncing(false); } }
 
 // 🌟 4. 畫面切換與導覽列互動
-function goTo(screen) {
+let screenHistory = [];
+function goBack() {
+    if (screenHistory.length > 0) {
+        const prev = screenHistory.pop();
+        goTo(prev, false); // false = do not push history
+    } else {
+        goTo('home', false);
+    }
+}
+
+function goTo(screen, pushHistory = true) {
+  if (pushHistory) {
+      const activeScreens = document.querySelectorAll('.screen.active');
+      if (activeScreens.length > 0) {
+          const currentId = activeScreens[0].id.replace('screen-', '');
+          if (screenHistory[screenHistory.length - 1] !== currentId && currentId !== screen) {
+              screenHistory.push(currentId);
+          }
+      }
+  } else if (screenHistory.length && screenHistory[screenHistory.length - 1] === screen && pushHistory !== false) {
+      screenHistory.pop();
+  }
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
   const targetScreen = document.getElementById('screen-' + screen);
   if(targetScreen) targetScreen.classList.add('active');
@@ -945,6 +971,8 @@ function goTo(screen) {
 
   if (activeIndex !== undefined) { 
       setNavActive(activeIndex);
+      // Clear history when tapping dock directly
+      if (pushHistory) screenHistory = [];
   } else if (['flower', 'mushroom', 'hidden'].includes(screen)) {
       setNavActive(0); 
   }
@@ -2076,28 +2104,102 @@ function executePrintAnimation(allCards, card) {
 }
 
 function initSwipeToBack() {
-    let screenTouchStartX = 0;
-    let screenTouchStartY = 0;
-    ['screen-flower', 'screen-mushroom', 'screen-hidden', 'screen-owned'].forEach(id => {
-        const screen = document.getElementById(id);
-        if (!screen) return;
-        screen.addEventListener('touchstart', e => {
-            if (e.changedTouches[0].clientX < 40) { 
-                screenTouchStartX = e.changedTouches[0].screenX;
-                screenTouchStartY = e.changedTouches[0].screenY;
-            } else {
-                screenTouchStartX = 0;
-                screenTouchStartY = 0;
+    let swipeBackStartX = 0;
+    let swipeBackCurrentX = 0;
+    let isSwipingBack = false;
+    let slidingScreen = null;
+    let bgScreenEl = null;
+
+    document.addEventListener('touchstart', (e) => {
+        if (e.touches[0].clientX < 30) {
+            const activeScreens = document.querySelectorAll('.screen.active');
+            if (activeScreens.length > 0 && activeScreens[0].id !== 'screen-home' && activeScreens[0].id !== 'screen-login') {
+                isSwipingBack = true;
+                swipeBackStartX = e.touches[0].clientX;
+                slidingScreen = activeScreens[0];
+                
+                slidingScreen.style.transition = 'none';
+                slidingScreen.style.animation = 'none';
+                slidingScreen.style.zIndex = 50;
+                slidingScreen.style.boxShadow = '-10px 0 20px rgba(0,0,0,0.1)';
+                
+                let targetId = 'home';
+                if (screenHistory.length > 0) {
+                    targetId = screenHistory[screenHistory.length - 1];
+                }
+                bgScreenEl = document.getElementById('screen-' + targetId);
+                if (bgScreenEl) {
+                    bgScreenEl.style.display = bgScreenEl.id === 'screen-home' ? 'block' : 'flex';
+                    bgScreenEl.style.zIndex = 10;
+                    bgScreenEl.style.transform = 'translateX(-30%)';
+                    bgScreenEl.style.transition = 'none';
+                }
             }
-        }, {passive: true});
-        screen.addEventListener('touchend', e => {
-            if (!screenTouchStartX) return;
-            let dx = e.changedTouches[0].screenX - screenTouchStartX;
-            let dy = e.changedTouches[0].screenY - screenTouchStartY;
-            if (dx > 70 && Math.abs(dx) > Math.abs(dy)) {
-                goTo('home');
+        }
+    }, {passive: true});
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isSwipingBack || !slidingScreen) return;
+        swipeBackCurrentX = e.touches[0].clientX;
+        let deltaX = swipeBackCurrentX - swipeBackStartX;
+        if (deltaX < 0) deltaX = 0;
+        
+        slidingScreen.style.transform = `translateX(${deltaX}px)`;
+        if (bgScreenEl) {
+            let progress = Math.min(deltaX / window.innerWidth, 1);
+            let bgOffset = -30 * (1 - progress);
+            bgScreenEl.style.transform = `translateX(${bgOffset}%)`;
+        }
+    }, {passive: true});
+
+    document.addEventListener('touchend', (e) => {
+        if (!isSwipingBack || !slidingScreen) return;
+        isSwipingBack = false;
+        
+        let deltaX = swipeBackCurrentX - swipeBackStartX;
+        let swipeThreshold = window.innerWidth * 0.3;
+        let fastSwipe = (e.changedTouches && e.changedTouches[0].clientX - swipeBackStartX > 50);
+        
+        if (deltaX > swipeThreshold || fastSwipe) {
+            slidingScreen.style.transition = 'transform 0.3s ease-out';
+            slidingScreen.style.transform = `translateX(${window.innerWidth}px)`;
+            if (bgScreenEl) {
+                bgScreenEl.style.transition = 'transform 0.3s ease-out';
+                bgScreenEl.style.transform = 'translateX(0%)';
             }
-        }, {passive: true});
+            
+            setTimeout(() => {
+                goBack();
+                slidingScreen.style.transform = '';
+                slidingScreen.style.boxShadow = '';
+                slidingScreen.style.zIndex = '';
+                slidingScreen.style.animation = '';
+                if (bgScreenEl) {
+                    bgScreenEl.style.display = '';
+                    bgScreenEl.style.zIndex = '';
+                    bgScreenEl.style.transform = '';
+                }
+            }, 300);
+        } else {
+            slidingScreen.style.transition = 'transform 0.2s ease-out';
+            slidingScreen.style.transform = `translateX(0px)`;
+            if (bgScreenEl) {
+                bgScreenEl.style.transition = 'transform 0.2s ease-out';
+                bgScreenEl.style.transform = 'translateX(-30%)';
+            }
+            
+            setTimeout(() => {
+                slidingScreen.style.transform = '';
+                slidingScreen.style.boxShadow = '';
+                slidingScreen.style.zIndex = '';
+                slidingScreen.style.animation = '';
+                if (bgScreenEl) {
+                    bgScreenEl.style.display = '';
+                    bgScreenEl.style.zIndex = '';
+                    bgScreenEl.style.transform = '';
+                }
+            }, 200);
+        }
     });
 }
 
