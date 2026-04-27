@@ -354,22 +354,36 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 #screen-gacha.active { display: flex; }
 .printer-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding-bottom: 72px; width: 100%; }
 
-.printer-machine { position: relative; width: 300px; height: 440px; display: flex; flex-direction: column; align-items: center; border-radius: 32px; background: linear-gradient(180deg, #e4e7eb 0%, #c4c9d1 100px, #a3aab3 100px, #8d959f 100%); border: 1px solid #9fa6ae; box-shadow: 0 20px 50px rgba(0,0,0,0.15); flex-shrink: 0; }
-.printer-label { margin-top: 20px; text-align: center; color: #4a5568; z-index: 5; }
-.printer-logo { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px; }
-.printer-logo svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
-.printer-text { font-size: 0.75rem; font-weight: 800; line-height: 1.4; letter-spacing: 1px; }
+.polaroid-camera { position: relative; width: 300px; height: 320px; display: flex; flex-direction: column; align-items: center; border-radius: 0; background: transparent; border: none; box-shadow: none; flex-shrink: 0; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2)); }
+.polaroid-camera .camera-body { position: relative; width: 280px; height: 260px; background: #e8e8e8; border-radius: 40px 40px 0 0; box-shadow: inset 0 12px 16px rgba(255,255,255,1), inset 0 -10px 15px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.1); z-index: 20; overflow: hidden; border: 1px solid #d4d4d4; border-bottom: none; }
+.polaroid-camera .camera-shutter { position: absolute; top: 24px; left: 24px; width: 56px; height: 56px; border-radius: 50%; background: #E83F33; border: 3px solid #ccc; box-shadow: inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; padding: 0; outline: none; }
+.polaroid-camera .camera-shutter:active { transform: scale(0.92) translateY(2px); box-shadow: inset 0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2); }
+.polaroid-camera .shutter-inner { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 30% 30%, transparent, rgba(0,0,0,0.1)); }
+.polaroid-camera .camera-flash { position: absolute; top: 24px; right: 24px; width: 52px; height: 52px; background: #222; border-radius: 12px; border: 3px solid #ccc; box-shadow: inset 0 0 12px #000, 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; }
+.polaroid-camera .flash-glare { position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), transparent 60%); border-radius: 50%; }
+.polaroid-camera .camera-lens { position: absolute; top: 120px; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px; background: #EAEBEE; border-radius: 50%; border: 3px solid #ccc; box-shadow: 0 12px 24px rgba(0,0,0,0.15), inset 0 -6px 12px rgba(0,0,0,0.05), inset 0 4px 8px rgba(255,255,255,0.8); display: flex; justify-content: center; align-items: center; z-index: 2; }
+.polaroid-camera .lens-1 { width: 100px; height: 100px; background: #2a2a2a; border-radius: 50%; border: 4px solid #555; box-shadow: inset 0 4px 12px #000; display: flex; justify-content: center; align-items: center; }
+.polaroid-camera .lens-2 { width: 56px; height: 56px; background: #0f1c2b; border-radius: 50%; border: 2px solid #1a2a3a; box-shadow: inset 0 0 16px #000; position: relative; }
+.polaroid-camera .lens-glare-1 { position: absolute; top: 6px; left: 6px; width: 14px; height: 14px; background: rgba(135,206,235,0.6); border-radius: 50%; filter: blur(2px); }
+.polaroid-camera .lens-glare-2 { position: absolute; bottom: 8px; right: 8px; width: 20px; height: 20px; background: rgba(147,112,219,0.3); border-radius: 50%; filter: blur(3px); }
+.polaroid-camera .camera-stripes { position: absolute; top: 180px; left: 50%; transform: translateX(-50%); width: 44px; height: 80px; display: flex; z-index: 1; }
+.polaroid-camera .stripe { flex: 1; height: 100%; }
+.polaroid-camera .stripe.red { background: #e35d5b; }
+.polaroid-camera .stripe.orange { background: #ee7836; }
+.polaroid-camera .stripe.purple { background: #855cc5; }
+.polaroid-camera .stripe.green { background: #34bc98; }
 
-.printer-slot-bg { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); width: 80%; height: 16px; background: #000; border-radius: 8px; z-index: 10; box-shadow: inset 0 4px 8px rgba(0,0,0,0.9);}
-.printer-slot-top-lip { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); width: 80%; height: 4px; background: rgba(0,0,0,0.4); border-radius: 8px 8px 0 0; z-index: 40; pointer-events: none; }
+.polaroid-camera .camera-bottom-base { position: relative; width: 280px; height: 60px; background: #2C2D2F; border-radius: 8px 8px 30px 30px; box-shadow: inset 0 8px 12px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.2); z-index: 30; display: flex; justify-content: center; }
+.polaroid-camera .printer-slot-bg { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 236px; height: 18px; background: #0B0B0C; border-radius: 20px; box-shadow: inset 0 4px 6px #000, 0 1px 0 rgba(255,255,255,0.1); z-index: 10; }
+.polaroid-camera .printer-slot-top-lip { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 236px; height: 6px; background: rgba(0,0,0,0.5); border-radius: 20px 20px 0 0; z-index: 50; pointer-events: none; }
 
-.printer-card-container { position: absolute; top: 100px; left: 0; width: 100%; height: calc(100% - 100px); clip-path: inset(0 0 -1000px 0); z-index: 90; pointer-events: none; }
+.printer-card-container { position: absolute; top: 40px; left: 0; width: 100%; height: 500px; clip-path: inset(0 0 -1000px 0); z-index: 20; pointer-events: none; }
 .printer-card-container.zoomed-active { clip-path: none; z-index: 100000; }
 
 .printer-card { 
     position: absolute; 
     top: 0; left: 50%; 
-    transform: translate(-50%, -100%) scale(0.8); 
+    transform: translate(-50%, -100%) scale(0.7); 
     transform-origin: top center; 
     width: 320px; 
     background: #fff; border-radius: 24px; 
@@ -377,7 +391,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
     display: flex; flex-direction: column; overflow: hidden; 
     pointer-events: auto; transition: transform 0.5s; z-index: 100;
 }
-.printer-card.printed { transform: translate(-50%, 15px) scale(0.7) rotate(-1.5deg); transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.3, 1); cursor: zoom-in; }
+.printer-card.printed { transform: translate(-50%, 0px) scale(0.7) rotate(-1.5deg); transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.3, 1); cursor: zoom-in; }
 .printer-card.dropped { transform: translate(-50%, 100vh) scale(0.7) rotate(-15deg); transition: transform 0.6s cubic-bezier(0.4, 0, 1, 1); }
 .printer-card.zoomed { 
     position: fixed !important; 
@@ -393,10 +407,9 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 .gacha-zoom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 99999; display: none; opacity: 0; transition: opacity 0.3s; pointer-events: auto; }
 .gacha-zoom-overlay.active { display: block; opacity: 1; }
 
-.action-area { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; width: 100%; z-index: 80; }
-.shutter-btn-outer { width: 72px; height: 72px; border-radius: 50%; background: #e0e5ec; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -6px -6px 12px rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s;}
-.shutter-btn-inner { width: 56px; height: 56px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #f4f6f8 0%, #d1d6de 100%); box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5); transition: all 0.15s; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; color: var(--sub);}
-.shutter-btn-outer:active .shutter-btn-inner { box-shadow: inset 6px 6px 12px rgba(0,0,0,0.15), inset -6px -6px 12px rgba(255,255,255,0.5); transform: scale(0.95); }
+.gacha-flash-fX { position: fixed; inset: 0; background: #fff; z-index: 999999; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.gacha-flash-fX.active { opacity: 1; transition: opacity 0.05s; }
+
 
 .camera-flash-overlay { position: fixed; inset: 0; background: #ffffff; z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.8s ease-out; }
 .camera-flash-overlay.flash-active { opacity: 1; transition: none; }
@@ -488,34 +501,55 @@ body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: va
 <div class="screen" id="screen-gacha">
   <div class="cat-screen-header" style="background:transparent; padding-bottom: 0;"><div class="cat-topbar"><button class="back-btn" onclick="goTo('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button></div></div>
   <div class="gacha-zoom-overlay" id="gacha-zoom-overlay" onclick="toggleZoomGachaCard()"></div>
+  <div class="gacha-flash-fX" id="gacha-flash-fX"></div>
   <div class="printer-viewport">
-      <div class="printer-machine" id="printer-machine">
-          <div class="printer-label"><div class="printer-logo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Pikmin</div><div class="printer-text">PHOTOS DELIVERED HERE<br>⬇</div></div>
-          <div class="printer-slot-bg"></div>
-          <div class="action-area">
-              <button class="shutter-btn-outer" onclick="spinPrinterGacha()">
-                  <div class="shutter-btn-inner"></div>
+      <div class="polaroid-camera" id="printer-machine">
+          <div class="camera-body">
+              <button class="camera-shutter" onclick="spinPrinterGacha()">
+                  <div class="shutter-inner"></div>
               </button>
-          </div>
-          <div class="printer-card-container" id="printer-card-container">
-              <div class="printer-card" id="printer-card" onclick="toggleZoomGachaCard()">
-                  <div class="map-detail-img-wrapper">
-                      <img id="gacha-result-img" src="">
-                      <div class="map-detail-img-gradient"></div>
-                      <div class="map-detail-title" id="gacha-result-title"></div>
-                      <div class="map-detail-time" id="gacha-result-time"></div>
-                      <div class="map-detail-icon-badge" id="gacha-result-icon"></div>
+              <div class="camera-flash">
+                  <div class="flash-glare"></div>
+              </div>
+              <div class="camera-lens">
+                  <div class="lens-1">
+                      <div class="lens-2">
+                          <div class="lens-glare-1"></div>
+                          <div class="lens-glare-2"></div>
+                      </div>
                   </div>
-                  <div class="map-detail-body" style="gap: 12px; padding: 16px;">
-                      <div class="map-detail-loc" id="gacha-result-loc" style="font-size:0.95rem;"></div>
-                      <div class="map-detail-tags" id="gacha-result-tags"></div>
-                      <div class="map-detail-footer" style="margin-top:auto;">
-                          <div class="coord-btn" id="gacha-result-coord"></div>
+              </div>
+              <div class="camera-stripes">
+                  <div class="stripe red"></div>
+                  <div class="stripe orange"></div>
+                  <div class="stripe purple"></div>
+                  <div class="stripe green"></div>
+              </div>
+          </div>
+          
+          <div class="camera-bottom-base">
+              <div class="printer-slot-bg"></div>
+              <div class="printer-slot-top-lip"></div>
+              
+              <div class="printer-card-container" id="printer-card-container">
+                  <div class="printer-card" id="printer-card" onclick="toggleZoomGachaCard()">
+                      <div class="map-detail-img-wrapper">
+                          <img id="gacha-result-img" src="">
+                          <div class="map-detail-img-gradient"></div>
+                          <div class="map-detail-title" id="gacha-result-title"></div>
+                          <div class="map-detail-time" id="gacha-result-time"></div>
+                          <div class="map-detail-icon-badge" id="gacha-result-icon"></div>
+                      </div>
+                      <div class="map-detail-body" style="gap: 12px; padding: 16px;">
+                          <div class="map-detail-loc" id="gacha-result-loc" style="font-size:0.95rem;"></div>
+                          <div class="map-detail-tags" id="gacha-result-tags"></div>
+                          <div class="map-detail-footer" style="margin-top:auto;">
+                              <div class="coord-btn" id="gacha-result-coord"></div>
+                          </div>
                       </div>
                   </div>
               </div>
           </div>
-          <div class="printer-slot-top-lip"></div>
       </div>
   </div>
 </div>
@@ -1949,17 +1983,59 @@ function spinPrinterGacha() {
     }
 }
 
+function playCameraSound() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        
+        // Shutter click
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.1);
+        
+        // Print whir
+        const bufferSize = ctx.sampleRate * 2.0; 
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * 0.05;
+        }
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0, ctx.currentTime);
+        noiseGain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.2);
+        noiseGain.gain.setValueAtTime(0.1, ctx.currentTime + 1.5);
+        noiseGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.8);
+        
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 600;
+        
+        noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(ctx.destination);
+        noise.start(ctx.currentTime + 0.1);
+    } catch(e) {}
+}
+
 function executePrintAnimation(allCards, card) { 
     if(!card) return; 
+    playCameraSound();
     const container = document.getElementById('printer-card-container'); 
     card.classList.remove('dropped', 'printed', 'zoomed'); 
     if(container) container.classList.remove('zoomed-active'); 
     card.style.transition = 'none'; 
     void card.offsetWidth; 
-    const flash = document.getElementById('camera-flash'); 
+    const flash = document.getElementById('gacha-flash-fX'); 
     if(flash) { 
-        flash.classList.add('flash-active'); 
-        setTimeout(() => flash.classList.remove('flash-active'), 50); 
+        flash.classList.add('active'); 
+        setTimeout(() => flash.classList.remove('active'), 50); 
     } 
     const result = allCards[Math.floor(Math.random() * allCards.length)]; 
     
