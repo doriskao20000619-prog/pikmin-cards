@@ -31,7 +31,7 @@
 html, body { font-family: 'Noto Sans TC', sans-serif; background: #000; color: var(--text); height: 100%; width: 100%; overflow: hidden; margin: 0; }
 
 /* ── LAYOUT & ANIMATIONS ── */
-.screen { display: none; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: var(--bg); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.screen { display: none; height: 100vh; height: 100dvh; width: 100vw; position: fixed; top: 0; left: 0; background: var(--bg); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: block; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
 @keyframes screenFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -2151,23 +2151,6 @@ function initSwipeToBack() {
                     dim.style.transition = 'none';
                     dim.style.opacity = '0.3';
                 }
-                
-                let stickyHeader = slidingScreen.querySelector('.cat-screen-header');
-                if (stickyHeader) {
-                    stickyHeader.dataset.isLocked = "true";
-                    stickyHeader.style.position = 'relative';
-                    stickyHeader.style.top = '0px';
-                    stickyHeader.style.transform = `translateY(${slidingScreen.scrollTop}px)`;
-                    stickyHeader.style.zIndex = '50';
-                }
-                
-                let bleed = slidingScreen.querySelector('.swipe-bleed');
-                if (!bleed) {
-                    bleed = document.createElement('div');
-                    bleed.className = 'swipe-bleed';
-                    bleed.style.cssText = `position:absolute; top:${slidingScreen.scrollTop - 200}px; left:0; right:0; height:200px; background:var(--bg); z-index:-1; pointer-events:none;`;
-                    slidingScreen.appendChild(bleed);
-                }
             }
         }
     }, {passive: true});
@@ -2215,16 +2198,6 @@ function initSwipeToBack() {
                     let dim = bgScreenEl.querySelector('.dim-overlay');
                     if(dim) { dim.style.opacity = '0'; dim.style.transition = 'none'; }
                 }
-                let stickyHeader = slidingScreen.querySelector('.cat-screen-header');
-                if (stickyHeader && stickyHeader.dataset.isLocked) {
-                    stickyHeader.style.position = '';
-                    stickyHeader.style.top = '';
-                    stickyHeader.style.transform = '';
-                    stickyHeader.style.zIndex = '';
-                    delete stickyHeader.dataset.isLocked;
-                }
-                let bleed = slidingScreen.querySelector('.swipe-bleed');
-                if (bleed) bleed.remove();
             }, 300);
         } else {
             slidingScreen.style.transition = 'transform 0.2s ease-out';
@@ -2245,16 +2218,6 @@ function initSwipeToBack() {
                     let dim = bgScreenEl.querySelector('.dim-overlay');
                     if(dim) { dim.style.opacity = '0'; dim.style.transition = 'none'; }
                 }
-                let stickyHeader = slidingScreen.querySelector('.cat-screen-header');
-                if (stickyHeader && stickyHeader.dataset.isLocked) {
-                    stickyHeader.style.position = '';
-                    stickyHeader.style.top = '';
-                    stickyHeader.style.transform = '';
-                    stickyHeader.style.zIndex = '';
-                    delete stickyHeader.dataset.isLocked;
-                }
-                let bleed = slidingScreen.querySelector('.swipe-bleed');
-                if (bleed) bleed.remove();
             }, 200);
         }
     });
