@@ -2147,7 +2147,7 @@ function initSwipeToBack() {
                 }
                 bgScreenEl = document.getElementById('screen-' + targetId);
                 if (bgScreenEl) {
-                    bgScreenEl.style.display = 'flex';
+                    bgScreenEl.style.display = 'block';
                     bgScreenEl.style.zIndex = 10;
                     let dim = bgScreenEl.querySelector('.dim-overlay');
                     if (!dim) { dim = document.createElement('div'); dim.className = 'dim-overlay'; dim.style.cssText = 'position:absolute; inset:0; background:#000; z-index:9000; pointer-events:none; opacity:0;'; bgScreenEl.appendChild(dim); }
