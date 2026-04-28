@@ -15,8 +15,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-
 <style>
 /* ── BASE & VARIABLES ── */
 :root {
@@ -2153,6 +2151,23 @@ function initSwipeToBack() {
                     dim.style.transition = 'none';
                     dim.style.opacity = '0.3';
                 }
+                
+                let stickyHeader = slidingScreen.querySelector('.cat-screen-header');
+                if (stickyHeader) {
+                    stickyHeader.dataset.isLocked = "true";
+                    stickyHeader.style.position = 'relative';
+                    stickyHeader.style.top = '0px';
+                    stickyHeader.style.transform = `translateY(${slidingScreen.scrollTop}px)`;
+                    stickyHeader.style.zIndex = '50';
+                }
+                
+                let bleed = slidingScreen.querySelector('.swipe-bleed');
+                if (!bleed) {
+                    bleed = document.createElement('div');
+                    bleed.className = 'swipe-bleed';
+                    bleed.style.cssText = `position:absolute; top:${slidingScreen.scrollTop - 200}px; left:0; right:0; height:200px; background:var(--bg); z-index:-1; pointer-events:none;`;
+                    slidingScreen.appendChild(bleed);
+                }
             }
         }
     }, {passive: true});
@@ -2200,6 +2215,16 @@ function initSwipeToBack() {
                     let dim = bgScreenEl.querySelector('.dim-overlay');
                     if(dim) { dim.style.opacity = '0'; dim.style.transition = 'none'; }
                 }
+                let stickyHeader = slidingScreen.querySelector('.cat-screen-header');
+                if (stickyHeader && stickyHeader.dataset.isLocked) {
+                    stickyHeader.style.position = '';
+                    stickyHeader.style.top = '';
+                    stickyHeader.style.transform = '';
+                    stickyHeader.style.zIndex = '';
+                    delete stickyHeader.dataset.isLocked;
+                }
+                let bleed = slidingScreen.querySelector('.swipe-bleed');
+                if (bleed) bleed.remove();
             }, 300);
         } else {
             slidingScreen.style.transition = 'transform 0.2s ease-out';
@@ -2220,6 +2245,16 @@ function initSwipeToBack() {
                     let dim = bgScreenEl.querySelector('.dim-overlay');
                     if(dim) { dim.style.opacity = '0'; dim.style.transition = 'none'; }
                 }
+                let stickyHeader = slidingScreen.querySelector('.cat-screen-header');
+                if (stickyHeader && stickyHeader.dataset.isLocked) {
+                    stickyHeader.style.position = '';
+                    stickyHeader.style.top = '';
+                    stickyHeader.style.transform = '';
+                    stickyHeader.style.zIndex = '';
+                    delete stickyHeader.dataset.isLocked;
+                }
+                let bleed = slidingScreen.querySelector('.swipe-bleed');
+                if (bleed) bleed.remove();
             }, 200);
         }
     });
@@ -2232,5 +2267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initSwipeToBack();
 });
 </script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
