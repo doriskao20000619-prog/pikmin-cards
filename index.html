@@ -28,10 +28,10 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { font-family: 'Noto Sans TC', sans-serif; background: #000; color: var(--text); height: 100%; width: 100%; overflow: hidden; margin: 0; }
+html, body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); height: 100%; width: 100%; overflow: hidden; margin: 0; }
 
 /* ── LAYOUT & ANIMATIONS ── */
-.screen { display: none; height: 100vh; height: 100dvh; width: 100vw; position: fixed; top: 0; left: 0; background: var(--bg); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.screen { display: none; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: var(--bg); padding-top: env(safe-area-inset-top); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: block; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
 @keyframes screenFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -60,7 +60,7 @@ html, body { font-family: 'Noto Sans TC', sans-serif; background: #000; color: v
 .login-title { font-family: 'Nunito', sans-serif; font-size: 2.4rem; font-weight: 900; margin-bottom: 8px; color: #111; letter-spacing: -0.5px; }
 
 /* ── HOME HEADER & FOLDERS ── */
-.home-header { padding: max(32px, env(safe-area-inset-top)) 24px 20px; display: flex; justify-content: space-between; align-items: center; }
+.home-header { padding: 32px 24px 20px; display: flex; justify-content: space-between; align-items: center; }
 .home-greeting { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 900; color: var(--text); margin-bottom: 2px; }
 .home-email { font-size: 0.85rem; font-weight: 700; color: var(--sub); }
 .home-avatar-container { position: relative; cursor: pointer; }
@@ -101,7 +101,7 @@ html, body { font-family: 'Noto Sans TC', sans-serif; background: #000; color: v
 .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); pointer-events: none; width: 20px; height: 20px;}
 
 /* ── CATEGORY & FILTERS ── */
-.cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-top: max(20px, env(safe-area-inset-top)); }
+.cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-top: 10px; }
 .cat-topbar { display: flex; align-items: center; justify-content: center; padding: 10px 16px 16px; position: relative; }
 .back-btn { display: none; }
 .back-btn svg { display: none; }
@@ -358,7 +358,7 @@ html, body { font-family: 'Noto Sans TC', sans-serif; background: #000; color: v
 .dropzone-box { border: 2px dashed var(--green); border-radius: 32px; padding: 60px 40px; text-align: center; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 16px 40px rgba(76,175,110,0.15);}
 
 /* 🖨️ 🌟 GACHA PRINTER */
-#screen-gacha { display: none; flex-direction: column; min-height: 100vh; background: var(--bg); }
+#screen-gacha { display: none; flex-direction: column; height: 100%; background: var(--bg); }
 #screen-gacha.active { display: flex; }
 .printer-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding-bottom: 72px; width: 100%; }
 
