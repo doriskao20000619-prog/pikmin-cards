@@ -31,7 +31,7 @@
 html, body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); height: 100%; width: 100%; overflow: hidden; margin: 0; }
 
 /* ── LAYOUT & ANIMATIONS ── */
-.screen { display: none; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: var(--bg); padding-top: env(safe-area-inset-top); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.screen { display: none; height: 100%; min-height: 100vh; min-height: -webkit-fill-available; width: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior: none; }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: block; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
 @keyframes screenFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -101,7 +101,7 @@ html, body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); col
 .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); pointer-events: none; width: 20px; height: 20px;}
 
 /* ── CATEGORY & FILTERS ── */
-.cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-top: 10px; }
+.cat-screen-header { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-top: max(10px, env(safe-area-inset-top)); }
 .cat-topbar { display: flex; align-items: center; justify-content: center; padding: 10px 16px 16px; position: relative; }
 .back-btn { display: none; }
 .back-btn svg { display: none; }
@@ -584,7 +584,7 @@ html, body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); col
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list" id="custom-theme-list"></div><button class="add-theme-btn" style="width:100%;margin-bottom:16px;padding:14px;" onclick="openAddThemeModal()">＋ 新增主題</button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.2 (更新時間: 04/28)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.3 (更新時間: 04/28)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal" style="padding: 0; max-height: 85vh;">
@@ -2120,6 +2120,7 @@ function executePrintAnimation(allCards, card) {
 
 function initSwipeToBack() {
     let swipeBackStartX = 0;
+    let swipeBackStartY = 0;
     let swipeBackCurrentX = 0;
     let isSwipingBack = false;
     let slidingScreen = null;
@@ -2128,28 +2129,32 @@ function initSwipeToBack() {
     document.addEventListener('touchstart', (e) => {
         if (e.touches[0].clientX < 30) {
             const activeScreens = document.querySelectorAll('.screen.active');
-            if (activeScreens.length > 0 && activeScreens[0].id !== 'screen-home' && activeScreens[0].id !== 'screen-login') {
-                isSwipingBack = true;
-                swipeBackStartX = e.touches[0].clientX;
-                slidingScreen = activeScreens[0];
-                
-                slidingScreen.style.transition = 'none';
-                slidingScreen.style.animation = 'none';
-                slidingScreen.style.zIndex = 50;
-                slidingScreen.style.boxShadow = '-10px 0 20px rgba(0,0,0,0.1)';
-                
-                let targetId = 'home';
-                if (screenHistory.length > 0) {
-                    targetId = screenHistory[screenHistory.length - 1];
-                }
-                bgScreenEl = document.getElementById('screen-' + targetId);
-                if (bgScreenEl) {
-                    bgScreenEl.style.display = 'block';
-                    bgScreenEl.style.zIndex = 10;
-                    let dim = bgScreenEl.querySelector('.dim-overlay');
-                    if (!dim) { dim = document.createElement('div'); dim.className = 'dim-overlay'; dim.style.cssText = 'position:absolute; inset:0; background:#000; z-index:9000; pointer-events:none; opacity:0;'; bgScreenEl.appendChild(dim); }
-                    dim.style.transition = 'none';
-                    dim.style.opacity = '0.3';
+            if (activeScreens.length > 0) {
+                const currentId = activeScreens[0].id;
+                if (['screen-flower', 'screen-mushroom', 'screen-hidden', 'screen-owned'].includes(currentId)) {
+                    isSwipingBack = true;
+                    swipeBackStartX = e.touches[0].clientX;
+                    swipeBackStartY = e.touches[0].clientY;
+                    slidingScreen = activeScreens[0];
+                    
+                    slidingScreen.style.transition = 'none';
+                    slidingScreen.style.animation = 'none';
+                    slidingScreen.style.zIndex = 50;
+                    slidingScreen.style.boxShadow = '-10px 0 20px rgba(0,0,0,0.1)';
+                    
+                    let targetId = 'home';
+                    if (screenHistory.length > 0) {
+                        targetId = screenHistory[screenHistory.length - 1];
+                    }
+                    bgScreenEl = document.getElementById('screen-' + targetId);
+                    if (bgScreenEl) {
+                        bgScreenEl.style.display = 'block';
+                        bgScreenEl.style.zIndex = 10;
+                        let dim = bgScreenEl.querySelector('.dim-overlay');
+                        if (!dim) { dim = document.createElement('div'); dim.className = 'dim-overlay'; dim.style.cssText = 'position:absolute; inset:0; background:#000; z-index:9000; pointer-events:none; opacity:0;'; bgScreenEl.appendChild(dim); }
+                        dim.style.transition = 'none';
+                        dim.style.opacity = '0.3';
+                    }
                 }
             }
         }
@@ -2158,7 +2163,17 @@ function initSwipeToBack() {
     document.addEventListener('touchmove', (e) => {
         if (!isSwipingBack || !slidingScreen) return;
         swipeBackCurrentX = e.touches[0].clientX;
-        let deltaX = Math.max(0, swipeBackCurrentX - swipeBackStartX);
+        let swipeBackCurrentY = e.touches[0].clientY;
+        
+        let deltaX = swipeBackCurrentX - swipeBackStartX;
+        let deltaY = swipeBackCurrentY - swipeBackStartY;
+        
+        if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 0) {
+            slidingScreen.style.overflowY = 'hidden';
+            if (e.cancelable) e.preventDefault();
+        }
+        
+        deltaX = Math.max(0, deltaX);
         deltaX = Math.min(deltaX, window.innerWidth);
         
         slidingScreen.style.transform = `translateX(${deltaX}px)`;
@@ -2167,11 +2182,13 @@ function initSwipeToBack() {
             let dim = bgScreenEl.querySelector('.dim-overlay');
             if(dim) dim.style.opacity = 0.3 * (1 - progress);
         }
-    }, {passive: true});
+    }, {passive: false});
 
     document.addEventListener('touchend', (e) => {
         if (!isSwipingBack || !slidingScreen) return;
         isSwipingBack = false;
+        
+        slidingScreen.style.overflowY = '';
         
         let deltaX = Math.max(0, swipeBackCurrentX - swipeBackStartX);
         deltaX = Math.min(deltaX, window.innerWidth);
