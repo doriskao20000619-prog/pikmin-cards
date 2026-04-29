@@ -1,7 +1,0 @@
-{
-  "name": "pikmin-postcard-tracker",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "mkdir -p dist && cp index.html dist/index.html && if [ -f manifest.json ]; then cp manifest.json dist/manifest.json; fi && if [ -f sw.js ]; then cp sw.js dist/sw.js; fi"
-  }
-}
