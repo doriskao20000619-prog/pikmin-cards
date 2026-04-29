@@ -18,9 +18,15 @@
 <style>
 /* ── BASE & VARIABLES ── */
 :root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --app-height: 100vh;
   --dock-height: 72px;
-  --dock-bottom-gap: max(6px, calc(env(safe-area-inset-bottom) - 18px));
-  --dock-clearance: calc(var(--dock-height) + var(--dock-bottom-gap) + 18px);
+  --ios-bottom-bleed: max(24px, var(--safe-bottom));
+  --dock-bottom-gap: max(8px, calc(var(--safe-bottom) - 24px));
+  --dock-clearance: calc(var(--dock-height) + max(16px, var(--dock-bottom-gap)) + 36px);
   --green: #4caf6e; --green-light: #a8ddb8; --green-dark: #2e7d4f;
   --mushroom: #f5a623; --mushroom-light: #fde0a0; --mushroom-dark: #b8710a;
   --flower: #e96fad; --flower-light: #f9c8e3; --flower-dark: #b0457e;
@@ -28,16 +34,26 @@
   --danger: #FF3B30; --star-gold: #FFCC00; 
   --dock-icon-inactive: #a0a0a0; --dock-icon-active: #111111;
   --dock-add-bg: linear-gradient(135deg, #c4fc62, #a8ff4a);
+  --gacha-machine-scale: 1;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background-color: var(--bg) !important; position: relative !important; font-family: 'Noto Sans TC', sans-serif; color: var(--text); }
+html, body { width: 100% !important; height: var(--app-height) !important; min-height: var(--app-height) !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background-color: var(--bg) !important; position: relative !important; font-family: 'Noto Sans TC', sans-serif; color: var(--text); overscroll-behavior: none; }
+body { min-height: var(--app-height); }
+input, textarea, select { font-size: 16px; }
+
+@supports (height: 100dvh) {
+  :root { --app-height: 100dvh; }
+}
 
 /* ── LAYOUT & ANIMATIONS ── */
-.screen { display: none; height: 100% !important; width: 100% !important; position: absolute !important; inset: 0 !important; background: var(--bg) !important; overflow: hidden !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important; }
+.screen { display: none; height: var(--app-height) !important; min-height: var(--app-height) !important; width: 100% !important; position: absolute !important; inset: 0 !important; background: var(--bg) !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important; isolation: isolate !important; }
+.screen::after { content: ""; position: absolute; left: 0; right: 0; bottom: calc(-1 * var(--ios-bottom-bleed)); height: var(--ios-bottom-bleed); background: var(--bg); pointer-events: none; z-index: -1; }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: flex !important; flex-direction: column; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
-.scroll-view { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; position: relative; width: 100%; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: var(--dock-clearance); box-sizing: border-box; }
+.screen.swipe-back-current { will-change: transform; }
+.screen.swipe-back-previous { display: flex !important; flex-direction: column; pointer-events: none; }
+.scroll-view { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; position: relative; width: 100%; padding-top: 0; padding-bottom: var(--dock-clearance); box-sizing: border-box; overscroll-behavior-y: contain; }
 .scroll-view::-webkit-scrollbar { display: none; }
 @keyframes screenFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes springUp { 0% { opacity: 0; transform: translateY(35px) scale(0.96); } 60% { transform: translateY(-4px) scale(1.01); opacity: 1; } 100% { opacity: 1; transform: translateY(0) scale(1); } }
@@ -65,7 +81,7 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 .login-title { font-family: 'Nunito', sans-serif; font-size: 2.4rem; font-weight: 900; margin-bottom: 8px; color: #111; letter-spacing: -0.5px; }
 
 /* ── HOME HEADER & FOLDERS ── */
-.home-header { padding: 32px 24px 20px; display: flex; justify-content: space-between; align-items: center; }
+.home-header { padding: calc(var(--safe-top) + 12px) 24px 20px; display: flex; justify-content: space-between; align-items: center; }
 .home-greeting { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 900; color: var(--text); margin-bottom: 2px; }
 .home-email { font-size: 0.85rem; font-weight: 700; color: var(--sub); }
 .home-avatar-container { position: relative; cursor: pointer; }
@@ -106,7 +122,7 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); pointer-events: none; width: 20px; height: 20px;}
 
 /* ── CATEGORY & FILTERS ── */
-.cat-screen-header { position: relative; z-index: 50; background: var(--bg); padding-top: max(10px, env(safe-area-inset-top)); flex-shrink: 0; }
+.cat-screen-header { position: relative; z-index: 50; background: var(--bg); padding-top: calc(var(--safe-top) + 6px); flex-shrink: 0; }
 .cat-topbar { display: flex; align-items: center; justify-content: center; padding: 10px 16px 16px; position: relative; }
 .back-btn { display: none; }
 .back-btn svg { display: none; }
@@ -175,8 +191,9 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 .res-main-title svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0;}
 
 /* ── DOCK NAV ── */
-.dock-nav { position: absolute !important; bottom: var(--dock-bottom-gap) !important; left: 50% !important; transform: translateX(-50%) !important; width: calc(100% - 32px) !important; max-width: 440px !important; height: 72px !important; background: rgba(255, 255, 255, 0.75) !important; backdrop-filter: blur(30px) !important; border: 1px solid rgba(255, 255, 255, 0.8) !important; border-radius: 36px !important; display: flex !important; align-items: center !important; justify-content: space-evenly !important; z-index: 9000 !important; box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; padding: 0 12px !important; transition: transform 0.4s; }
-.dock-nav.hidden-dock { transform: translate(-50%, 240%) !important; opacity: 0 !important; pointer-events: none !important; }
+.dock-nav { position: fixed !important; bottom: var(--dock-bottom-gap) !important; left: max(16px, calc(var(--safe-left) + 12px)) !important; right: max(16px, calc(var(--safe-right) + 12px)) !important; width: auto !important; max-width: 440px !important; height: 72px !important; margin: 0 auto !important; background: rgba(255, 255, 255, 0.75) !important; backdrop-filter: blur(30px) !important; border: 1px solid rgba(255, 255, 255, 0.8) !important; border-radius: 36px !important; display: flex !important; align-items: center !important; justify-content: space-evenly !important; z-index: 9000 !important; box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; padding: 0 12px !important; transition: transform 0.35s ease, opacity 0.25s ease; overflow: visible !important; }
+.dock-nav::after { content: none !important; display: none !important; }
+.dock-nav.hidden-dock { transform: translateY(calc(100% + var(--safe-bottom) + 28px)) !important; opacity: 0 !important; pointer-events: none !important; }
 .dock-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; color: var(--dock-icon-inactive); }
 .nav-label { font-size: 0.65rem; font-weight: 800; font-family: 'Nunito', sans-serif; transition: color 0.3s; margin-top: 4px; }
 .nav-icon { width: 24px; height: 24px; stroke-width: 2.2; transition: all 0.3s; fill: none; }
@@ -189,8 +206,9 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 
 /* ── 🗺️ NEW MAP SCREEN ── */
 #screen-map { background: var(--bg); }
-.map-body-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: var(--dock-clearance); display: flex; flex-direction: column; }
-.map-box { position: relative !important; width: calc(100% - 32px) !important; height: 60vh !important; margin: max(16px, env(safe-area-inset-top)) auto 0 !important; flex-shrink: 0; border-radius: 32px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 10; background: #eef2ef; }
+.map-body-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: var(--dock-clearance); display: flex; flex-direction: column; scrollbar-width: none; overscroll-behavior-y: contain; }
+.map-body-wrapper::-webkit-scrollbar { display: none; }
+.map-box { position: relative !important; width: calc(100% - 32px) !important; height: clamp(360px, calc(var(--app-height) * 0.58), 560px) !important; margin: calc(var(--safe-top) + 12px) auto 0 !important; flex-shrink: 0; border-radius: 32px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 10; background: #eef2ef; }
 #map-container { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
 
 .map-floating-header { position: absolute; top: 16px; left: 0; width: 100%; z-index: 2000; padding: 16px; pointer-events: none; }
@@ -215,10 +233,10 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 .route-fab svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round;}
 .route-fab-badge { background: var(--green); color: #fff; padding: 2px 8px; border-radius: 99px; font-size: 0.8rem; }
 
-.custom-photo-pin { display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s; cursor: pointer; }
+.custom-photo-pin { display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s; cursor: pointer; max-width: 108px; }
 .custom-photo-pin.active { transform: scale(1.2); z-index: 1000 !important; }
 .custom-photo-pin-img { width: 52px; height: 52px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 6px 12px rgba(0,0,0,0.2); object-fit: cover; aspect-ratio: 1/1; background: #eee; display: flex; align-items: center; justify-content: center; }
-.custom-photo-pin-label { font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 900; color: #111; text-shadow: 0 1px 2px #fff, 0 -1px 2px #fff, 1px 0 2px #fff,-1px 0 2px #fff; white-space: nowrap; margin-top: 4px; }
+.custom-photo-pin-label { font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 900; color: #111; text-shadow: 0 1px 2px #fff, 0 -1px 2px #fff, 1px 0 2px #fff,-1px 0 2px #fff; white-space: nowrap; margin-top: 4px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: block; }
 .custom-photo-pin-img.empty { background: linear-gradient(135deg, #007AFF, #5AC8FA); color: #fff; font-size: 1.2rem; }
 .custom-photo-pin-img.empty svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2.5;}
 
@@ -356,7 +374,7 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 .lightbox-img { width: 100%; height: 100%; object-fit: contain; }
 .crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
 .crop-modal-overlay.open { display: flex; }
-.crop-header { display: flex; justify-content: space-between; padding: max(24px, env(safe-area-inset-top)) 20px 20px; }
+.crop-header { display: flex; justify-content: space-between; padding: max(24px, var(--safe-top)) 20px 20px; }
 .crop-container { flex: 1; position: relative; overflow: hidden; width: 100%; }
 .global-dropzone { display: none; position: fixed; inset: 0; background: rgba(240, 247, 242, 0.8); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
 .global-dropzone.active { display: flex; }
@@ -365,9 +383,9 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 /* 🖨️ 🌟 GACHA PRINTER */
 #screen-gacha { display: none; flex-direction: column; height: 100%; background: var(--bg); }
 #screen-gacha.active { display: flex; }
-.printer-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding-bottom: var(--dock-clearance); width: 100%; outline: none; -webkit-tap-highlight-color: transparent; }
+.printer-viewport { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 0 16px var(--dock-clearance); width: 100%; outline: none; -webkit-tap-highlight-color: transparent; overflow: hidden; }
 
-.polaroid-camera { position: relative; width: 300px; height: 320px; display: flex; flex-direction: column; align-items: center; border-radius: 0; background: transparent; border: none; box-shadow: none; flex-shrink: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+.polaroid-camera { position: relative; width: 300px; height: 320px; display: flex; flex-direction: column; align-items: center; border-radius: 0; background: transparent; border: none; box-shadow: none; flex-shrink: 0; outline: none; -webkit-tap-highlight-color: transparent; transform: scale(var(--gacha-machine-scale)); transform-origin: center center; }
 .polaroid-camera .camera-body { position: relative; width: 280px; height: 260px; background: #e8e8e8; border-radius: 40px 40px 0 0; box-shadow: inset 0 12px 16px rgba(255,255,255,1), inset 0 -10px 15px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.1); z-index: 20; overflow: hidden; border: 1px solid #d4d4d4; border-bottom: none; outline: none; -webkit-tap-highlight-color: transparent; }
 .polaroid-camera .camera-shutter { position: absolute; top: 24px; left: 24px; width: 56px; height: 56px; border-radius: 50%; background: #E83F33; border: 3px solid #ccc; box-shadow: inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 .polaroid-camera .camera-shutter:active { transform: scale(0.92) translateY(2px); box-shadow: inset 0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2); }
@@ -417,11 +435,26 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
     z-index: 100000 !important; 
 }
 
-.gacha-zoom-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 99999; display: none; opacity: 0; transition: opacity 0.3s; pointer-events: auto; }
+.gacha-zoom-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 99999; display: none; opacity: 0; transition: opacity 0.3s; pointer-events: auto; }
 .gacha-zoom-overlay.active { display: block; opacity: 1; }
 
 .camera-flash-effect { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: 999999; pointer-events: none; animation: flashFade 0.6s ease-out forwards;  }
 @keyframes flashFade { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+.modal-overlay, .route-panel-overlay, .map-detail-overlay, .lightbox-overlay, .crop-modal-overlay, .global-dropzone { bottom: calc(-1 * var(--ios-bottom-bleed)) !important; min-height: calc(var(--app-height) + var(--ios-bottom-bleed)) !important; }
+.modal-overlay.open, .route-panel-overlay.open { align-items: flex-end !important; }
+.modal { margin-bottom: calc(-1 * var(--ios-bottom-bleed)) !important; padding-bottom: calc(45px + var(--ios-bottom-bleed)) !important; }
+#settingsModal .modal, #editModal .modal { margin-bottom: calc(-1 * var(--ios-bottom-bleed)) !important; }
+#settingsModal .hide-scrollbar, #editModal .hide-scrollbar { padding-bottom: calc(45px + var(--ios-bottom-bleed)) !important; }
+#shared-preview-container { top: var(--safe-top) !important; }
+
+@media (max-width: 390px) {
+  :root { --gacha-machine-scale: 0.92; }
+}
+
+@media (max-width: 375px), (max-height: 760px) {
+  :root { --gacha-machine-scale: 0.86; }
+}
 </style>
 </head>
 <body onclick="resetSwipes()">
@@ -584,7 +617,7 @@ html, body { width: 100% !important; height: 100% !important; margin: 0 !importa
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list" id="custom-theme-list"></div><button class="add-theme-btn" style="width:100%;margin-bottom:16px;padding:14px;" onclick="openAddThemeModal()">＋ 新增主題</button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.19 (更新時間: 04/29)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.22 (更新時間: 04/29)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal" style="padding: 0; max-height: 85vh;">
@@ -716,6 +749,16 @@ let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','�
 let currentNewThemeEmoji = '✨';
 
 let autocompleteTimer = null;
+
+function syncViewportMetrics() {
+    const viewport = window.visualViewport;
+    const height = Math.round(viewport ? viewport.height : window.innerHeight);
+    document.documentElement.style.setProperty('--app-height', `${height}px`);
+}
+
+function hasBlockingOverlayOpen() {
+    return !!document.querySelector('.modal-overlay.open, .route-panel-overlay.open, .map-detail-overlay.open, .lightbox-overlay.open, .crop-modal-overlay.open');
+}
 
 // 🌟 2. 基礎共用函數
 function showToast(m) { const t = document.getElementById('toast'); if(t) { t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); } }
@@ -970,7 +1013,13 @@ function goTo(screen, pushHistory = true, noAnimation = false) {
 
   document.querySelectorAll('.screen').forEach(s => {
       s.classList.remove('active');
+      s.classList.remove('swipe-back-current', 'swipe-back-previous');
       s.style.animation = ''; // clear any override
+      s.style.transform = '';
+      s.style.transition = '';
+      s.style.zIndex = '';
+      s.style.boxShadow = '';
+      s.style.pointerEvents = '';
   }); 
   const targetScreen = document.getElementById('screen-' + screen);
   if(targetScreen) {
@@ -2138,28 +2187,68 @@ function executePrintAnimation(allCards, card) {
 }
 
 function initSwipeToBack() {
+    const swipeableScreens = new Set(['screen-flower', 'screen-mushroom', 'screen-hidden', 'screen-owned']);
     let swipeBackStartX = 0;
     let swipeBackStartY = 0;
     let swipeBackCurrentX = 0;
+    let swipeBackStartTime = 0;
     let isSwipingBack = false;
     let slidingScreen = null;
     let bgScreenEl = null;
+    let isHorizontalSwipe = false;
+
+    function cleanupSwipeBackStyles() {
+        if (slidingScreen) {
+            slidingScreen.classList.remove('swipe-back-current');
+            slidingScreen.style.transform = '';
+            slidingScreen.style.transition = '';
+            slidingScreen.style.boxShadow = '';
+            slidingScreen.style.zIndex = '';
+            slidingScreen.style.animation = '';
+            slidingScreen.style.overflowY = '';
+            slidingScreen.style.pointerEvents = '';
+        }
+        if (bgScreenEl) {
+            bgScreenEl.classList.remove('swipe-back-previous');
+            bgScreenEl.style.display = '';
+            bgScreenEl.style.transform = '';
+            bgScreenEl.style.transition = '';
+            bgScreenEl.style.zIndex = '';
+            let dim = bgScreenEl.querySelector('.dim-overlay');
+            if (dim) {
+                dim.style.opacity = '0';
+                dim.style.transition = 'none';
+            }
+        }
+        isHorizontalSwipe = false;
+        slidingScreen = null;
+        bgScreenEl = null;
+    }
 
     document.addEventListener('touchstart', (e) => {
-        if (e.touches[0].clientX < 30) {
+        const firstTouch = e.touches[0];
+        const target = e.target;
+        if (!firstTouch || hasBlockingOverlayOpen()) return;
+        if (target && target.closest('input, textarea, select, .leaflet-container, .map-search-row, .route-start-bar')) return;
+        if (firstTouch.clientX <= 28) {
             const activeScreens = document.querySelectorAll('.screen.active');
             if (activeScreens.length > 0) {
                 const currentId = activeScreens[0].id;
-                if (['screen-flower', 'screen-mushroom', 'screen-hidden', 'screen-owned'].includes(currentId)) {
+                if (swipeableScreens.has(currentId)) {
                     isSwipingBack = true;
-                    swipeBackStartX = e.touches[0].clientX;
-                    swipeBackStartY = e.touches[0].clientY;
+                    isHorizontalSwipe = false;
+                    swipeBackStartTime = Date.now();
+                    swipeBackCurrentX = firstTouch.clientX;
+                    swipeBackStartX = firstTouch.clientX;
+                    swipeBackStartY = firstTouch.clientY;
                     slidingScreen = activeScreens[0];
                     
+                    slidingScreen.classList.add('swipe-back-current');
                     slidingScreen.style.transition = 'none';
                     slidingScreen.style.animation = 'none';
                     slidingScreen.style.zIndex = 50;
                     slidingScreen.style.boxShadow = '-10px 0 20px rgba(0,0,0,0.1)';
+                    slidingScreen.style.pointerEvents = 'none';
                     
                     let targetId = 'home';
                     if (screenHistory.length > 0) {
@@ -2167,7 +2256,9 @@ function initSwipeToBack() {
                     }
                     bgScreenEl = document.getElementById('screen-' + targetId);
                     if (bgScreenEl) {
-                        bgScreenEl.style.display = 'block';
+                        bgScreenEl.classList.add('swipe-back-previous');
+                        bgScreenEl.style.display = 'flex';
+                        bgScreenEl.style.transform = 'translate3d(-18px, 0, 0)';
                         bgScreenEl.style.zIndex = 10;
                         let dim = bgScreenEl.querySelector('.dim-overlay');
                         if (!dim) { dim = document.createElement('div'); dim.className = 'dim-overlay'; dim.style.cssText = 'position:absolute; inset:0; background:#000; z-index:9000; pointer-events:none; opacity:0;'; bgScreenEl.appendChild(dim); }
@@ -2182,23 +2273,28 @@ function initSwipeToBack() {
     document.addEventListener('touchmove', (e) => {
         if (!isSwipingBack || !slidingScreen) return;
         swipeBackCurrentX = e.touches[0].clientX;
-        let swipeBackCurrentY = e.touches[0].clientY;
+        const swipeBackCurrentY = e.touches[0].clientY;
         
         let deltaX = swipeBackCurrentX - swipeBackStartX;
-        let deltaY = swipeBackCurrentY - swipeBackStartY;
+        const deltaY = swipeBackCurrentY - swipeBackStartY;
         
         if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 0) {
+            isHorizontalSwipe = true;
             slidingScreen.style.overflowY = 'hidden';
             if (e.cancelable) e.preventDefault();
+        } else if (!isHorizontalSwipe) {
+            return;
         }
         
         deltaX = Math.max(0, deltaX);
         deltaX = Math.min(deltaX, window.innerWidth);
         
-        slidingScreen.style.transform = `translateX(${deltaX}px)`;
+        slidingScreen.style.transform = `translate3d(${deltaX}px, 0, 0)`;
         if (bgScreenEl) {
-            let progress = Math.min(deltaX / window.innerWidth, 1);
-            let dim = bgScreenEl.querySelector('.dim-overlay');
+            const progress = Math.min(deltaX / window.innerWidth, 1);
+            const bgOffset = -18 + (18 * progress);
+            bgScreenEl.style.transform = `translate3d(${bgOffset}px, 0, 0)`;
+            const dim = bgScreenEl.querySelector('.dim-overlay');
             if(dim) dim.style.opacity = 0.3 * (1 - progress);
         }
     }, {passive: false});
@@ -2211,49 +2307,37 @@ function initSwipeToBack() {
         
         let deltaX = Math.max(0, swipeBackCurrentX - swipeBackStartX);
         deltaX = Math.min(deltaX, window.innerWidth);
-        let swipeThreshold = window.innerWidth * 0.3;
-        let fastSwipe = (e.changedTouches && e.changedTouches[0].clientX - swipeBackStartX > 50);
+        const elapsed = Math.max(Date.now() - swipeBackStartTime, 1);
+        const velocityX = deltaX / elapsed;
+        const swipeThreshold = window.innerWidth * 0.3;
+        const fastSwipe = velocityX > 0.45 || (e.changedTouches && e.changedTouches[0].clientX - swipeBackStartX > 50);
         
-        if (deltaX > swipeThreshold || fastSwipe) {
+        if (isHorizontalSwipe && (deltaX > swipeThreshold || fastSwipe)) {
             slidingScreen.style.transition = 'transform 0.3s ease-out';
-            slidingScreen.style.transform = `translateX(${window.innerWidth}px)`;
+            slidingScreen.style.transform = `translate3d(${window.innerWidth}px, 0, 0)`;
             if (bgScreenEl) {
-                let dim = bgScreenEl.querySelector('.dim-overlay');
+                bgScreenEl.style.transition = 'transform 0.3s ease-out';
+                bgScreenEl.style.transform = 'translate3d(0, 0, 0)';
+                const dim = bgScreenEl.querySelector('.dim-overlay');
                 if(dim) { dim.style.transition = 'opacity 0.3s ease-out'; dim.style.opacity = '0'; }
             }
             
             setTimeout(() => {
                 goBack(true);
-                slidingScreen.style.transform = '';
-                slidingScreen.style.boxShadow = '';
-                slidingScreen.style.zIndex = '';
-                slidingScreen.style.animation = '';
-                if (bgScreenEl) {
-                    bgScreenEl.style.display = '';
-                    bgScreenEl.style.zIndex = '';
-                    let dim = bgScreenEl.querySelector('.dim-overlay');
-                    if(dim) { dim.style.opacity = '0'; dim.style.transition = 'none'; }
-                }
+                cleanupSwipeBackStyles();
             }, 300);
         } else {
             slidingScreen.style.transition = 'transform 0.2s ease-out';
-            slidingScreen.style.transform = `translateX(0px)`;
+            slidingScreen.style.transform = 'translate3d(0, 0, 0)';
             if (bgScreenEl) {
-                let dim = bgScreenEl.querySelector('.dim-overlay');
+                bgScreenEl.style.transition = 'transform 0.2s ease-out';
+                bgScreenEl.style.transform = 'translate3d(-18px, 0, 0)';
+                const dim = bgScreenEl.querySelector('.dim-overlay');
                 if(dim) { dim.style.transition = 'opacity 0.2s ease-out'; dim.style.opacity = '0.3'; }
             }
             
             setTimeout(() => {
-                slidingScreen.style.transform = '';
-                slidingScreen.style.boxShadow = '';
-                slidingScreen.style.zIndex = '';
-                slidingScreen.style.animation = '';
-                if (bgScreenEl) {
-                    bgScreenEl.style.display = '';
-                    bgScreenEl.style.zIndex = '';
-                    let dim = bgScreenEl.querySelector('.dim-overlay');
-                    if(dim) { dim.style.opacity = '0'; dim.style.transition = 'none'; }
-                }
+                cleanupSwipeBackStyles();
             }, 200);
         }
     });
@@ -2286,10 +2370,16 @@ document.addEventListener('drop', (e) => {
 
 // 🌟 系統初始化 (已補上 await loadDataFromLocal() 以確保資料不丟失)
 document.addEventListener('DOMContentLoaded', async () => { 
+    syncViewportMetrics();
     await ensureLocalDataLoaded();
     initModalDrag(); 
     initSwipeToBack();
 });
+window.addEventListener('resize', syncViewportMetrics);
+window.addEventListener('orientationchange', () => setTimeout(syncViewportMetrics, 150));
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncViewportMetrics);
+}
 </script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
