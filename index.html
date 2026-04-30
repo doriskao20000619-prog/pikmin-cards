@@ -136,6 +136,10 @@ input, textarea, select { font-size: 16px; }
 .filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: none; background: #ffffff; color: var(--sub); font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
 .filter-pill.active { background: var(--green); color: #ffffff; }
 .add-theme-btn { padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: rgba(255,255,255,0.5); color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+.btn-add-theme { width: 100%; margin-bottom: 16px; padding: 14px 18px; border: none; border-radius: 16px; background: #F0F5F1; color: #4A8E59; font-weight: 900; font-size: 0.98rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: inset 0 0 0 1px rgba(74, 142, 89, 0.12); cursor: pointer; transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease; }
+.btn-add-theme:active { transform: scale(0.98); }
+.btn-add-theme:hover { background: #e8f1ea; box-shadow: inset 0 0 0 1px rgba(74, 142, 89, 0.18); }
+.btn-add-theme-icon { font-size: 1.05rem; line-height: 1; }
 .cat-body { padding: 16px 16px 0; }
 .group-section { margin-bottom: 24px; }
 .group-header { font-weight: 900; font-size: 0.85rem; color: var(--sub); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
@@ -329,6 +333,7 @@ input, textarea, select { font-size: 16px; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 4000; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); height: 100% !important; min-height: 100% !important; bottom: 0 !important; }
 .modal-overlay.open { display: flex; }
 .modal { background: rgba(255,255,255,0.85); backdrop-filter: blur(30px); border-radius: 40px 40px 0 0; width: 100%; max-width: 480px; padding: 24px 20px 45px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); display: flex; flex-direction: column; }
+.bottom-sheet { border-radius: 24px 24px 0 0 !important; overflow: hidden; }
 .modal-header { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 20px; cursor: grab; flex-shrink: 0; }
 .modal-handle { width: 45px; height: 5px; background: rgba(0,0,0,0.15); border-radius: 99px; margin-bottom: 20px; }
 .modal-title { font-weight: 900; font-size: 1.2rem; text-align: center;}
@@ -378,6 +383,7 @@ input, textarea, select { font-size: 16px; }
 .theme-item-wrapper.is-swiped .custom-theme-item { --theme-swipe-offset: -88px; }
 .theme-item-wrapper.is-swiped .theme-delete-reveal { opacity: 1; pointer-events: auto; }
 .theme-label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; color: var(--text); line-height: 1.25; }
+.theme-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; }
 .theme-label-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .theme-action-group { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
 .theme-action-group .mac-btn { flex-shrink: 0; }
@@ -403,8 +409,17 @@ input, textarea, select { font-size: 16px; }
 .lightbox-img { width: 100%; height: 100%; object-fit: contain; }
 .crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
 .crop-modal-overlay.open { display: flex; }
-.crop-header { display: flex; justify-content: space-between; padding: max(24px, var(--safe-top)) 20px 20px; }
+.crop-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: max(24px, var(--safe-top)) 20px 20px; }
+.crop-header .btn-primary { justify-self: end; }
+.crop-header .btn-cancel { justify-self: start; }
+.crop-title { color: #fff; font-weight: 900; font-size: 1rem; text-align: center; }
 .crop-container { flex: 1; position: relative; overflow: hidden; width: 100%; }
+.crop-modal-overlay.avatar-crop-mode .crop-container { display: flex; align-items: center; justify-content: center; padding: 0 20px 24px; }
+.crop-modal-overlay.avatar-crop-mode .cropper-view-box,
+.crop-modal-overlay.avatar-crop-mode .cropper-face { border-radius: 50%; }
+.crop-modal-overlay.avatar-crop-mode .cropper-view-box { outline: 0; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
+.crop-modal-overlay.avatar-crop-mode .cropper-line,
+.crop-modal-overlay.avatar-crop-mode .cropper-point { opacity: 0; }
 .global-dropzone { display: none; position: fixed; inset: 0; background: rgba(240, 247, 242, 0.8); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
 .global-dropzone.active { display: flex; }
 .dropzone-box { border: 2px dashed var(--green); border-radius: 32px; padding: 60px 40px; text-align: center; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 16px 40px rgba(76,175,110,0.15);}
@@ -510,7 +525,7 @@ input, textarea, select { font-size: 16px; }
 </div>
 
 <div class="crop-modal-overlay" id="cropModal">
-  <div class="crop-header"><button class="btn-cancel" style="width:auto;color:#fff;" onclick="cancelCrop()">取消</button><button class="btn-primary" style="width:auto;" onclick="confirmCrop()">確認</button></div>
+  <div class="crop-header"><button class="btn-cancel" style="width:auto;color:#fff;" onclick="cancelCrop()">取消</button><div class="crop-title" id="crop-modal-title">裁切圖片</div><button class="btn-primary" style="width:auto;" onclick="confirmCrop()">確認</button></div>
   <div class="crop-container"><img id="crop-image-target" src=""></div>
 </div>
 
@@ -640,20 +655,20 @@ input, textarea, select { font-size: 16px; }
 </div>
 
 <div class="modal-overlay" id="uploadModal" onclick="closeModalOutside(event, 'uploadModal')">
-    <div class="modal">
+    <div class="modal bottom-sheet">
         <div class="modal-header"><div class="modal-handle"></div><div class="modal-title">批次匯入</div></div>
         <div class="batch-results-container" id="batch-container" style="display:block;"></div>
         <button id="btn-batch-save" class="btn-primary" style="display:none;" onclick="handleBatchSave()">儲存入庫</button>
     </div>
 </div>
 
-<div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
-<div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list" id="custom-theme-list"></div><button class="add-theme-btn" style="width:100%;margin-bottom:16px;padding:14px;" onclick="openAddThemeModal()">＋ 新增主題</button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
+<div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
+<div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.25 (更新時間: 05/01)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.26 (更新時間: 05/01)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
-  <div class="modal" style="padding: 0; max-height: 85vh;">
+  <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
     <div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title">修改資訊</div></div>
     <div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;">
       <div id="edit-img-section" style="position:relative; width:120px; height:120px; margin: 10px auto 24px; cursor: pointer;">
@@ -685,8 +700,8 @@ input, textarea, select { font-size: 16px; }
   </div>
 </div>
 
-<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">取消收藏</div></div><button class="btn-danger" onclick="executeCancelOwned()">確定移除</button></div></div>
-<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')"><div class="modal"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">刪除明信片</div></div><button class="btn-danger" onclick="executeHardDelete()">確定刪除</button></div></div>
+<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">取消收藏</div></div><button class="btn-danger" onclick="executeCancelOwned()">確定移除</button></div></div>
+<div class="modal-overlay" id="deleteConfirmModal" onclick="closeModalOutside(event, 'deleteConfirmModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">刪除明信片</div></div><button class="btn-danger" onclick="executeHardDelete()">確定刪除</button></div></div>
 
 <div class="map-detail-overlay" id="map-detail-overlay" onclick="closeMapDetail(event)">
     <div class="map-detail-card" onclick="event.stopPropagation()">
@@ -774,6 +789,7 @@ let tempEditImg = null; let tempEditOriginalImg = null; let tempEditCropData = n
 let dragStartX = 0; let dragStartY = 0; let isSwiping = false; let swipeDirection = null; let ocrCache = {};
 let themeDragStartX = 0; let themeDragStartY = 0; let themeDragOffsetStart = 0; let themeSwipeDirection = null; let activeThemeSwipeEl = null; let themeSwipeSuppressUntil = 0;
 let currentPeekCard = null; let dragCounter = 0; let coordDebounceTimer; let batchDebounceTimers = {};
+let pendingAvatarImage = null;
 
 let globalMap = null; let mapMarkers = []; let currentMapFilter = 'all';
 let routeDestinations = []; let routeLineFeature = null; let currentLocLatLng = null; let gachaIsSpinning = false;
@@ -821,6 +837,40 @@ function closeModal(id) {
     if(id==='confirmModal') pendingRemoveCard = null; 
 }
 function closeModalOutside(e, id) { if(e && e.target && e.target.id === id) closeModal(id); }
+function resetSettingsAvatarInput() { const input = document.getElementById('settings-avatar-input'); if (input) input.value = ''; }
+function updateCropModalUI(mode) {
+    const cropModal = document.getElementById('cropModal');
+    const cropTitle = document.getElementById('crop-modal-title');
+    if (cropModal) cropModal.classList.toggle('avatar-crop-mode', mode === 'avatar');
+    if (cropTitle) cropTitle.textContent = mode === 'avatar' ? '裁切頭貼' : '裁切圖片';
+}
+function openCropperModal(imageSrc, mode, options = {}) {
+    const imageTarget = document.getElementById('crop-image-target');
+    if (!imageTarget || !imageSrc) return;
+    cropMode = mode;
+    updateCropModalUI(mode);
+    openModal('cropModal');
+    imageTarget.onload = () => {
+        setTimeout(() => {
+            if (cropperInstance) cropperInstance.destroy();
+            const cropOptions = Object.assign({
+                aspectRatio: mode === 'avatar' ? 1 : 3 / 2,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                background: false,
+                guides: mode !== 'avatar',
+                center: true,
+                zoomable: true,
+                toggleDragModeOnDblclick: false,
+                checkCrossOrigin: false,
+                restore: true
+            }, options);
+            cropperInstance = new Cropper(imageTarget, cropOptions);
+        }, 120);
+    };
+    imageTarget.src = imageSrc;
+}
 function showLightbox(imgSrc) { if (!imgSrc) return; const el = document.getElementById('lightbox'); if(el) el.classList.add('open'); const imgEl = document.getElementById('lightbox-img'); if(imgEl) imgEl.src = imgSrc; }
 function closeLightbox() { const el = document.getElementById('lightbox'); if(el) el.classList.remove('open'); }
 function cleanLocText(text) { 
@@ -976,6 +1026,31 @@ async function fetchUserInfo() { try { const res = await fetch('https://www.goog
 function updateProfileUI() { const displayName = userProfile.customNickname || userProfile.name || 'Explorer'; const displayAvatar = userProfile.customAvatar || userProfile.picture; const dn = document.getElementById('display-name'); if(dn) dn.innerText = displayName; const de = document.getElementById('display-email'); if(de) de.innerText = userProfile.email || '未綁定信箱'; const sn = document.getElementById('settings-nickname'); if(sn) sn.value = userProfile.customNickname || ''; const se = document.getElementById('settings-email-display'); if(se) se.innerText = userProfile.email || '未綁定信箱'; const sak = document.getElementById('settings-api-key'); if(sak) sak.value = localStorage.getItem('pikmin_gemini_api_key') || ''; const avatarEl = document.getElementById('display-avatar'); const fallbackEl = document.getElementById('display-avatar-fallback'); const settingsAvatarEl = document.getElementById('settings-avatar-preview'); if (displayAvatar) { if(avatarEl) { avatarEl.src = displayAvatar; avatarEl.style.display = 'block'; } if(settingsAvatarEl) settingsAvatarEl.src = displayAvatar; if(fallbackEl) fallbackEl.style.display = 'none'; } else { if(avatarEl) avatarEl.style.display = 'none'; if(fallbackEl) fallbackEl.style.display = 'flex'; if(settingsAvatarEl) settingsAvatarEl.src = ''; } }
 function openSettingsModal() { updateProfileUI(); openModal('settingsModal'); }
 function saveSettings() { const sn = document.getElementById('settings-nickname'); if(sn) userProfile.customNickname = sn.value.trim(); const sak = document.getElementById('settings-api-key'); if(sak) { const newVal = sak.value.trim(); if(newVal) { localStorage.setItem('pikmin_gemini_api_key', newVal); apiKey = newVal; } else { localStorage.removeItem('pikmin_gemini_api_key'); apiKey = "AIzaSyA6pVGOf9J7O0yt8X2_snLKoHrs9ZF4g8U"; } } updateProfileUI(); saveDataToLocal(); closeModal('settingsModal'); showToast('✅ 設定已儲存'); }
+function handleSettingsAvatarUpload(files) {
+    if (!files || files.length === 0) {
+        resetSettingsAvatarInput();
+        return;
+    }
+    const file = files[0];
+    if (!file.type.startsWith('image/')) {
+        showToast('⚠️ 請選擇圖片檔');
+        resetSettingsAvatarInput();
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        pendingAvatarImage = e.target.result;
+        openCropperModal(pendingAvatarImage, 'avatar', {
+            aspectRatio: 1,
+            guides: false,
+            modal: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: false
+        });
+    };
+    reader.readAsDataURL(file);
+}
 function showSyncing(isSyncing) { const ind = document.getElementById('sync-status-indicator'); if(ind) { if(isSyncing) ind.classList.add('syncing'); else { ind.classList.remove('syncing'); const now = new Date(); const settingsLastSync = document.getElementById('settings-last-sync'); if(settingsLastSync) settingsLastSync.innerText = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0'); } } }
 function forceSync() { 
     if (isPreviewMode) {
@@ -1368,9 +1443,71 @@ function renderOwned() {
 // 🌟 6. 檔案處理與裁切
 function handleFiles(files) { document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0; if (files.length === 0) return; filesToCrop = Array.from(files); currentCropIndex = 0; tempBatchList = []; ocrCache = {}; startCropNext(); document.getElementById('file-input').value = ""; }
 async function resizeForOCR(imgUrl) { return new Promise((resolve) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const maxDim = 1024; let scale = Math.min(1, Math.min(maxDim / img.width, maxDim / img.height)); canvas.width = img.width * scale; canvas.height = img.height * scale; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.8)); }; img.src = imgUrl; }); }
-function startCropNext() { if (currentCropIndex >= filesToCrop.length) { openModal('uploadModal'); renderBatchItems(); return; } const file = filesToCrop[currentCropIndex]; const reader = new FileReader(); reader.onload = async (e) => { const originalImgUrl = e.target.result; const smallImgForOcr = await resizeForOCR(originalImgUrl); preloadOCR(currentCropIndex, smallImgForOcr); cropMode = 'upload'; const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); imageTarget.onload = () => { setTimeout(() => { if (cropperInstance) { cropperInstance.destroy(); } cropperInstance = new Cropper(imageTarget, { aspectRatio: 3 / 2, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false, checkCrossOrigin: false, restore: true }); }, 150); }; imageTarget.src = originalImgUrl; }; reader.readAsDataURL(file); }
-function confirmCrop() { if (!cropperInstance) return; if (cropMode === 'avatar') { const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 400, maxHeight: 400 }); userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.85); const sap = document.getElementById('settings-avatar-preview'); if(sap) sap.src = userProfile.customAvatar; const da = document.getElementById('display-avatar'); if(da) { da.src = userProfile.customAvatar; da.style.display = 'flex'; } const daf = document.getElementById('display-avatar-fallback'); if(daf) daf.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 }); const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.92); const originalImgUrl = document.getElementById('crop-image-target').src; const currentCropData = { data: cropperInstance.getData(), canvasData: cropperInstance.getCanvasData(), cropBoxData: cropperInstance.getCropBoxData() }; if (cropMode === 'edit') { tempEditCropData = currentCropData; tempEditImg = croppedImgUrl; const imgPre = document.getElementById('edit-img-preview'); if (imgPre) { imgPre.src = tempEditImg; imgPre.style.display = 'inline-block'; } const btnRecrop = document.getElementById('btn-recrop-img'); if(btnRecrop) btnRecrop.style.display = 'flex'; const btnReplace = document.getElementById('btn-replace-edit-img'); if(btnReplace) btnReplace.style.display = 'flex'; const btnAdd = document.getElementById('btn-add-edit-img'); if(btnAdd) btnAdd.style.display = 'none'; closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; cropMode = 'upload'; return; } const batchIdx = tempBatchList.length; tempBatchList.push({ name: '辨識中...', loc: '', coord: window.pendingContextCoord || '', favorite: false, status: 'ocr_detecting', img: croppedImgUrl, originalImg: originalImgUrl, cropData: currentCropData, tz: '', type: 'flower', theme: '' }); if(window.pendingContextCoord) { const parts = window.pendingContextCoord.split(',').map(Number); fetchLocationForBatchItem(batchIdx, parts[0], parts[1]); window.pendingContextCoord = null; } closeModal('cropModal'); cropperInstance.destroy(); cropperInstance = null; if(ocrCache[currentCropIndex]) { ocrCache[currentCropIndex].batchIdx = batchIdx; applyOcrToBatch(currentCropIndex); } currentCropIndex++; startCropNext(); }
-function cancelCrop() { closeModal('cropModal'); if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; } if (cropMode === 'edit' || cropMode === 'avatar') { cropMode = 'upload'; return; } currentCropIndex++; startCropNext(); }
+function startCropNext() { if (currentCropIndex >= filesToCrop.length) { openModal('uploadModal'); renderBatchItems(); return; } const file = filesToCrop[currentCropIndex]; const reader = new FileReader(); reader.onload = async (e) => { const originalImgUrl = e.target.result; const smallImgForOcr = await resizeForOCR(originalImgUrl); preloadOCR(currentCropIndex, smallImgForOcr); openCropperModal(originalImgUrl, 'upload', { aspectRatio: 3 / 2, guides: true }); }; reader.readAsDataURL(file); }
+function confirmCrop() {
+    if (!cropperInstance) return;
+    if (cropMode === 'avatar') {
+        const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 400, maxHeight: 400, imageSmoothingQuality: 'high' });
+        userProfile.customAvatar = canvas.toDataURL('image/jpeg', 0.9);
+        updateProfileUI();
+        resetSettingsAvatarInput();
+        pendingAvatarImage = null;
+        closeModal('cropModal');
+        cropperInstance.destroy();
+        cropperInstance = null;
+        updateCropModalUI('upload');
+        cropMode = 'upload';
+        return;
+    }
+    const canvas = cropperInstance.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 });
+    const croppedImgUrl = canvas.toDataURL('image/jpeg', 0.92);
+    const originalImgUrl = document.getElementById('crop-image-target').src;
+    const currentCropData = { data: cropperInstance.getData(), canvasData: cropperInstance.getCanvasData(), cropBoxData: cropperInstance.getCropBoxData() };
+    if (cropMode === 'edit') {
+        tempEditCropData = currentCropData;
+        tempEditImg = croppedImgUrl;
+        const imgPre = document.getElementById('edit-img-preview');
+        if (imgPre) { imgPre.src = tempEditImg; imgPre.style.display = 'inline-block'; }
+        const btnRecrop = document.getElementById('btn-recrop-img'); if(btnRecrop) btnRecrop.style.display = 'flex';
+        const btnReplace = document.getElementById('btn-replace-edit-img'); if(btnReplace) btnReplace.style.display = 'flex';
+        const btnAdd = document.getElementById('btn-add-edit-img'); if(btnAdd) btnAdd.style.display = 'none';
+        closeModal('cropModal');
+        cropperInstance.destroy();
+        cropperInstance = null;
+        updateCropModalUI('upload');
+        cropMode = 'upload';
+        return;
+    }
+    const batchIdx = tempBatchList.length;
+    tempBatchList.push({ name: '辨識中...', loc: '', coord: window.pendingContextCoord || '', favorite: false, status: 'ocr_detecting', img: croppedImgUrl, originalImg: originalImgUrl, cropData: currentCropData, tz: '', type: 'flower', theme: '' });
+    if(window.pendingContextCoord) { const parts = window.pendingContextCoord.split(',').map(Number); fetchLocationForBatchItem(batchIdx, parts[0], parts[1]); window.pendingContextCoord = null; }
+    closeModal('cropModal');
+    cropperInstance.destroy();
+    cropperInstance = null;
+    updateCropModalUI('upload');
+    if(ocrCache[currentCropIndex]) { ocrCache[currentCropIndex].batchIdx = batchIdx; applyOcrToBatch(currentCropIndex); }
+    currentCropIndex++;
+    startCropNext();
+}
+function cancelCrop() {
+    closeModal('cropModal');
+    if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+    if (cropMode === 'avatar') {
+        pendingAvatarImage = null;
+        resetSettingsAvatarInput();
+        updateCropModalUI('upload');
+        cropMode = 'upload';
+        return;
+    }
+    if (cropMode === 'edit') {
+        updateCropModalUI('upload');
+        cropMode = 'upload';
+        return;
+    }
+    updateCropModalUI('upload');
+    currentCropIndex++;
+    startCropNext();
+}
 
 // 🌟 7. Gemini OCR 與批次處理
 async function preloadOCR(fileIndex, imgUrl, attempt = 1) { 
@@ -1566,58 +1703,105 @@ function openAddThemeFromBatch(index) {
     openAddThemeModal();
 }
 
-function saveThemeAction() { const name = document.getElementById('new-theme-name').value.trim(); if(!name) return; const fullTheme = currentNewThemeEmoji ? `${currentNewThemeEmoji} ${name}` : name; if (editingThemeIndex > -1) { const oldTheme = customThemes[editingThemeIndex]; customThemes[editingThemeIndex] = fullTheme; [...flowerCards, ...mushroomCards, ...hiddenCards].forEach(c => { const idx = (c.themes || []).indexOf(oldTheme); if (idx > -1) c.themes[idx] = fullTheme; }); showToast('主題已更新'); closeModal('addThemeModal'); openManageThemeModal(); refreshCurrentView(); } else { if (!defaultThemes.includes(fullTheme) && !customThemes.includes(fullTheme)) customThemes.push(fullTheme); document.getElementById('new-theme-name').value = ''; closeModal('addThemeModal'); refreshCurrentView(); showToast('主題已新增'); const em = document.getElementById('editModal'); if (em && em.classList.contains('open')) { if (!tempEditThemes.includes(fullTheme)) tempEditThemes.push(fullTheme); renderEditThemes(); } if (pendingBatchThemeIndex > -1) { updateBatchItem(pendingBatchThemeIndex, 'theme', fullTheme); pendingBatchThemeIndex = -1; renderBatchItems(); } } saveDataToLocal(); }
-function openManageThemeModal() {
-  const list = document.getElementById('custom-theme-list');
-  if (customThemes.length === 0) {
-    list.innerHTML = '<div style="text-align:center; padding: 20px; color:var(--sub); font-weight:700;">尚無自訂主題</div>';
-  } else {
-    list.innerHTML = customThemes.map((theme, i) => `
-      <div class="theme-item-wrapper">
-        <div class="theme-delete-reveal">
-          <button class="theme-delete-btn" onclick="event.stopPropagation(); deleteCustomTheme(${i})" aria-label="刪除主題">
+function buildThemeItemHTML(theme) {
+  const themeValue = escapeHTML(theme);
+  const spaceIdx = theme.indexOf(' ');
+  const icon = spaceIdx > -1 ? theme.substring(0, spaceIdx) : '';
+  const label = spaceIdx > -1 ? theme.substring(spaceIdx + 1) : theme;
+  return `
+    <div class="theme-item-wrapper" data-theme-value="${themeValue}">
+      <div class="theme-delete-reveal">
+        <button class="theme-delete-btn" onclick="event.stopPropagation(); deleteCustomThemeByElement(this)" aria-label="刪除主題">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+      <div
+        class="custom-theme-item"
+        onclick="handleThemeItemTap(event, this)"
+        ontouchstart="handleThemeSwipeStart(event, this)"
+        ontouchmove="handleThemeSwipeMove(event, this)"
+        ontouchend="handleThemeSwipeEnd(event, this)"
+        ontouchcancel="handleThemeSwipeEnd(event, this)"
+      >
+        <div class="theme-label">
+          ${icon ? `<span class="theme-icon">${escapeHTML(icon)}</span>` : ''}
+          <span class="theme-label-text" title="${escapeHTML(label)}">${escapeHTML(label)}</span>
+        </div>
+        <div class="theme-action-group">
+          <button class="mac-btn" onclick="event.stopPropagation(); openEditCustomThemeByElement(this)" aria-label="編輯主題">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+            </svg>
+          </button>
+          <button class="mac-btn theme-delete-desktop" onclick="event.stopPropagation(); deleteCustomThemeByElement(this)" aria-label="刪除主題">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
           </button>
         </div>
-        <div
-          class="custom-theme-item"
-          onclick="handleThemeItemTap(event, this)"
-          ontouchstart="handleThemeSwipeStart(event, this)"
-          ontouchmove="handleThemeSwipeMove(event, this)"
-          ontouchend="handleThemeSwipeEnd(event, this)"
-          ontouchcancel="handleThemeSwipeEnd(event, this)"
-        >
-          <div class="theme-label">
-            <span class="theme-label-text" title="${escapeHTML(theme)}">${escapeHTML(theme)}</span>
-          </div>
-          <div class="theme-action-group">
-            <button class="mac-btn" onclick="event.stopPropagation(); openEditCustomTheme(${i})" aria-label="編輯主題">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M12 20h9"></path>
-                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-              </svg>
-            </button>
-            <button class="mac-btn theme-delete-desktop" onclick="event.stopPropagation(); deleteCustomTheme(${i})" aria-label="刪除主題">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
       </div>
-    `).join('');
+    </div>
+  `;
+}
+function getThemeListEl() { return document.querySelector('#custom-theme-list, .theme-list'); }
+function getThemeValueFromElement(el) { const wrapper = el ? el.closest('.theme-item-wrapper') : null; return wrapper ? wrapper.dataset.themeValue || '' : ''; }
+function getCustomThemeIndexByValue(value) { return customThemes.indexOf(value); }
+function prependThemeListItem(theme) {
+  const list = getThemeListEl();
+  if (!list) return;
+  const empty = list.querySelector('.theme-list-empty');
+  if (empty) empty.remove();
+  list.insertAdjacentHTML('afterbegin', buildThemeItemHTML(theme));
+}
+function openEditCustomThemeByElement(el) { const idx = getCustomThemeIndexByValue(getThemeValueFromElement(el)); if (idx > -1) openEditCustomTheme(idx); }
+function deleteCustomThemeByElement(el) { const idx = getCustomThemeIndexByValue(getThemeValueFromElement(el)); if (idx > -1) deleteCustomTheme(idx); }
+function saveThemeAction() {
+  const input = document.getElementById('new-theme-name');
+  const name = input ? input.value.trim() : '';
+  if(!name) return;
+  const fullTheme = currentNewThemeEmoji ? `${currentNewThemeEmoji} ${name}` : name;
+  if (editingThemeIndex > -1) {
+    const oldTheme = customThemes[editingThemeIndex];
+    customThemes[editingThemeIndex] = fullTheme;
+    [...flowerCards, ...mushroomCards, ...hiddenCards].forEach(c => { const idx = (c.themes || []).indexOf(oldTheme); if (idx > -1) c.themes[idx] = fullTheme; });
+    showToast('主題已更新');
+    closeModal('addThemeModal');
+    openManageThemeModal();
+    refreshCurrentView();
+  } else {
+    if (!defaultThemes.includes(fullTheme) && !customThemes.includes(fullTheme)) {
+      customThemes.unshift(fullTheme);
+      prependThemeListItem(fullTheme);
+    }
+    if (input) input.value = '';
+    closeModal('addThemeModal');
+    refreshCurrentView();
+    showToast('主題已新增');
+    const em = document.getElementById('editModal');
+    if (em && em.classList.contains('open')) { if (!tempEditThemes.includes(fullTheme)) tempEditThemes.push(fullTheme); renderEditThemes(); }
+    if (pendingBatchThemeIndex > -1) { updateBatchItem(pendingBatchThemeIndex, 'theme', fullTheme); pendingBatchThemeIndex = -1; renderBatchItems(); }
+  }
+  saveDataToLocal();
+}
+function openManageThemeModal() {
+  const list = document.getElementById('custom-theme-list');
+  if (customThemes.length === 0) {
+    list.innerHTML = '<div class="theme-list-empty" style="text-align:center; padding: 20px; color:var(--sub); font-weight:700;">尚無自訂主題</div>';
+  } else {
+    list.innerHTML = customThemes.map(theme => buildThemeItemHTML(theme)).join('');
   }
   openModal('manageThemeModal');
 }
 function openEditCustomTheme(idx) { editingThemeIndex = idx; const themeStr = customThemes[idx]; const spaceIdx = themeStr.indexOf(' '); const emoji = spaceIdx > -1 ? themeStr.substring(0, spaceIdx) : ''; const name = spaceIdx > -1 ? themeStr.substring(spaceIdx + 1) : themeStr; const tTitle = document.getElementById('addThemeModalTitle'); if(tTitle) tTitle.innerHTML = '修改主題'; const tBtn = document.getElementById('addThemeModalBtn'); if(tBtn) tBtn.textContent = '儲存修改'; const nInput = document.getElementById('new-theme-name'); if(nInput) nInput.value = name; currentNewThemeEmoji = emoji; const eGrid = document.getElementById('emoji-grid'); if(eGrid) eGrid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===emoji?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join(''); closeModal('manageThemeModal'); openModal('addThemeModal'); }
 function deleteCustomTheme(idx) { const t = customThemes[idx]; customThemes.splice(idx, 1); [...flowerCards, ...mushroomCards, ...hiddenCards].forEach(c => { const i = (c.themes || []).indexOf(t); if (i > -1) c.themes.splice(i, 1); if (!c.themes || c.themes.length === 0) c.themes = ['未分類']; }); showToast(`已移除 ${t}`); openManageThemeModal(); refreshCurrentView(); saveDataToLocal(); }
 
-function handleEditFileUpload(files) { if(files.length === 0) return; const file = files[0]; const reader = new FileReader(); reader.onload = (e) => { tempEditOriginalImg = e.target.result; tempEditCropData = null; cropMode = 'edit'; isEditImgDeleted = false; const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); imageTarget.onload = () => { setTimeout(() => { if (cropperInstance) cropperInstance.destroy(); cropperInstance = new Cropper(imageTarget, { aspectRatio: 3 / 2, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false }); }, 150); }; imageTarget.src = tempEditOriginalImg; }; reader.readAsDataURL(file); }
-function startEditCrop() { const list = currentEditCat === 'flower' ? flowerCards : (currentEditCat === 'hidden' ? hiddenCards : mushroomCards); const c = list.find(x => x.id == currentEditId); if (!c) return; const targetOriginal = tempEditOriginalImg || c.originalImg || c.img; if (!targetOriginal) return; cropMode = 'edit'; const imageTarget = document.getElementById('crop-image-target'); openModal('cropModal'); imageTarget.onload = () => { setTimeout(() => { if (cropperInstance) cropperInstance.destroy(); cropperInstance = new Cropper(imageTarget, { aspectRatio: 3 / 2, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: true, center: true, zoomable: true, toggleDragModeOnDblclick: false }); }, 150); }; imageTarget.src = targetOriginal; }
+function handleEditFileUpload(files) { if(files.length === 0) return; const file = files[0]; const reader = new FileReader(); reader.onload = (e) => { tempEditOriginalImg = e.target.result; tempEditCropData = null; isEditImgDeleted = false; openCropperModal(tempEditOriginalImg, 'edit', { aspectRatio: 3 / 2, guides: true }); }; reader.readAsDataURL(file); }
+function startEditCrop() { const list = currentEditCat === 'flower' ? flowerCards : (currentEditCat === 'hidden' ? hiddenCards : mushroomCards); const c = list.find(x => x.id == currentEditId); if (!c) return; const targetOriginal = tempEditOriginalImg || c.originalImg || c.img; if (!targetOriginal) return; openCropperModal(targetOriginal, 'edit', { aspectRatio: 3 / 2, guides: true }); }
 function setEditType(type) { currentEditType = type; const fEl = document.getElementById('edit-type-flower'); if(fEl) fEl.classList.toggle('active', type === 'flower'); const mEl = document.getElementById('edit-type-mushroom'); if(mEl) mEl.classList.toggle('active', type === 'mushroom'); const hEl = document.getElementById('edit-type-hidden'); if(hEl) hEl.classList.toggle('active', type === 'hidden'); }
 function promptEdit(e, cat, id) { 
   if(e) e.stopPropagation(); currentEditCat = cat; currentEditId = id; 
