@@ -126,46 +126,53 @@ input, textarea, select { font-size: 16px; }
 .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); pointer-events: none; width: 20px; height: 20px;}
 
 /* ── CATEGORY & FILTERS ── */
-.cat-screen-header { position: relative; z-index: 50; background: var(--bg); padding-top: calc(var(--safe-top) + 6px); flex-shrink: 0; }
-.cat-topbar { display: flex; align-items: center; justify-content: center; padding: 10px 16px 16px; position: relative; }
+.cat-screen-header { position: relative; z-index: 50; background: transparent; padding-top: calc(var(--safe-top) + 6px); flex-shrink: 0; }
+.cat-topbar { display: flex; align-items: center; justify-content: center; padding: 12px 22px 18px; position: relative; }
 .back-btn { display: none; }
 .back-btn svg { display: none; }
 .cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; text-align: center; width: 100%; } 
-.sub-tabs { display: flex; padding: 0 16px; gap: 8px; margin-bottom: 12px; }
-.sub-tab { flex: 1; padding: 12px 8px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; color: #8e9a92; cursor: pointer; border-radius: 16px; transition: all 0.2s; }
-.sub-tab.active { background: #ffffff; color: var(--green-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
-.quick-filter-wrapper { display: flex; gap: 10px; padding: 4px 16px 16px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.sub-tabs { --cat-content-gutter: 30px; display: flex; align-items: flex-end; gap: 0; margin: 0; padding: 0; background: #f0f1ef; border: 1px solid rgba(222,225,221,0.95); border-bottom: none; border-radius: 30px 30px 0 0; box-shadow: 0 1px 0 rgba(255,255,255,0.5); overflow: hidden; min-height: 64px; position: relative; z-index: 3; }
+.sub-tab { flex: 1; min-height: 64px; display: flex; align-items: center; justify-content: center; padding: 0 18px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.95rem; color: #444; cursor: pointer; border-radius: 22px 22px 0 0; transition: all 0.22s ease; line-height: 1; position: relative; }
+.sub-tab.active { background: #ffffff; color: #111; box-shadow: none; }
+.sub-tab.active::after { display: none; }
+.quick-filter-wrapper { display: flex; gap: 8px; margin: 20px 0 0; padding: 6px 12px; width: 100%; box-sizing: border-box; overflow-x: auto; scrollbar-width: none; scroll-padding-left: 12px; scroll-padding-right: 12px; border-bottom: none; border-radius: 999px; background: linear-gradient(180deg, rgba(255,255,255,0.56) 0%, rgba(239,242,239,0.84) 100%); box-shadow: inset 0 2px 5px rgba(197, 203, 198, 0.42), inset 0 1px 0 rgba(255,255,255,0.96), inset 0 0 0 1px rgba(214,220,216,0.9), 0 1px 1px rgba(255,255,255,0.45); }
 .quick-filter-wrapper::-webkit-scrollbar { display: none; }
-.filter-pill { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 99px; border: none; background: #ffffff; color: var(--sub); font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
-.filter-pill.active { background: var(--green); color: #ffffff; }
+.filter-pill { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 16px; border-radius: 999px; border: none; background: transparent; color: #8e9a92; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; box-shadow: none; flex-shrink: 0; }
+.filter-pill.active { background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(250,251,250,0.98) 58%, rgba(242,245,242,0.94) 100%); color: var(--green-dark); box-shadow: 0 0 10px rgba(17,17,17,0.05), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(219,225,221,0.72); }
 .add-theme-btn { padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: rgba(255,255,255,0.5); color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
 .btn-add-theme { width: 100%; margin-bottom: 16px; padding: 14px 18px; border: none; border-radius: 16px; background: #F0F5F1; color: #4A8E59; font-weight: 900; font-size: 0.98rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: inset 0 0 0 1px rgba(74, 142, 89, 0.12); cursor: pointer; transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease; }
 .btn-add-theme:active { transform: scale(0.98); }
 .btn-add-theme:hover { background: #e8f1ea; box-shadow: inset 0 0 0 1px rgba(74, 142, 89, 0.18); }
 .btn-add-theme-icon { font-size: 1.05rem; line-height: 1; }
-.cat-body { padding: 16px 16px 0; }
-.group-section { margin-bottom: 24px; }
-.group-header { font-weight: 900; font-size: 0.85rem; color: var(--sub); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.cat-body { padding: 48px 0 10px; background: transparent; box-sizing: border-box; }
+.group-section { margin-bottom: 32px; }
+.group-header { font-weight: 900; font-size: 0.85rem; color: var(--sub); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; padding-left: 2px; }
 .group-count { background: rgba(0,0,0,0.06); color: var(--sub); border-radius: 99px; padding: 2px 10px; font-size: 0.7rem; }
+.cat-content-panel { background: #fff; margin: -2px 0 0; width: 100%; padding: 14px var(--cat-content-gutter) 0; border-radius: 0 30px 0 0; box-shadow: 0 14px 30px rgba(17,17,17,0.04), inset 0 1px 0 rgba(255,255,255,0.96); box-sizing: border-box; overflow-x: hidden; }
 
 /* ── POSTCARDS LIST ── */
-.postcard-wrapper { position: relative; margin-bottom: 18px; border-radius: 24px; background: transparent; overflow: visible; }
-.delete-action { position: absolute; top: 10px; right: 0; bottom: 10px; width: 88px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; border-radius: 16px; background: linear-gradient(180deg, #ff8c86 0%, #ff5f57 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 12px 24px rgba(255,95,87,0.22); }
+.postcard-wrapper { position: relative; margin-bottom: 22px; border-radius: 24px; background: transparent; overflow: visible; }
+.delete-action { position: absolute; top: 10px; right: 0; bottom: 10px; width: 88px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; border-radius: 16px; background: linear-gradient(180deg, #ff8c86 0%, #ff5f57 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 12px 24px rgba(255,95,87,0.22); opacity: 0; pointer-events: none; transform: translateX(10px) scale(0.98); transition: opacity 0.22s ease, transform 0.22s ease; }
+.postcard-wrapper.is-swiped .delete-action { opacity: 1; pointer-events: auto; transform: translateX(0) scale(1); }
 .postcard { background: #ffffff; border-radius: 24px; border: 1px solid #eef2ef; display: flex; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); cursor: pointer; transition: transform 0.3s, box-shadow 0.25s ease, border-color 0.25s ease; position: relative; z-index: 2; }
 .postcard.swiped { transform: translateX(-92px); }
 .postcard.is-owned,
 .postcard.is-selected {
-  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,255,248,0.82) 100%) !important;
-  border: 1px solid rgba(255,255,255,0.72) !important;
-  backdrop-filter: blur(18px);
-  box-shadow: 0 18px 36px rgba(76, 175, 110, 0.14), 0 8px 18px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+  background:
+    linear-gradient(#fbfdfb, #fbfdfb) padding-box,
+    linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(224,246,255,0.96) 22%, rgba(181,232,255,0.98) 52%, rgba(245,252,255,0.96) 78%, rgba(255,255,255,0.98) 100%) border-box !important;
+  border: 3px solid transparent !important;
+  box-shadow:
+    0 10px 26px rgba(0,0,0,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.98),
+    inset 0 10px 18px rgba(255,255,255,0.28) !important;
 }
-.postcard-thumb { width: 140px; min-width: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1px solid #eef2ef; position: relative; background: #f5f5f5; }
+.postcard-thumb { width: 140px; min-width: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1px solid #eef2ef; position: relative; background: #f5f5f5; border-radius: 24px 0 0 24px; }
 .postcard-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: 10% center; }
 .image-time-badge { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
 
-.postcard-info { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-.mac-btns-container { position: absolute; top: 12px; right: 10px; display: flex; gap: 6px; z-index: 10; flex-shrink: 0; }
+.postcard-info { flex: 1; padding: 16px 14px 16px 16px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.mac-btns-container { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 10; flex-shrink: 0; }
 .mac-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(142, 142, 147, 0.1); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: transform 0.2s; }
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
@@ -194,8 +201,9 @@ input, textarea, select { font-size: 16px; }
 .stack-card.expanded + .stack-card { margin-top: 20px; }
 .stack-thumb { height: 200px; width: 100%; background-size: cover; background-position: 10% center; position: relative; transition: height 0.5s; display: flex; align-items: center; justify-content: center; }
 .stack-card.expanded .stack-thumb { height: 260px; cursor: zoom-in; }
+.stack-thumb::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); background: linear-gradient(180deg, rgba(246,249,247,0.14) 0%, rgba(246,249,247,0.09) 34%, rgba(246,249,247,0.04) 62%, rgba(246,249,247,0) 100%); -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 42%, rgba(0,0,0,0.35) 72%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 42%, rgba(0,0,0,0.35) 72%, rgba(0,0,0,0) 100%); pointer-events: none; z-index: 1; }
 .stack-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.3) 100%); pointer-events: none; }
-.stack-title { position: absolute; top: 24px; left: 24px; right: 60px; color: #fff; font-weight: 900; font-size: 1.4rem; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+.stack-title { position: absolute; top: 24px; left: 24px; right: 60px; color: #fff; font-weight: 900; font-size: 1.4rem; z-index: 3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
 .stack-time-badge { position: absolute; bottom: 16px; right: 24px; background: rgba(255,255,255,0.9); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px;}
 .stack-time-badge svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5;}
 .stack-indicator { position: absolute; top: 20px; right: 20px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: #fff; transition: transform 0.5s; }
@@ -262,15 +270,15 @@ input, textarea, select { font-size: 16px; }
 
 .map-bottom-section { padding: 24px 0 0; display: flex; flex-direction: column; }
 .sheet-title { padding: 0 24px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #111; margin-bottom: 16px; }
-.sheet-cards-scroll { display: flex; gap: 16px; padding: 0 24px calc(var(--dock-clearance) + 20px); overflow-x: auto; scrollbar-width: none; }
+.sheet-cards-scroll { display: flex; gap: 16px; padding: 12px 24px calc(var(--dock-clearance) + 20px); overflow-x: auto; scrollbar-width: none; }
 .sheet-cards-scroll::-webkit-scrollbar { display: none; }
-.sheet-card { position: relative; width: 140px; height: 180px; border-radius: 16px; overflow: visible; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, z-index 0.2s; z-index: 1; isolation: isolate; }
+.sheet-card { position: relative; width: 140px; height: 180px; border-radius: 20px; overflow: visible; flex-shrink: 0; background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,250,248,0.96) 100%); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 14px 30px rgba(28, 36, 32, 0.08), inset 0 1px 0 rgba(255,255,255,0.98), inset 0 10px 24px rgba(255,255,255,0.32); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, z-index 0.2s; z-index: 1; isolation: isolate; }
 .sheet-card:active { transform: scale(0.96); }
 .sheet-card::before { content: ""; position: absolute; inset: 0; border-radius: 16px; background: transparent; pointer-events: none; transition: all 0.22s ease; z-index: 1; }
-.sheet-card-overlay { position: absolute; inset: 0; border-radius: 16px; background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #fff; z-index: 2; }
-.sheet-card.is-selected { z-index: 30; transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 40px rgba(76, 175, 110, 0.18), 0 10px 18px rgba(0,0,0,0.14); }
-.sheet-card.is-selected::before { background: linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.16) 100%); border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
-.sheet-card.is-selected .sheet-card-overlay { background: linear-gradient(180deg, rgba(255,255,255,0.02) 15%, rgba(23,35,29,0.18) 58%, rgba(23,35,29,0.64) 100%); }
+.sheet-card::after { content: ""; position: absolute; inset: 1px; border-radius: 19px; pointer-events: none; background: radial-gradient(120% 85% at 18% 14%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.22) 34%, rgba(255,255,255,0) 62%), linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 44%); z-index: 1; }
+.sheet-card-overlay { position: absolute; inset: 0; border-radius: 20px; background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(18,24,21,0.04) 48%, rgba(18,24,21,0.56) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #fff; z-index: 2; }
+.sheet-card.is-selected { z-index: 30; transform: translateY(-4px) scale(1.02); box-shadow: 0 0 0 2px var(--green), 0 0 16px rgba(76, 175, 110, 0.6); }
+.sheet-card.is-selected::before { content: none; }
 .sheet-card-icon-badge { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 5; color: var(--text); }
 .sheet-card-icon-badge svg { width: 16px; height: 16px; fill: currentColor; }
 .sheet-card-title { font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
@@ -533,17 +541,16 @@ input, textarea, select { font-size: 16px; }
 #settingsModal .hide-scrollbar, #editModal .hide-scrollbar { padding-bottom: calc(45px + var(--ios-bottom-bleed)) !important; }
 #settingsModal .modal { max-height: min(76vh, calc(var(--app-height) - var(--safe-top) - 20px)) !important; }
 #settingsModal .hide-scrollbar { padding-bottom: calc(20px + var(--safe-bottom)) !important; }
-#editModal .modal { max-height: min(86vh, calc(var(--app-height) - var(--safe-top) - 12px)) !important; }
-#editModal .hide-scrollbar { padding-bottom: calc(28px + var(--safe-bottom)) !important; }
+#editModal .modal { max-height: min(86vh, calc(var(--app-height) - var(--safe-top) - 12px)) !important; background: rgba(255,255,255,0.85) !important; }
+#editModal .hide-scrollbar { padding-bottom: calc(10px + var(--safe-bottom)) !important; }
 .edit-modal-footer {
   position: sticky;
   bottom: 0;
   z-index: 12;
-  padding: 14px 20px calc(18px + var(--safe-bottom));
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(18px);
-  border-top: 1px solid rgba(255,255,255,0.7);
-  box-shadow: 0 -10px 24px rgba(17,17,17,0.06);
+  padding: 12px 20px calc(16px + var(--safe-bottom));
+  background: transparent;
+  border-top: none;
+  box-shadow: none;
 }
 #screen-owned .scroll-view { padding-bottom: calc(var(--dock-clearance) - 44px); }
 #shared-preview-container { top: var(--safe-top) !important; }
@@ -612,9 +619,9 @@ input, textarea, select { font-size: 16px; }
   </div>
 </div>
 
-<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="scroll-view"><div class="quick-filter-wrapper" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div></div>
-<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="scroll-view"><div class="quick-filter-wrapper" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div></div>
-<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="scroll-view"><div class="quick-filter-wrapper" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div></div>
+<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div></div>
+<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div></div>
+<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div></div>
 
 <div class="screen" id="screen-map">
   <div class="map-body-wrapper">
@@ -722,7 +729,7 @@ input, textarea, select { font-size: 16px; }
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.34 (更新時間: 05/02)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.58 (更新時間: 05/02)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -751,7 +758,7 @@ input, textarea, select { font-size: 16px; }
         <button class="reset-input-btn" onclick="resetEditInput()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 10h10a5 5 0 0 1 0 10H11M3 10l4-4M3 10l4 4"/></svg></button>
       </div>
       <div class="edit-label">主題分類 (可多選)：</div>
-      <div class="theme-selector" id="edit-theme-selector" style="margin-bottom: 24px;"></div>
+      <div class="theme-selector" id="edit-theme-selector" style="margin-bottom: 12px;"></div>
     </div>
     <div class="edit-modal-footer"><button class="btn-primary" onclick="saveEdit()">儲存修改</button></div>
   </div>
@@ -1178,7 +1185,7 @@ function openCropperModal(imageSrc, mode, options = {}) {
                 cropBoxResizable: !isAvatarMode,
                 cropstart: function (event) {
                     if (!isAvatarMode || !event.detail) return;
-                    const allowedActions = ['move', 'all'];
+                    const allowedActions = ['move', 'all', 'zoom'];
                     if (!allowedActions.includes(event.detail.action)) event.preventDefault();
                 },
                 cropmove: function () {
@@ -1651,13 +1658,16 @@ function resetThemeSwipes(exceptItem = null) {
 }
 
 function resetSwipes() {
-    document.querySelectorAll('.postcard.swiped').forEach(el => el.classList.remove('swiped'));
+    document.querySelectorAll('.postcard.swiped').forEach(el => {
+        el.classList.remove('swiped');
+        el.parentElement?.classList.remove('is-swiped');
+    });
     resetThemeSwipes();
 }
 
 function handleDragStart(e) { isSwiping = false; swipeDirection = null; dragStartX = e.type.includes('mouse') ? e.pageX : e.touches[0].screenX; dragStartY = e.type.includes('mouse') ? e.pageY : e.touches[0].screenY; }
 function handleDragMove(e) { if (!dragStartX || !e.touches) return; let dx = e.touches[0].screenX - dragStartX; let dy = e.touches[0].screenY - dragStartY; if (!swipeDirection) { if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) swipeDirection = 'h'; else if (Math.abs(dy) > 10) swipeDirection = 'v'; } if (swipeDirection === 'h') { if (e.cancelable) e.preventDefault(); } }
-function handleDragEnd(e, el) { if (!dragStartX) return; let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX; let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { isSwiping = true; if (dx < -40) { resetSwipes(); el.classList.add('swiped'); } else if (dx > 40) { el.classList.remove('swiped'); } } dragStartX = 0; dragStartY = 0; }
+function handleDragEnd(e, el) { if (!dragStartX) return; let dx = (e.type.includes('mouse') ? e.pageX : e.changedTouches[0].screenX) - dragStartX; let dy = (e.type.includes('mouse') ? e.pageY : e.changedTouches[0].screenY) - dragStartY; const wrapper = el ? el.parentElement : null; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { isSwiping = true; if (dx < -40) { resetSwipes(); el.classList.add('swiped'); wrapper?.classList.add('is-swiped'); } else if (dx > 40) { el.classList.remove('swiped'); wrapper?.classList.remove('is-swiped'); } } dragStartX = 0; dragStartY = 0; }
 
 function canUseThemeSwipe() {
     return window.innerWidth < 768;
@@ -2591,7 +2601,7 @@ function updateMapBottomSheet(forceCards = null) {
         
         return `
         <div class="sheet-card" onclick="handleSheetCardClick('${c.id}', this)">
-            <div style="position:absolute; inset:0; ${bgStyle} background-size:cover; background-position:10% center; border-radius:16px;"></div>
+            <div style="position:absolute; inset:0; ${bgStyle} background-size:cover; background-position:10% center; border-radius:20px;"></div>
             <div class="sheet-card-icon-badge" style="color: ${c.type === 'flower' ? 'var(--flower-dark)' : c.type === 'mushroom' ? 'var(--mushroom-dark)' : '#555'}">${typeIcon}</div>
             <div class="sheet-card-overlay">
                 <div class="sheet-card-tags"><div class="sheet-card-tag">${theme}</div></div>
