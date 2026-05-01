@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Pikmin Bloom 明信片記錄</title>
@@ -416,26 +416,32 @@ input, textarea, select { font-size: 16px; }
 .lightbox-overlay.open { display: flex; }
 .lightbox-frame { width: 92vw; max-width: 600px; aspect-ratio: 1.4 / 1; }
 .lightbox-img { width: 100%; height: 100%; object-fit: contain; }
-.crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
+.crop-modal-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; touch-action: none !important; }
 .crop-modal-overlay.open { display: flex; }
 .crop-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: max(24px, var(--safe-top)) 20px 20px; }
 .crop-header .btn-primary { justify-self: end; background: #F0F5F1; color: #4A8E59; border: none; border-radius: 12px; box-shadow: none; padding: 12px 20px; width: auto; }
 .crop-header .btn-primary:active { transform: scale(0.98); }
 .crop-header .btn-cancel { justify-self: start; }
 .crop-title { color: #fff; font-weight: 900; font-size: 1rem; text-align: center; }
-.crop-container { flex: 1; position: relative; overflow: hidden; width: 100%; }
-.crop-modal-overlay.avatar-crop-mode .crop-container { display: flex; align-items: center; justify-content: center; padding: 0 20px 24px; }
+.crop-container, .crop-area { flex: 1; position: relative; overflow: hidden; width: 100%; }
+.crop-area { touch-action: none !important; display: flex; align-items: stretch; justify-content: center; }
+.crop-modal-overlay.avatar-crop-mode .crop-container,
+.crop-modal-overlay.avatar-crop-mode .crop-area { display: flex; align-items: center; justify-content: center; padding: 0 20px 24px; }
 .crop-modal-overlay.avatar-crop-mode .cropper-view-box,
 .crop-modal-overlay.avatar-crop-mode .cropper-face { border-radius: 50%; }
 .crop-modal-overlay.avatar-crop-mode .cropper-view-box { outline: 0; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
 .crop-modal-overlay.avatar-crop-mode .cropper-line,
 .crop-modal-overlay.avatar-crop-mode .cropper-point { opacity: 0; }
 .crop-modal-overlay .crop-container,
+.crop-modal-overlay .crop-area,
 .crop-modal-overlay .cropper-container,
 .crop-modal-overlay .cropper-wrap-box,
 .crop-modal-overlay .cropper-drag-box,
 .crop-modal-overlay .cropper-canvas,
 .crop-modal-overlay .cropper-crop-box { touch-action: none !important; }
+.crop-zoom-controls { padding: 0 24px calc(20px + var(--safe-bottom)); display: flex; align-items: center; gap: 12px; }
+.crop-zoom-label { color: rgba(255,255,255,0.78); font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
+.crop-zoom-slider { width: 100%; accent-color: #a8ddb8; }
 
 .user-location-pin {
   width: 22px;
@@ -551,7 +557,11 @@ input, textarea, select { font-size: 16px; }
 
 <div class="crop-modal-overlay" id="cropModal">
   <div class="crop-header"><button class="btn-cancel" style="width:auto;color:#fff;" onclick="cancelCrop()">取消</button><div class="crop-title" id="crop-modal-title">裁切圖片</div><button class="btn-primary" style="width:auto;" onclick="confirmCrop()">確認</button></div>
-  <div class="crop-container"><img id="crop-image-target" src=""></div>
+  <div class="crop-container crop-area" id="crop-area"><img id="crop-image-target" src=""></div>
+  <div class="crop-zoom-controls">
+    <span class="crop-zoom-label">縮放</span>
+    <input type="range" id="crop-zoom-slider" class="crop-zoom-slider" min="1" max="3.5" step="0.01" value="1">
+  </div>
 </div>
 
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()"><div class="lightbox-frame"><img src="" class="lightbox-img" id="lightbox-img"></div></div>
@@ -690,7 +700,7 @@ input, textarea, select { font-size: 16px; }
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.32 (更新時間: 05/01)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.33 (更新時間: 05/02)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -1059,9 +1069,44 @@ function centerAvatarCropBox(cropper, imageTarget) {
     cropper.setCropBoxData(fixedCropBoxData);
     imageTarget.dataset.fixedCropBox = JSON.stringify(fixedCropBoxData);
 }
+function setupCropAreaGestureGuards() {
+    const cropArea = document.getElementById('crop-area');
+    if (!cropArea || cropArea.dataset.touchGuardsBound === 'true') return;
+    const stopTouchBubble = (e) => {
+        e.stopPropagation();
+        if (e.touches && e.touches.length > 1 && e.cancelable) e.preventDefault();
+    };
+    cropArea.addEventListener('touchstart', stopTouchBubble, { passive: false });
+    cropArea.addEventListener('touchmove', stopTouchBubble, { passive: false });
+    cropArea.addEventListener('touchend', stopTouchBubble, { passive: false });
+    cropArea.dataset.touchGuardsBound = 'true';
+}
+function syncCropZoomSlider(cropper) {
+    const slider = document.getElementById('crop-zoom-slider');
+    if (!slider || !cropper) return;
+    const imageData = cropper.getImageData();
+    if (!imageData || !imageData.naturalWidth) return;
+    const currentRatio = imageData.width / imageData.naturalWidth;
+    const baseZoom = parseFloat(slider.dataset.baseZoom || currentRatio || 1);
+    slider.value = String(Math.max(1, Math.min(3.5, currentRatio / Math.max(baseZoom, 0.0001))));
+}
+function setupCropZoomSlider(cropper, imageTarget) {
+    const slider = document.getElementById('crop-zoom-slider');
+    if (!slider || !cropper) return;
+    const imageData = cropper.getImageData();
+    const baseZoom = imageData && imageData.naturalWidth ? (imageData.width / imageData.naturalWidth) : 1;
+    slider.dataset.baseZoom = String(baseZoom || 1);
+    slider.value = '1';
+    slider.oninput = () => {
+        const ratio = parseFloat(slider.dataset.baseZoom || '1') * parseFloat(slider.value || '1');
+        cropper.zoomTo(ratio);
+        if (imageTarget) imageTarget.dataset.forceKeepCentered = 'true';
+    };
+}
 function openCropperModal(imageSrc, mode, options = {}) {
     const imageTarget = document.getElementById('crop-image-target');
     if (!imageTarget || !imageSrc) return;
+    setupCropAreaGestureGuards();
     cropMode = mode;
     updateCropModalUI(mode);
     openModal('cropModal');
@@ -1078,6 +1123,7 @@ function openCropperModal(imageSrc, mode, options = {}) {
                 cropper.setCropBoxData({ width: fixedSize, height: fixedSize });
                 centerAvatarCropBox(cropper, this);
                 cropper.setDragMode('move');
+                setupCropZoomSlider(cropper, this);
                 setTimeout(() => centerAvatarCropBox(cropper, this), 30);
                 requestAnimationFrame(() => centerAvatarCropBox(cropper, this));
             };
@@ -1113,6 +1159,10 @@ function openCropperModal(imageSrc, mode, options = {}) {
                             this.cropper.setDragMode('move');
                         }
                     } catch (e) {}
+                },
+                zoom: function () {
+                    syncCropZoomSlider(this.cropper);
+                    if (isAvatarMode) centerAvatarCropBox(this.cropper, this);
                 }
             }, options);
             if (isAvatarMode) {
