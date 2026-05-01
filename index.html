@@ -87,7 +87,7 @@ input, textarea, select { font-size: 16px; }
 /* ── HOME HEADER & FOLDERS ── */
 .home-header { padding: calc(var(--safe-top) + 12px) 24px 20px; display: flex; justify-content: space-between; align-items: center; }
 .home-greeting { font-family: 'Nunito', sans-serif; font-size: 1.7rem; font-weight: 900; color: var(--text); margin-bottom: 2px; }
-.home-email { font-size: 0.85rem; font-weight: 700; color: var(--sub); }
+.home-email, #display-email { display: none !important; }
 .home-avatar-container { position: relative; cursor: pointer; }
 .home-avatar { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2.5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #e0e0e0; display: flex; align-items: center; justify-content: center;}
 .sync-indicator { position: absolute; bottom: 0; right: -2px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; border: 3px solid #d1fadd; transition: opacity 0.3s; z-index: 2; opacity: 0; }
@@ -149,11 +149,17 @@ input, textarea, select { font-size: 16px; }
 .group-count { background: rgba(0,0,0,0.06); color: var(--sub); border-radius: 99px; padding: 2px 10px; font-size: 0.7rem; }
 
 /* ── POSTCARDS LIST ── */
-.postcard-wrapper { position: relative; margin-bottom: 16px; border-radius: 24px; background: var(--danger); overflow: hidden; }
-.delete-action { position: absolute; top: 0; right: 0; bottom: 0; width: 75px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; }
-.postcard { background: #ffffff; border-radius: 24px; border: 1px solid #eef2ef; display: flex; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); cursor: pointer; transition: transform 0.3s; position: relative; z-index: 2; }
-.postcard.swiped { transform: translateX(-75px); }
-.postcard.is-owned { background: #ffffff !important; border: 1.5px solid var(--green) !important; box-shadow: 0 6px 20px rgba(76, 175, 110, 0.1) !important;}
+.postcard-wrapper { position: relative; margin-bottom: 18px; border-radius: 24px; background: transparent; overflow: visible; }
+.delete-action { position: absolute; top: 10px; right: 0; bottom: 10px; width: 88px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; z-index: 1; border-radius: 16px; background: linear-gradient(180deg, #ff8c86 0%, #ff5f57 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 12px 24px rgba(255,95,87,0.22); }
+.postcard { background: #ffffff; border-radius: 24px; border: 1px solid #eef2ef; display: flex; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); cursor: pointer; transition: transform 0.3s, box-shadow 0.25s ease, border-color 0.25s ease; position: relative; z-index: 2; }
+.postcard.swiped { transform: translateX(-92px); }
+.postcard.is-owned,
+.postcard.is-selected {
+  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,255,248,0.82) 100%) !important;
+  border: 1px solid rgba(255,255,255,0.72) !important;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 36px rgba(76, 175, 110, 0.14), 0 8px 18px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+}
 .postcard-thumb { width: 140px; min-width: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-right: 1px solid #eef2ef; position: relative; background: #f5f5f5; }
 .postcard-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: 10% center; }
 .image-time-badge { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
@@ -178,7 +184,7 @@ input, textarea, select { font-size: 16px; }
 .postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
 .coord-btn { background: rgba(240, 247, 242, 0.8); border: 1.5px solid var(--green-light); font-size: 0.7rem; font-weight: 800; color: var(--green-dark); cursor: pointer; padding: 4px 12px; border-radius: 99px; font-family: 'Nunito', monospace; display: block; text-align: center; transition: transform 0.2s; white-space: nowrap; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: calc(100% - 36px); }
 .coord-btn:active { transform: scale(0.95); }
-.owned-badge { background: var(--green); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.owned-badge { display: none !important; }
 
 /* ── STACK CARDS (Collection Page Restoration) ── */
 .postcard-stack { display: flex; flex-direction: column; padding: 10px 0 0; gap: 0; }
@@ -258,9 +264,13 @@ input, textarea, select { font-size: 16px; }
 .sheet-title { padding: 0 24px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #111; margin-bottom: 16px; }
 .sheet-cards-scroll { display: flex; gap: 16px; padding: 0 24px calc(var(--dock-clearance) + 20px); overflow-x: auto; scrollbar-width: none; }
 .sheet-cards-scroll::-webkit-scrollbar { display: none; }
-.sheet-card { position: relative; width: 140px; height: 180px; border-radius: 16px; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.sheet-card { position: relative; width: 140px; height: 180px; border-radius: 16px; overflow: visible; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, z-index 0.2s; z-index: 1; isolation: isolate; }
 .sheet-card:active { transform: scale(0.96); }
-.sheet-card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #fff; }
+.sheet-card::before { content: ""; position: absolute; inset: 0; border-radius: 16px; background: transparent; pointer-events: none; transition: all 0.22s ease; z-index: 1; }
+.sheet-card-overlay { position: absolute; inset: 0; border-radius: 16px; background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #fff; z-index: 2; }
+.sheet-card.is-selected { z-index: 30; transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 40px rgba(76, 175, 110, 0.18), 0 10px 18px rgba(0,0,0,0.14); }
+.sheet-card.is-selected::before { background: linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.16) 100%); border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+.sheet-card.is-selected .sheet-card-overlay { background: linear-gradient(180deg, rgba(255,255,255,0.02) 15%, rgba(23,35,29,0.18) 58%, rgba(23,35,29,0.64) 100%); }
 .sheet-card-icon-badge { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 5; color: var(--text); }
 .sheet-card-icon-badge svg { width: 16px; height: 16px; fill: currentColor; }
 .sheet-card-title { font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
@@ -523,6 +533,18 @@ input, textarea, select { font-size: 16px; }
 #settingsModal .hide-scrollbar, #editModal .hide-scrollbar { padding-bottom: calc(45px + var(--ios-bottom-bleed)) !important; }
 #settingsModal .modal { max-height: min(76vh, calc(var(--app-height) - var(--safe-top) - 20px)) !important; }
 #settingsModal .hide-scrollbar { padding-bottom: calc(20px + var(--safe-bottom)) !important; }
+#editModal .modal { max-height: min(86vh, calc(var(--app-height) - var(--safe-top) - 12px)) !important; }
+#editModal .hide-scrollbar { padding-bottom: calc(28px + var(--safe-bottom)) !important; }
+.edit-modal-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 12;
+  padding: 14px 20px calc(18px + var(--safe-bottom));
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(18px);
+  border-top: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 -10px 24px rgba(17,17,17,0.06);
+}
 #screen-owned .scroll-view { padding-bottom: calc(var(--dock-clearance) - 44px); }
 #shared-preview-container { top: var(--safe-top) !important; }
 
@@ -573,7 +595,7 @@ input, textarea, select { font-size: 16px; }
 
 <div class="screen" id="screen-home">
   <div class="scroll-view">
-  <div class="home-header animate-stagger-1"><div><div class="home-greeting">Hi, <span id="display-name">Explorer</span></div><div class="home-email" id="display-email">Loading...</div></div><div class="home-avatar-container" onclick="openSettingsModal()"><img id="display-avatar" src="" class="home-avatar" style="display:none;"><div id="display-avatar-fallback" class="home-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;"><circle cx="12" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path></svg></div><div id="sync-status-indicator" class="sync-indicator"></div></div></div>
+  <div class="home-header animate-stagger-1"><div><div class="home-greeting">Hi, <span id="display-name">Explorer</span></div></div><div class="home-avatar-container" onclick="openSettingsModal()"><img id="display-avatar" src="" class="home-avatar" style="display:none;"><div id="display-avatar-fallback" class="home-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;"><circle cx="12" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path></svg></div><div id="sync-status-indicator" class="sync-indicator"></div></div></div>
   <div class="home-body">
     <div class="category-grid animate-stagger-2">
       <div class="folder-container" onclick="goTo('flower')"><div class="folder-wrapper"><div class="folder-tab"></div><div class="folder-back-main"></div><div class="folder-photos" id="folder-photos-flower"></div><div class="folder-front"><div class="folder-stickers" id="folder-icon-flower"></div></div></div><div class="folder-info"><div class="folder-label">Flower</div><div class="folder-count" id="stat-f-total">0</div></div></div>
@@ -700,11 +722,11 @@ input, textarea, select { font-size: 16px; }
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.33 (更新時間: 05/02)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.34 (更新時間: 05/02)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
-    <div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title">修改資訊</div></div>
+    <div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div>
     <div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;">
       <div id="edit-img-section" style="position:relative; width:120px; height:120px; margin: 10px auto 24px; cursor: pointer;">
         <img id="edit-img-preview" src="" style="width:100%;height:100%;object-fit:cover;border-radius:20px;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.08);" onclick="startEditCrop()">
@@ -730,8 +752,8 @@ input, textarea, select { font-size: 16px; }
       </div>
       <div class="edit-label">主題分類 (可多選)：</div>
       <div class="theme-selector" id="edit-theme-selector" style="margin-bottom: 24px;"></div>
-      <button class="btn-primary" onclick="saveEdit()">儲存修改</button>
     </div>
+    <div class="edit-modal-footer"><button class="btn-primary" onclick="saveEdit()">儲存修改</button></div>
   </div>
 </div>
 
@@ -1058,13 +1080,21 @@ function centerAvatarCropBox(cropper, imageTarget) {
     if (!cropper || !imageTarget) return;
     const containerData = cropper.getContainerData();
     const cropBoxData = cropper.getCropBoxData();
-    const width = cropBoxData.width || Math.max(180, Math.min(250, containerData.width - 40, containerData.height - 40));
+    const cropArea = imageTarget.closest('.crop-area') || imageTarget.parentElement;
+    const cropAreaStyle = cropArea ? window.getComputedStyle(cropArea) : null;
+    const padLeft = cropAreaStyle ? (parseFloat(cropAreaStyle.paddingLeft) || 0) : 0;
+    const padRight = cropAreaStyle ? (parseFloat(cropAreaStyle.paddingRight) || 0) : 0;
+    const padTop = cropAreaStyle ? (parseFloat(cropAreaStyle.paddingTop) || 0) : 0;
+    const padBottom = cropAreaStyle ? (parseFloat(cropAreaStyle.paddingBottom) || 0) : 0;
+    const usableWidth = Math.max(0, containerData.width - padLeft - padRight);
+    const usableHeight = Math.max(0, containerData.height - padTop - padBottom);
+    const width = cropBoxData.width || Math.max(180, Math.min(250, usableWidth - 40, usableHeight - 40));
     const height = cropBoxData.height || width;
     const fixedCropBoxData = {
         width,
         height,
-        left: (containerData.width - width) / 2,
-        top: (containerData.height - height) / 2
+        left: padLeft + ((usableWidth - width) / 2),
+        top: padTop + ((usableHeight - height) / 2)
     };
     cropper.setCropBoxData(fixedCropBoxData);
     imageTarget.dataset.fixedCropBox = JSON.stringify(fixedCropBoxData);
@@ -1074,11 +1104,10 @@ function setupCropAreaGestureGuards() {
     if (!cropArea || cropArea.dataset.touchGuardsBound === 'true') return;
     const stopTouchBubble = (e) => {
         e.stopPropagation();
-        if (e.touches && e.touches.length > 1 && e.cancelable) e.preventDefault();
     };
-    cropArea.addEventListener('touchstart', stopTouchBubble, { passive: false });
-    cropArea.addEventListener('touchmove', stopTouchBubble, { passive: false });
-    cropArea.addEventListener('touchend', stopTouchBubble, { passive: false });
+    cropArea.addEventListener('touchstart', stopTouchBubble, { passive: true });
+    cropArea.addEventListener('touchmove', stopTouchBubble, { passive: true });
+    cropArea.addEventListener('touchend', stopTouchBubble, { passive: true });
     cropArea.dataset.touchGuardsBound = 'true';
 }
 function syncCropZoomSlider(cropper) {
@@ -1125,6 +1154,8 @@ function openCropperModal(imageSrc, mode, options = {}) {
                 cropper.setDragMode('move');
                 setupCropZoomSlider(cropper, this);
                 setTimeout(() => centerAvatarCropBox(cropper, this), 30);
+                setTimeout(() => centerAvatarCropBox(cropper, this), 80);
+                setTimeout(() => centerAvatarCropBox(cropper, this), 140);
                 requestAnimationFrame(() => centerAvatarCropBox(cropper, this));
             };
             const cropOptions = Object.assign({
@@ -2560,7 +2591,7 @@ function updateMapBottomSheet(forceCards = null) {
         
         return `
         <div class="sheet-card" onclick="handleSheetCardClick('${c.id}', this)">
-            <div style="position:absolute; inset:0; ${bgStyle} background-size:cover; background-position:center;"></div>
+            <div style="position:absolute; inset:0; ${bgStyle} background-size:cover; background-position:10% center; border-radius:16px;"></div>
             <div class="sheet-card-icon-badge" style="color: ${c.type === 'flower' ? 'var(--flower-dark)' : c.type === 'mushroom' ? 'var(--mushroom-dark)' : '#555'}">${typeIcon}</div>
             <div class="sheet-card-overlay">
                 <div class="sheet-card-tags"><div class="sheet-card-tag">${theme}</div></div>
@@ -2584,7 +2615,14 @@ function updateMapBottomSheet(forceCards = null) {
     }
 }
 
-function flyToCardOnMap(coordStr, el) { const parts = coordStr.split(',').map(s => parseFloat(s.trim())); if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { globalMap.flyTo([parts[0], parts[1]], 16, { duration: 1.5 }); document.querySelectorAll('.sheet-card').forEach(c => c.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'); el.style.boxShadow = '0 0 0 3px var(--green), 0 8px 24px rgba(76, 175, 110, 0.3)'; } }
+function flyToCardOnMap(coordStr, el) {
+    const parts = coordStr.split(',').map(s => parseFloat(s.trim()));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        globalMap.flyTo([parts[0], parts[1]], 16, { duration: 1.5 });
+        document.querySelectorAll('.sheet-card').forEach(card => card.classList.remove('is-selected'));
+        if (el) el.classList.add('is-selected');
+    }
+}
 
 function openRoutePanel() { renderRouteList(); openModal('route-panel-overlay'); }
 function closeRoutePanel(e) { if(e && e.target.id === 'route-panel-overlay') closeModal('route-panel-overlay'); else if(!e) closeModal('route-panel-overlay'); document.getElementById('route-autocomplete-list').classList.remove('show'); }
