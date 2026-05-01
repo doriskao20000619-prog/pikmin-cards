@@ -672,7 +672,7 @@ input, textarea, select { font-size: 16px; }
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.30 (更新時間: 05/01)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.31 (更新時間: 05/01)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -804,6 +804,7 @@ const ROUTE_STATE_KEY = 'pikmin_route_state_v1';
 const APP_VIEW_STATE_KEY = 'pikmin_app_view_state_v1';
 let pendingMapResumeRetry = false;
 let pendingRestoredMapView = null;
+let userLocationMarker = null;
 let sharedFileBlob = null; let tempMapPin = null; let customMapPins = []; 
 
 let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','🌳','🎨','🗿','🍱','🍰','☕','🍺','🚞','✈️','⛵','🚲','🚗','🗻','🏕️','🏖️','🏝️','🏜️','🏙️','🎡','🎢','🎭','🛍️','🐱','🐶','🦊','🦁','🪴','⚽','⚾','🏀','🎵','❄️','⛄','🧊','🌲','🌊','♨️','🚂','🚢','🌉','🏰'];
@@ -931,6 +932,41 @@ function applyRestoredMapState() {
     renderMapMarkers();
     updateMapBottomSheet();
 }
+function renderUserLocationMarker() {
+    if (!globalMap) return;
+    if (userLocationMarker) {
+        globalMap.removeLayer(userLocationMarker);
+        userLocationMarker = null;
+    }
+    if (!Array.isArray(currentLocLatLng) || currentLocLatLng.length !== 2) return;
+    userLocationMarker = L.circleMarker(currentLocLatLng, {
+        radius: 9,
+        color: '#ffffff',
+        weight: 3,
+        fillColor: '#2f80ff',
+        fillOpacity: 1
+    }).addTo(globalMap);
+}
+function requestFreshGeolocation(onSuccess, onError) {
+    if (!navigator.geolocation) {
+        if (typeof onError === 'function') onError(new Error('unsupported'));
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const latLng = [pos.coords.latitude, pos.coords.longitude];
+            currentLocLatLng = latLng;
+            pendingMapResumeRetry = false;
+            renderUserLocationMarker();
+            persistAppViewState();
+            if (typeof onSuccess === 'function') onSuccess(pos, latLng);
+        },
+        (err) => {
+            if (typeof onError === 'function') onError(err);
+        },
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+    );
+}
 function openExternalUrl(url) {
     if (!url) return;
     try {
@@ -978,6 +1014,21 @@ function buildTraditionalLocation(address = {}, fallbackDisplayName = '') {
     const loc = primary && country && primary !== country ? `${primary}，${country}` : (primary || country);
     return { country, city: primary, loc };
 }
+function centerAvatarCropBox(cropper, imageTarget) {
+    if (!cropper || !imageTarget) return;
+    const containerData = cropper.getContainerData();
+    const cropBoxData = cropper.getCropBoxData();
+    const width = cropBoxData.width || Math.max(180, Math.min(250, containerData.width - 40, containerData.height - 40));
+    const height = cropBoxData.height || width;
+    const fixedCropBoxData = {
+        width,
+        height,
+        left: (containerData.width - width) / 2,
+        top: (containerData.height - height) / 2
+    };
+    cropper.setCropBoxData(fixedCropBoxData);
+    imageTarget.dataset.fixedCropBox = JSON.stringify(fixedCropBoxData);
+}
 function openCropperModal(imageSrc, mode, options = {}) {
     const imageTarget = document.getElementById('crop-image-target');
     if (!imageTarget || !imageSrc) return;
@@ -994,20 +1045,18 @@ function openCropperModal(imageSrc, mode, options = {}) {
                 if (!cropper) return;
                 const containerData = cropper.getContainerData();
                 const fixedSize = Math.max(180, Math.min(250, containerData.width - 40, containerData.height - 40));
-                const fixedCropBoxData = {
-                    width: fixedSize,
-                    height: fixedSize,
-                    left: (containerData.width - fixedSize) / 2,
-                    top: (containerData.height - fixedSize) / 2
-                };
-                cropper.setCropBoxData(fixedCropBoxData);
-                this.dataset.fixedCropBox = JSON.stringify(fixedCropBoxData);
+                cropper.setCropBoxData({ width: fixedSize, height: fixedSize });
+                centerAvatarCropBox(cropper, this);
+                cropper.setDragMode('move');
+                setTimeout(() => centerAvatarCropBox(cropper, this), 30);
+                requestAnimationFrame(() => centerAvatarCropBox(cropper, this));
             };
             const cropOptions = Object.assign({
                 aspectRatio: isAvatarMode ? 1 : 3 / 2,
                 viewMode: isAvatarMode ? 1 : 1,
                 dragMode: 'move',
                 movable: true,
+                scalable: true,
                 autoCropArea: 1,
                 background: false,
                 guides: !isAvatarMode,
@@ -1029,7 +1078,10 @@ function openCropperModal(imageSrc, mode, options = {}) {
                     if (!isAvatarMode) return;
                     try {
                         const fixedCropBoxData = JSON.parse(this.dataset.fixedCropBox || 'null');
-                        if (fixedCropBoxData && this.cropper) this.cropper.setCropBoxData(fixedCropBoxData);
+                        if (fixedCropBoxData && this.cropper) {
+                            this.cropper.setCropBoxData(fixedCropBoxData);
+                            this.cropper.setDragMode('move');
+                        }
                     } catch (e) {}
                 }
             }, options);
@@ -1041,6 +1093,7 @@ function openCropperModal(imageSrc, mode, options = {}) {
                 cropOptions.guides = false;
                 cropOptions.movable = true;
                 cropOptions.zoomable = true;
+                cropOptions.scalable = true;
             }
             cropOptions.ready = function () {
                 avatarReady.call(this);
@@ -1186,20 +1239,26 @@ function normalizeThemeLabel(theme) {
 
 function normalizeCardRecord(card, typeFallback = '') {
     if (!card || typeof card !== 'object') return card;
-    const normalized = { ...card };
-    normalized.type = normalized.type || typeFallback || '';
-    if (normalized.name) normalized.name = s2t(normalized.name);
-    if (normalized.loc) normalized.loc = cleanLocText(normalized.loc);
-    if (normalized.country) normalized.country = normalizeCountryLabel(normalized.country);
-    if (Array.isArray(normalized.themes)) {
-        normalized.themes = normalized.themes.map(normalizeThemeLabel);
-    }
-    return normalized;
+    return {
+        ...card,
+        type: card.type || typeFallback || '',
+        name: card.name ? s2t(card.name) : card.name,
+        loc: card.loc ? cleanLocText(card.loc) : card.loc,
+        country: card.country ? normalizeCountryLabel(card.country) : card.country,
+        themes: Array.isArray(card.themes) ? card.themes.map(normalizeThemeLabel) : card.themes
+    };
 }
 
 function normalizeCardArray(list, typeFallback = '') {
     if (!Array.isArray(list)) return [];
-    return list.map(card => normalizeCardRecord(card, typeFallback));
+    return list.map(postcard => ({
+        ...postcard,
+        type: postcard.type || typeFallback || '',
+        name: postcard.name ? s2t(postcard.name) : postcard.name,
+        loc: postcard.loc ? cleanLocText(postcard.loc) : postcard.loc,
+        country: postcard.country ? normalizeCountryLabel(postcard.country) : postcard.country,
+        themes: Array.isArray(postcard.themes) ? postcard.themes.map(normalizeThemeLabel) : postcard.themes
+    }));
 }
 
 function normalizeDatasetCollections() {
@@ -2153,6 +2212,7 @@ function initMap() {
         });
     } 
     applyRestoredMapState();
+    renderUserLocationMarker();
     setTimeout(() => updateMapBottomSheet(), 300); 
 }
 
@@ -2238,19 +2298,13 @@ function locateMeOnMap() {
     if(navigator.geolocation) {
         showToast('📍 定位中...');
         pendingMapResumeRetry = true;
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                pendingMapResumeRetry = false;
+        requestFreshGeolocation(
+            (_pos, latLng) => {
                 if(globalMap) {
-                    globalMap.flyTo([lat, lon], 14, { duration: 1.5 });
+                    globalMap.flyTo(latLng, 14, { duration: 1.5 });
                 }
-                currentLocLatLng = [lat, lon];
-                persistAppViewState();
             },
-            () => { showToast('⚠️ 無法獲取您的位置'); },
-            { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+            () => { showToast('⚠️ 無法獲取您的位置'); }
         );
     } else {
         showToast('⚠️ 您的裝置不支援定位');
@@ -2594,21 +2648,17 @@ function openGoogleMapsRoute() {
 function retryMapLocalization(silent = true) {
     if (!navigator.geolocation) return;
     const runRetry = () => {
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                pendingMapResumeRetry = false;
-                currentLocLatLng = [pos.coords.latitude, pos.coords.longitude];
+        requestFreshGeolocation(
+            (_pos, latLng) => {
                 if (globalMap && getActiveScreenName() === 'map') {
                     globalMap.invalidateSize();
-                    globalMap.flyTo(currentLocLatLng, Math.max(globalMap.getZoom(), 14), { duration: 1.2 });
+                    globalMap.flyTo(latLng, Math.max(globalMap.getZoom(), 14), { duration: 1.2 });
                 }
-                persistAppViewState();
                 if (!silent) showToast('📍 已重新取得定位');
             },
             () => {
                 if (!silent) showToast('⚠️ 重新定位失敗，請再試一次');
-            },
-            { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+            }
         );
     };
     setTimeout(runRetry, 260);
@@ -2617,6 +2667,7 @@ function retryMapLocalization(silent = true) {
 function handleAppResume() {
     const savedScreen = restoreAppViewState();
     if (getActiveScreenName() === 'map' || savedScreen === 'map') {
+        pendingMapResumeRetry = true;
         if (globalMap) {
             setTimeout(() => {
                 globalMap.invalidateSize();
@@ -3033,6 +3084,10 @@ if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', syncViewportMetrics);
 }
 document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        pendingMapResumeRetry = true;
+        return;
+    }
     if (document.visibilityState === 'visible') handleAppResume();
 });
 window.addEventListener('pageshow', handleAppResume);
