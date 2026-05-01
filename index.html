@@ -160,13 +160,12 @@ input, textarea, select { font-size: 16px; }
 .mac-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(142, 142, 147, 0.1); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: transform 0.2s; }
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
-.postcard-name { font-weight: 800; font-size: 1.05rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 100px; margin-bottom: 4px; display: block; max-width: 100%; }
+.postcard-name { font-weight: 800; font-size: 1.05rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; display: block; flex: 1 1 auto; flex-grow: 1; flex-shrink: 1; min-width: 0; max-width: none; padding-right: 0; }
 .postcard-name-row,
-.postcard-loc-row { display: flex; align-items: center; min-width: 0; padding-right: 96px; }
+.postcard-loc-row { display: flex; align-items: center; min-width: 0; margin-right: 104px; }
 @media (max-width: 768px) {
-  .postcard-name { padding-right: 70px; }
   .postcard-name-row,
-  .postcard-loc-row { padding-right: 76px; }
+  .postcard-loc-row { margin-right: 80px; }
 }
 .postcard-loc { font-size: 0.8rem; color: var(--sub); font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; flex: 1 1 auto; min-width: 0; }
 .postcard-loc svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0;}
@@ -205,6 +204,7 @@ input, textarea, select { font-size: 16px; }
 .dock-nav { position: fixed !important; bottom: var(--dock-bottom-gap) !important; left: max(16px, calc(var(--safe-left) + 12px)) !important; right: max(16px, calc(var(--safe-right) + 12px)) !important; width: auto !important; max-width: 440px !important; height: 72px !important; margin: 0 auto !important; background: rgba(255, 255, 255, 0.75) !important; backdrop-filter: blur(30px) !important; border: 1px solid rgba(255, 255, 255, 0.8) !important; border-radius: 36px !important; display: flex !important; align-items: center !important; justify-content: space-evenly !important; z-index: 9000 !important; box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; padding: 0 12px !important; transition: transform 0.35s ease, opacity 0.25s ease; overflow: visible !important; }
 .dock-nav::after { content: none !important; display: none !important; }
 .dock-nav.hidden-dock { transform: translateY(calc(100% + var(--safe-bottom) + 28px)) !important; opacity: 0 !important; pointer-events: none !important; }
+.dock-nav.viewer-hidden { transform: translateY(calc(100% + var(--safe-bottom) + 28px)) !important; opacity: 0 !important; pointer-events: none !important; }
 .dock-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; color: var(--dock-icon-inactive); }
 .nav-label { font-size: 0.65rem; font-weight: 800; font-family: 'Nunito', sans-serif; transition: color 0.3s; margin-top: 4px; }
 .nav-icon { width: 24px; height: 24px; stroke-width: 2.2; transition: all 0.3s; fill: none; }
@@ -672,7 +672,7 @@ input, textarea, select { font-size: 16px; }
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.27 (更新時間: 05/01)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.28 (更新時間: 05/01)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -845,6 +845,10 @@ function closeModal(id) {
 }
 function closeModalOutside(e, id) { if(e && e.target && e.target.id === id) closeModal(id); }
 function resetSettingsAvatarInput() { const input = document.getElementById('settings-avatar-input'); if (input) input.value = ''; }
+function setViewerDockHidden(hidden) {
+    const nav = document.getElementById('global-nav');
+    if (nav) nav.classList.toggle('viewer-hidden', !!hidden);
+}
 function updateCropModalUI(mode) {
     const cropModal = document.getElementById('cropModal');
     const cropTitle = document.getElementById('crop-modal-title');
@@ -867,12 +871,14 @@ function openCropperModal(imageSrc, mode, options = {}) {
                 if (!cropper) return;
                 const containerData = cropper.getContainerData();
                 const fixedSize = Math.max(180, Math.min(250, containerData.width - 40, containerData.height - 40));
-                cropper.setCropBoxData({
+                const fixedCropBoxData = {
                     width: fixedSize,
                     height: fixedSize,
                     left: (containerData.width - fixedSize) / 2,
                     top: (containerData.height - fixedSize) / 2
-                });
+                };
+                cropper.setCropBoxData(fixedCropBoxData);
+                this.dataset.fixedCropBox = JSON.stringify(fixedCropBoxData);
             };
             const cropOptions = Object.assign({
                 aspectRatio: isAvatarMode ? 1 : 3 / 2,
@@ -889,7 +895,17 @@ function openCropperModal(imageSrc, mode, options = {}) {
                 checkCrossOrigin: false,
                 restore: true,
                 cropBoxMovable: !isAvatarMode,
-                cropBoxResizable: !isAvatarMode
+                cropBoxResizable: !isAvatarMode,
+                cropstart: function (event) {
+                    if (isAvatarMode && event.detail && event.detail.action !== 'move') event.preventDefault();
+                },
+                cropmove: function () {
+                    if (!isAvatarMode) return;
+                    try {
+                        const fixedCropBoxData = JSON.parse(this.dataset.fixedCropBox || 'null');
+                        if (fixedCropBoxData && this.cropper) this.cropper.setCropBoxData(fixedCropBoxData);
+                    } catch (e) {}
+                }
             }, options);
             cropOptions.ready = function () {
                 avatarReady.call(this);
@@ -900,8 +916,8 @@ function openCropperModal(imageSrc, mode, options = {}) {
     };
     imageTarget.src = imageSrc;
 }
-function showLightbox(imgSrc) { if (!imgSrc) return; const el = document.getElementById('lightbox'); if(el) el.classList.add('open'); const imgEl = document.getElementById('lightbox-img'); if(imgEl) imgEl.src = imgSrc; }
-function closeLightbox() { const el = document.getElementById('lightbox'); if(el) el.classList.remove('open'); }
+function showLightbox(imgSrc) { if (!imgSrc) return; const el = document.getElementById('lightbox'); if(el) el.classList.add('open'); const imgEl = document.getElementById('lightbox-img'); if(imgEl) imgEl.src = imgSrc; setViewerDockHidden(true); }
+function closeLightbox() { const el = document.getElementById('lightbox'); if(el) el.classList.remove('open'); setViewerDockHidden(false); }
 function cleanLocText(text) { 
     if (!text) return ''; 
     const slashParts = String(text)
@@ -926,6 +942,14 @@ function cleanLocText(text) {
         val = val.replace(new RegExp(s, 'g'), t);
     }
     return s2t(val);
+}
+
+function normalizeCountryLabel(value) {
+    const normalized = cleanLocText(value || '');
+    if (!normalized) return '';
+    if (/(韓國|南韓|大韓民國)/.test(normalized) && !/(北韓|朝鮮)/.test(normalized)) return '南韓';
+    if (/(北韓|朝鮮)/.test(normalized)) return '北韓';
+    return normalized;
 }
 function showDropzone() { const el = document.getElementById('global-dropzone'); if(el) el.classList.add('active'); }
 function closeDropzone(e) { if (e && e.target && e.target.id === 'global-dropzone') { document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0; } }
@@ -1025,7 +1049,7 @@ function migrateSimplifiedChinese() {
     let changed = false;
     [flowerCards, mushroomCards, hiddenCards].forEach(list => {
         list.forEach(c => {
-            if (c.country) { let tc = cleanLocText(c.country); if (tc !== c.country) { c.country = tc; changed = true; } }
+            if (c.country) { let tc = normalizeCountryLabel(c.country); if (tc !== c.country) { c.country = tc; changed = true; } }
             if (c.loc) { let tl = s2t(c.loc); if (tl !== c.loc) { c.loc = tl; changed = true; } }
         });
     });
@@ -1449,7 +1473,7 @@ function renderCat(cat, mode) {
   const body = document.getElementById(cat + '-body'); const fw = document.getElementById(cat + '-filters'); let processed = hideOwnedState[cat] ? raw.filter(x => !x.owned) : [...raw];
   if (mode === 'favorite') { fw.style.display = 'none'; const favs = processed.filter(x => x.favorite); favs.sort((a,b) => a.owned - b.owned); body.innerHTML = favs.length > 0 ? favs.map(x => cardHTML(x, cat==='flower'?'':'mushroom-thumb', cat)).join('') : '<div style="text-align:center; padding:40px; color:var(--sub);">還沒收藏的最愛喔</div>'; return; }
   fw.style.display = 'flex'; const gs = {}; const allCurrentThemes = [...defaultThemes, ...customThemes];
-  if (mode === 'theme') { allCurrentThemes.forEach(t => { gs[t] = []; }); processed.forEach(x => { const themes = Array.isArray(x.themes) ? x.themes : ['未分類']; themes.forEach(t => { if(!gs[t]) gs[t] = []; gs[t].push(x); }); }); } else { processed.forEach(x => { const k = cleanLocText(x.country || '未設定國家'); if(!gs[k]) gs[k] = []; gs[k].push(x); }); }
+  if (mode === 'theme') { allCurrentThemes.forEach(t => { gs[t] = []; }); processed.forEach(x => { const themes = Array.isArray(x.themes) ? x.themes : ['未分類']; themes.forEach(t => { if(!gs[t]) gs[t] = []; gs[t].push(x); }); }); } else { processed.forEach(x => { const k = normalizeCountryLabel(x.country || '未設定國家'); if(!gs[k]) gs[k] = []; gs[k].push(x); }); }
   Object.keys(gs).forEach(key => { gs[key].sort((a, b) => { if (a.owned === b.owned) return 0; return a.owned ? 1 : -1; }); });
   
   const cf = activeFilters[cat] || '全部'; let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">全部</div>`;
@@ -1621,7 +1645,7 @@ async function preloadOCR(fileIndex, imgUrl, attempt = 1) {
 function applyOcrToBatch(fileIndex) { const cache = ocrCache[fileIndex]; if (!cache || cache.batchIdx === undefined || !cache.done) return; const batchIdx = cache.batchIdx; if (cache.name && cache.name !== '未命名明信片') { tempBatchList[batchIdx].name = cache.name; } else if (tempBatchList[batchIdx].name === '辨識中...') { tempBatchList[batchIdx].name = '未命名明信片'; } if (cache.coord) { tempBatchList[batchIdx].coord = cache.coord; } tempBatchList[batchIdx].status = 'detecting'; renderBatchItems(); const finalCoord = tempBatchList[batchIdx].coord; if (finalCoord) { const parts = finalCoord.split(',').map(s => s.trim()); const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(batchIdx, lat, lon); } }
 function updateBatchItem(idx, key, val) { tempBatchList[idx][key] = val; renderBatchItems(); }
 async function fetchTimeZone(lat, lon) { try { const res = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`); const data = await res.json(); if(data && data.timeZone) return data.timeZone; } catch(e) {} return null; }
-async function fetchLocationForBatchItem(index, lat, lon) { let locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '偵測地點與時區中...'; try { const [locRes, tz] = await Promise.all([ fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW,en`), fetchTimeZone(lat, lon) ]); if (tz) tempBatchList[index].tz = tz; const data = await locRes.json(); if (data && data.address) { const addr = data.address; const country = cleanLocText(addr.country); const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || ''; const city = cleanLocText(cityRaw); tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country; locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = tempBatchList[index].loc; } else { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '無法辨識地點'; } } catch(e) { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '網路錯誤'; } }
+async function fetchLocationForBatchItem(index, lat, lon) { let locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '偵測地點與時區中...'; try { const [locRes, tz] = await Promise.all([ fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW,en`), fetchTimeZone(lat, lon) ]); if (tz) tempBatchList[index].tz = tz; const data = await locRes.json(); if (data && data.address) { const addr = data.address; const country = normalizeCountryLabel(addr.country); const cityRaw = addr.city || addr.town || addr.village || addr.suburb || addr.county || addr.state || ''; const city = cleanLocText(cityRaw); tempBatchList[index].loc = city && city !== country ? `${city}，${country}` : country; locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = tempBatchList[index].loc; } else { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '無法辨識地點'; } } catch(e) { locPreview = document.getElementById(`batch-loc-preview-${index}`); if(locPreview) locPreview.innerText = '網路錯誤'; } }
 function handleBatchCoordInput(index, val, el) { el.value = val.replace(/[^0-9.,\- ]/g, ''); tempBatchList[index].coord = el.value; clearTimeout(batchDebounceTimers[index]); batchDebounceTimers[index] = setTimeout(() => { const parts = el.value.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) fetchLocationForBatchItem(index, lat, lon); } }, 800); }
 
 function renderBatchItems() { 
@@ -1696,7 +1720,7 @@ function handleBatchSave() {
     tempBatchList.forEach(item => { 
         const theme = item.theme || '未分類'; 
         const locParts = (item.loc || '').split(/[,，]/); 
-        const country = locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc; 
+        const country = normalizeCountryLabel(locParts.length > 1 ? locParts[locParts.length - 1].trim() : item.loc); 
         const list = item.type === 'flower' ? flowerCards : (item.type === 'hidden' ? hiddenCards : mushroomCards); 
         list.push({ 
             id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000), 
@@ -2445,16 +2469,18 @@ function toggleZoomGachaCard() {
     const container = document.getElementById('printer-card-container'); 
     const overlay = document.getElementById('gacha-zoom-overlay'); 
     if (!card || (!card.classList.contains('printed') && !card.classList.contains('zoomed'))) return; 
-    if (card.classList.contains('zoomed')) { 
-        if (container) container.appendChild(card);
-        card.classList.remove('zoomed'); 
-        if(overlay) overlay.classList.remove('active'); 
-    } else { 
-        document.body.appendChild(card);
-        void card.offsetWidth;
-        card.classList.add('zoomed'); 
-        if(overlay) overlay.classList.add('active'); 
-    } 
+        if (card.classList.contains('zoomed')) { 
+            if (container) container.appendChild(card);
+            card.classList.remove('zoomed'); 
+            if(overlay) overlay.classList.remove('active'); 
+            setViewerDockHidden(false);
+        } else { 
+            document.body.appendChild(card);
+            void card.offsetWidth;
+            card.classList.add('zoomed'); 
+            if(overlay) overlay.classList.add('active'); 
+            setViewerDockHidden(true);
+        } 
 }
 
 function spinPrinterGacha() { 
