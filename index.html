@@ -131,23 +131,36 @@ input, textarea, select { font-size: 16px; }
 .back-btn { display: none; }
 .back-btn svg { display: none; }
 .cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; text-align: center; width: 100%; } 
-.sub-tabs { --cat-content-gutter: 30px; display: flex; align-items: flex-end; gap: 0; margin: 0; padding: 0; background: #f0f1ef; border: 1px solid rgba(222,225,221,0.95); border-bottom: none; border-radius: 30px 30px 0 0; box-shadow: 0 1px 0 rgba(255,255,255,0.5); overflow: hidden; min-height: 64px; position: relative; z-index: 3; }
-.sub-tab { flex: 1; min-height: 64px; display: flex; align-items: center; justify-content: center; padding: 0 18px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.95rem; color: #444; cursor: pointer; border-radius: 22px 22px 0 0; transition: all 0.22s ease; line-height: 1; position: relative; }
-.sub-tab.active { background: #ffffff; color: #111; box-shadow: none; }
-.sub-tab.active::after { display: none; }
-.quick-filter-wrapper { display: flex; gap: 8px; margin: 20px 24px 0; padding: 6px 12px; width: calc(100% - 48px); box-sizing: border-box; overflow-x: auto; scrollbar-width: none; scroll-padding-left: 12px; scroll-padding-right: 12px; border-bottom: none; border-radius: 999px; background: linear-gradient(180deg, rgba(255,255,255,0.56) 0%, rgba(239,242,239,0.84) 100%); box-shadow: inset 0 2px 5px rgba(197, 203, 198, 0.42), inset 0 1px 0 rgba(255,255,255,0.96), inset 0 0 0 1px rgba(214,220,216,0.9), 0 1px 1px rgba(255,255,255,0.45); }
+.sub-tabs { --cat-content-gutter: 30px; display: flex; align-items: flex-end; gap: 0; margin: 0; padding: 0 0 0; background: #f0f1ef; border: 1px solid rgba(222,225,221,0.95); border-bottom: none; border-radius: 28px 28px 0 0; box-shadow: 0 1px 0 rgba(255,255,255,0.5); overflow: hidden; min-height: 56px; position: relative; z-index: 3; isolation: isolate; }
+.sub-tab { flex: 1; min-height: 56px; display: flex; align-items: center; justify-content: center; padding: 0 18px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.95rem; color: #444; cursor: pointer; border-radius: 20px 20px 0 0; transition: all 0.22s ease; line-height: 1; position: relative; z-index: 1; background: transparent; }
+.sub-tab.active { background: #ffffff; color: #111; box-shadow: none; z-index: 3; border-radius: 20px 20px 0 0; overflow: hidden; }
+.sub-tab.active::before { content: none; }
+.sub-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 3px;
+  background: #1A1A1A;
+  border-radius: 3px;
+}
+.quick-filter-wrapper { display: flex; gap: 0; margin: 20px 24px 0; padding: 8px 16px; width: calc(100% - 48px); min-height: 64px; box-sizing: border-box; align-items: center; overflow-x: auto; scrollbar-width: none; scroll-padding-left: 16px; scroll-padding-right: 16px; border-bottom: none; border-radius: 999px; background: linear-gradient(180deg, rgba(240,240,240,0.99) 0%, rgba(230,230,230,0.97) 100%); border: 1px solid rgba(255,255,255,0.62); box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.62), inset 0 -1px 1px rgba(214,214,214,0.48); position: relative; }
 .quick-filter-wrapper::-webkit-scrollbar { display: none; }
-.filter-pill { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 16px; border-radius: 999px; border: none; background: transparent; color: #8e9a92; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; box-shadow: none; flex-shrink: 0; }
-.filter-pill.active { background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(250,251,250,0.98) 58%, rgba(242,245,242,0.94) 100%); color: var(--green-dark); box-shadow: 0 0 10px rgba(17,17,17,0.05), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(219,225,221,0.72); }
-.add-theme-btn { padding: 8px 16px; border-radius: 99px; border: 1.5px dashed var(--sub); background: rgba(255,255,255,0.5); color: var(--sub); font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+.slider-indicator { position: absolute; top: 8px; left: 0; height: calc(100% - 16px); border-radius: 999px; background: #FFFFFF; box-shadow: 0px 2px 8px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.04); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease; z-index: 0; pointer-events: none; will-change: left, width; }
+.filter-pill { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 0 18px; border-radius: 999px; border: none; background: transparent; color: #1A1A1A; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: color 0.22s ease; box-shadow: none; flex-shrink: 0; position: relative; z-index: 2; }
+.filter-pill.active { background: transparent; color: #0088FF; box-shadow: none; }
+.add-theme-btn { padding: 0 16px; min-height: 42px; border-radius: 100px; border: none; background: #FFFFFF; color: #6d8674; font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.75); }
+.manage-theme-btn { padding: 0 14px; color: #6d8674; }
 .btn-add-theme { width: 100%; margin-bottom: 16px; padding: 14px 18px; border: none; border-radius: 16px; background: #F0F5F1; color: #4A8E59; font-weight: 900; font-size: 0.98rem; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: inset 0 0 0 1px rgba(74, 142, 89, 0.12); cursor: pointer; transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease; }
 .btn-add-theme:active { transform: scale(0.98); }
 .btn-add-theme:hover { background: #e8f1ea; box-shadow: inset 0 0 0 1px rgba(74, 142, 89, 0.18); }
 .btn-add-theme-icon { font-size: 1.05rem; line-height: 1; }
-.cat-body { padding: 48px 0 10px; background: transparent; box-sizing: border-box; }
-.group-section { margin-bottom: 32px; padding: 0 24px; }
-.group-section:first-child { margin-top: 8px; }
-.cat-body > .postcard-wrapper { margin-left: 24px; margin-right: 24px; }
+.cat-body { padding: 20px 24px 10px; background: transparent; box-sizing: border-box; }
+.group-section { margin-bottom: 32px; padding: 0; }
+.group-section:first-child { margin-top: 0; }
+.cat-body > .postcard-wrapper { margin-left: 0; margin-right: 0; }
 .group-header { font-weight: 900; font-size: 0.85rem; color: var(--sub); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; padding-left: 2px; }
 .group-count { background: rgba(0,0,0,0.06); color: var(--sub); border-radius: 99px; padding: 2px 10px; font-size: 0.7rem; }
 .cat-content-panel { background: #fff; margin: -2px 0 0; width: 100%; padding: 14px var(--cat-content-gutter) 0; border-radius: 0 30px 0 0; box-shadow: 0 14px 30px rgba(17,17,17,0.04), inset 0 1px 0 rgba(255,255,255,0.96); box-sizing: border-box; overflow-x: hidden; }
@@ -459,9 +472,6 @@ input, textarea, select { font-size: 16px; }
 .crop-modal-overlay .cropper-drag-box,
 .crop-modal-overlay .cropper-canvas,
 .crop-modal-overlay .cropper-crop-box { touch-action: none !important; }
-.crop-zoom-controls { padding: 0 24px calc(20px + var(--safe-bottom)); display: flex; align-items: center; gap: 12px; }
-.crop-zoom-label { color: rgba(255,255,255,0.78); font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
-.crop-zoom-slider { width: 100%; accent-color: #a8ddb8; }
 
 .user-location-pin {
   width: 22px;
@@ -589,10 +599,6 @@ input, textarea, select { font-size: 16px; }
 <div class="crop-modal-overlay" id="cropModal">
   <div class="crop-header"><button class="btn-cancel" style="width:auto;color:#fff;" onclick="cancelCrop()">取消</button><div class="crop-title" id="crop-modal-title">裁切圖片</div><button class="btn-primary" style="width:auto;" onclick="confirmCrop()">確認</button></div>
   <div class="crop-container crop-area" id="crop-area"><img id="crop-image-target" src=""></div>
-  <div class="crop-zoom-controls">
-    <span class="crop-zoom-label">縮放</span>
-    <input type="range" id="crop-zoom-slider" class="crop-zoom-slider" min="1" max="3.5" step="0.01" value="1">
-  </div>
 </div>
 
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()"><div class="lightbox-frame"><img src="" class="lightbox-img" id="lightbox-img"></div></div>
@@ -621,9 +627,9 @@ input, textarea, select { font-size: 16px; }
   </div>
 </div>
 
-<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div></div>
-<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div></div>
-<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div></div>
+<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div></div>
+<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div></div>
+<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div></div>
 
 <div class="screen" id="screen-map">
   <div class="map-body-wrapper">
@@ -731,7 +737,7 @@ input, textarea, select { font-size: 16px; }
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.59 (更新時間: 05/02)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.77 (更新時間: 05/03)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -1269,9 +1275,11 @@ function applyFilter(cat, mode, val) {
     const bodyEl = document.getElementById('screen-' + cat) || document.getElementById('screen-home');
     const savedScrollY = bodyEl ? bodyEl.scrollTop : 0;
 
+    if (fw) setQuickFilterActive(fw, val);
     activeFilters[cat] = val; 
     refreshCurrentView(); 
 
+    if (fw) fw.scrollLeft = savedScrollX;
     if (bodyEl) { bodyEl.scrollTop = savedScrollY; }
 }
 
@@ -1623,6 +1631,7 @@ function refreshCurrentView() {
 
   updateFolderPhotos(); 
   enableDragScroll(); 
+  requestAnimationFrame(refreshQuickFilterSliders);
 }
 
 function initModalDrag() {
@@ -1647,7 +1656,56 @@ function enableDragScroll() {
     slider.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 1.5; if (Math.abs(walk) > 3) isDragging = true; slider.scrollLeft = scrollLeft - walk; });
     slider.addEventListener('click', (e) => { if (isDragging) { e.preventDefault(); e.stopPropagation(); } }, true);
     slider.addEventListener('wheel', (e) => { if (e.deltaY !== 0) { e.preventDefault(); slider.scrollLeft += e.deltaY > 0 ? 40 : -40; } }, { passive: false });
+    if (slider.classList.contains('quick-filter-wrapper')) {
+      slider.addEventListener('scroll', () => updateQuickFilterSlider(slider), { passive: true });
+    }
   });
+}
+
+function updateQuickFilterSlider(container) {
+  if (!container) return;
+  const indicator = container.querySelector('.slider-indicator');
+  const activeTab = container.querySelector('.filter-pill.active');
+  if (!indicator || !activeTab) {
+    if (indicator) {
+      indicator.style.width = '0px';
+      indicator.style.left = '0px';
+    }
+    return;
+  }
+
+  indicator.style.width = `${activeTab.offsetWidth}px`;
+  indicator.style.left = `${activeTab.offsetLeft}px`;
+}
+
+function setQuickFilterActive(container, value) {
+  if (!container) return;
+  container.querySelectorAll('.filter-pill').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.filterValue === value);
+  });
+  requestAnimationFrame(() => updateQuickFilterSlider(container));
+}
+
+function renderQuickFilterBar(container, options, activeValue, cat, mode) {
+  if (!container) return;
+  const signature = JSON.stringify({ options, mode });
+  const needsThemeActions = mode === 'theme';
+
+  if (container.dataset.signature !== signature) {
+    let html = `<div class="slider-indicator"></div>`;
+    html += options.map(value => `<div class="filter-pill tab" data-filter-value="${value}" onclick="applyFilter('${cat}','${mode}','${value}')">${value}</div>`).join('');
+    if (needsThemeActions) {
+      html += `<button class="add-theme-btn" style="margin-left: 6px;" onclick="openAddThemeModal()">＋</button><button class="add-theme-btn manage-theme-btn" style="margin-left: 6px;" onclick="openManageThemeModal()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`;
+    }
+    container.innerHTML = html;
+    container.dataset.signature = signature;
+  }
+
+  setQuickFilterActive(container, activeValue);
+}
+
+function refreshQuickFilterSliders() {
+  document.querySelectorAll('.quick-filter-wrapper').forEach(updateQuickFilterSlider);
 }
 
 function resetThemeSwipes(exceptItem = null) {
@@ -1839,13 +1897,11 @@ function renderCat(cat, mode) {
   if (mode === 'theme') { allCurrentThemes.forEach(t => { gs[t] = []; }); processed.forEach(x => { const themes = Array.isArray(x.themes) ? x.themes : ['未分類']; themes.forEach(t => { if(!gs[t]) gs[t] = []; gs[t].push(x); }); }); } else { processed.forEach(x => { const k = normalizeCountryLabel(x.country || '未設定國家'); if(!gs[k]) gs[k] = []; gs[k].push(x); }); }
   Object.keys(gs).forEach(key => { gs[key].sort((a, b) => { if (a.owned === b.owned) return 0; return a.owned ? 1 : -1; }); });
   
-  const cf = activeFilters[cat] || '全部'; let fH = `<div class="filter-pill ${cf==='全部'?'active':''}" onclick="applyFilter('${cat}','${mode}','全部')">全部</div>`;
-  Object.keys(gs).forEach(n => { fH += `<div class="filter-pill ${cf===n?'active':''}" onclick="applyFilter('${cat}','${mode}','${n}')">${n}</div>`; });
-  if (mode === 'theme') { fH += `<button class="add-theme-btn" style="margin-left: 6px;" onclick="openAddThemeModal()">＋</button><button class="add-theme-btn manage-theme-btn" style="margin-left: 6px;" onclick="openManageThemeModal()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`; }
-  
+  const cf = activeFilters[cat] || '全部';
+  const filterOptions = ['全部', ...Object.keys(gs)];
   let savedScroll = fw ? fw.scrollLeft : 0;
-  if(fw) {
-      fw.innerHTML = fH;
+  if (fw) {
+      renderQuickFilterBar(fw, filterOptions, cf, cat, mode);
       fw.scrollLeft = savedScroll;
   }
   
@@ -3234,8 +3290,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderRouteList();
     initModalDrag(); 
     initSwipeToBack();
+    requestAnimationFrame(refreshQuickFilterSliders);
 });
-window.addEventListener('resize', syncViewportMetrics);
+window.addEventListener('resize', () => { syncViewportMetrics(); refreshQuickFilterSliders(); });
 window.addEventListener('orientationchange', () => setTimeout(syncViewportMetrics, 150));
 if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', syncViewportMetrics);
