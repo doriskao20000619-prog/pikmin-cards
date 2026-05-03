@@ -25,9 +25,8 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
-  --app-height: 100vh;
+  --app-height: 100dvh;
   --dock-height: 72px;
-  --ios-bottom-bleed: max(24px, var(--safe-bottom));
   --dock-bottom-gap: max(8px, calc(var(--safe-bottom) - 24px));
   --dock-clearance: calc(var(--dock-height) + max(16px, var(--dock-bottom-gap)) + 36px);
   --green: #4caf6e; --green-light: #a8ddb8; --green-dark: #2e7d4f;
@@ -43,16 +42,14 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { width: 100% !important; height: var(--app-height) !important; min-height: var(--app-height) !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background-color: var(--bg) !important; position: relative !important; font-family: 'Noto Sans TC', sans-serif; color: var(--text); overscroll-behavior: none; }
 body { min-height: var(--app-height); }
-body::before { content: ""; position: fixed; inset: -80px 0 -80px; background: var(--bg); z-index: -10; pointer-events: none; }
 input, textarea, select { font-size: 16px; }
 
-@supports (height: 100dvh) {
-  :root { --app-height: 100dvh; }
+@supports not (height: 100dvh) {
+  :root { --app-height: 100vh; }
 }
 
 /* ── LAYOUT & ANIMATIONS ── */
 .screen { display: none; height: var(--app-height) !important; min-height: var(--app-height) !important; width: 100% !important; position: absolute !important; inset: 0 !important; background: var(--bg) !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important; isolation: isolate !important; }
-.screen::after { content: ""; position: absolute; left: 0; right: 0; bottom: calc(-1 * var(--ios-bottom-bleed)); height: var(--ios-bottom-bleed); background: var(--bg); pointer-events: none; z-index: -1; }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: flex !important; flex-direction: column; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
 .screen.swipe-back-current { will-change: transform; }
@@ -131,24 +128,76 @@ input, textarea, select { font-size: 16px; }
 .back-btn { display: none; }
 .back-btn svg { display: none; }
 .cat-topbar-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; text-align: center; width: 100%; } 
-.sub-tabs { --cat-content-gutter: 30px; display: flex; align-items: flex-end; gap: 0; margin: 0; padding: 0 0 0; background: #f0f1ef; border: 1px solid rgba(222,225,221,0.95); border-bottom: none; border-radius: 28px 28px 0 0; box-shadow: 0 1px 0 rgba(255,255,255,0.5); overflow: hidden; min-height: 56px; position: relative; z-index: 3; isolation: isolate; }
-.sub-tab { flex: 1; min-height: 56px; display: flex; align-items: center; justify-content: center; padding: 0 18px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.95rem; color: #444; cursor: pointer; border-radius: 20px 20px 0 0; transition: all 0.22s ease; line-height: 1; position: relative; z-index: 1; background: transparent; }
-.sub-tab.active { background: #ffffff; color: #111; box-shadow: none; z-index: 3; border-radius: 20px 20px 0 0; overflow: hidden; }
-.sub-tab.active::before { content: none; }
-.sub-tab.active::after {
+.sub-tabs { --cat-content-gutter: 30px; display: flex; align-items: flex-end; gap: 0; margin: 0; padding: 0; background: transparent; border: 1px solid rgba(222,225,221,0.95); border-bottom: none; border-radius: 20px 20px 0 0; box-shadow: 0 1px 0 rgba(255,255,255,0.5); overflow: hidden; min-height: 48px; height: 48px; position: relative; z-index: 3; isolation: isolate; }
+.sub-tabs::before {
   content: "";
+  position: absolute;
+  inset: 0;
+  background: #f0f1ef;
+  border-radius: 20px 20px 0 0;
+  z-index: 0;
+}
+.sub-tabs > .slider-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  border-radius: 20px 20px 0 0;
+  background: #ffffff;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
+.sub-tabs > .slider-indicator::before,
+.sub-tabs > .slider-indicator::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: transparent;
+}
+.sub-tabs > .slider-indicator::before {
+  left: -20px;
+  box-shadow: 10px 10px 0 0 #ffffff;
+}
+.sub-tabs > .slider-indicator::after {
+  right: -20px;
+  box-shadow: -10px 10px 0 0 #ffffff;
+}
+.sub-tabs > .slider-indicator.is-first::before {
+  display: none;
+}
+.sub-tabs > .slider-indicator.is-first {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 0;
+}
+.sub-tabs > .slider-indicator.is-last::after {
+  display: none;
+}
+.sub-tabs > .slider-indicator.is-last {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 0;
+}
+.sub-tabs > .slider-indicator .indicator-line {
   position: absolute;
   bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
   width: 28px;
   height: 3px;
-  background: #1A1A1A;
   border-radius: 3px;
+  background: #1A1A1A;
+  pointer-events: none;
 }
-.quick-filter-wrapper { display: flex; gap: 0; margin: 20px 24px 0; padding: 8px 16px; width: calc(100% - 48px); min-height: 64px; box-sizing: border-box; align-items: center; overflow-x: auto; scrollbar-width: none; scroll-padding-left: 16px; scroll-padding-right: 16px; border-bottom: none; border-radius: 999px; background: linear-gradient(180deg, rgba(240,240,240,0.99) 0%, rgba(230,230,230,0.97) 100%); border: 1px solid rgba(255,255,255,0.62); box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.62), inset 0 -1px 1px rgba(214,214,214,0.48); position: relative; }
+.sub-tab { flex: 1; min-height: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 18px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.95rem; color: #444; cursor: pointer; transition: color 0.22s ease; line-height: 1; position: relative; z-index: 1; background: #f0f1ef; border-radius: 20px 20px 0 0; }
+.sub-tab.active { background: transparent; color: #111; box-shadow: none; z-index: 3; }
+.quick-filter-wrapper { display: flex; gap: 0; margin: 20px 24px 0; padding: 4px; width: calc(100% - 48px); min-height: 48px; height: 48px; box-sizing: border-box; align-items: center; overflow-x: auto; scrollbar-width: none; scroll-padding-left: 4px; scroll-padding-right: 4px; border-bottom: none; border-radius: 999px; background: linear-gradient(180deg, rgba(240,240,240,0.99) 0%, rgba(230,230,230,0.97) 100%); border: 1px solid rgba(255,255,255,0.62); box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.62), inset 0 -1px 1px rgba(214,214,214,0.48); position: relative; }
 .quick-filter-wrapper::-webkit-scrollbar { display: none; }
-.slider-indicator { position: absolute; top: 8px; left: 0; height: calc(100% - 16px); border-radius: 999px; background: #FFFFFF; box-shadow: 0px 2px 8px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.04); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease; z-index: 0; pointer-events: none; will-change: left, width; }
+.quick-filter-wrapper > .slider-indicator { position: absolute; top: 4px; left: 0; height: calc(100% - 8px); border-radius: 999px; background: #FFFFFF; box-shadow: 0px 2px 8px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.04); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease; z-index: 0; pointer-events: none; will-change: left, width; }
 .filter-pill { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 0 18px; border-radius: 999px; border: none; background: transparent; color: #1A1A1A; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: color 0.22s ease; box-shadow: none; flex-shrink: 0; position: relative; z-index: 2; }
 .filter-pill.active { background: transparent; color: #0088FF; box-shadow: none; }
 .add-theme-btn { padding: 0 16px; min-height: 42px; border-radius: 100px; border: none; background: #FFFFFF; color: #6d8674; font-weight: 900; cursor: pointer; font-size: 0.9rem; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.75); }
@@ -163,7 +212,7 @@ input, textarea, select { font-size: 16px; }
 .cat-body > .postcard-wrapper { margin-left: 0; margin-right: 0; }
 .group-header { font-weight: 900; font-size: 0.85rem; color: var(--sub); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; padding-left: 2px; }
 .group-count { background: rgba(0,0,0,0.06); color: var(--sub); border-radius: 99px; padding: 2px 10px; font-size: 0.7rem; }
-.cat-content-panel { background: #fff; margin: -2px 0 0; width: 100%; padding: 14px var(--cat-content-gutter) 0; border-radius: 0 30px 0 0; box-shadow: 0 14px 30px rgba(17,17,17,0.04), inset 0 1px 0 rgba(255,255,255,0.96); box-sizing: border-box; overflow-x: hidden; }
+.cat-content-panel { background: #fff; margin: -2px 0 0; width: 100%; padding: 14px var(--cat-content-gutter) 0; border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; box-shadow: 0 14px 30px rgba(17,17,17,0.04), inset 0 1px 0 rgba(255,255,255,0.96); box-sizing: border-box; overflow-x: hidden; }
 
 /* ── POSTCARDS LIST ── */
 .postcard-wrapper { position: relative; margin-bottom: 22px; border-radius: 24px; background: transparent; overflow: visible; }
@@ -546,11 +595,11 @@ input, textarea, select { font-size: 16px; }
 .camera-flash-effect { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: 999999; pointer-events: none; animation: flashFade 0.6s ease-out forwards;  }
 @keyframes flashFade { 0% { opacity: 1; } 100% { opacity: 0; } }
 
-.modal-overlay, .route-panel-overlay, .map-detail-overlay, .lightbox-overlay, .crop-modal-overlay, .global-dropzone { bottom: calc(-1 * var(--ios-bottom-bleed)) !important; min-height: calc(var(--app-height) + var(--ios-bottom-bleed)) !important; }
+.modal-overlay, .route-panel-overlay, .map-detail-overlay, .lightbox-overlay, .crop-modal-overlay, .global-dropzone { bottom: 0 !important; min-height: 100% !important; }
 .modal-overlay.open, .route-panel-overlay.open { align-items: flex-end !important; }
-.modal { margin-bottom: calc(-1 * var(--ios-bottom-bleed)) !important; padding-bottom: calc(45px + var(--ios-bottom-bleed)) !important; }
-#settingsModal .modal, #editModal .modal { margin-bottom: calc(-1 * var(--ios-bottom-bleed)) !important; }
-#settingsModal .hide-scrollbar, #editModal .hide-scrollbar { padding-bottom: calc(45px + var(--ios-bottom-bleed)) !important; }
+.modal { margin-bottom: 0 !important; padding-bottom: calc(45px + env(safe-area-inset-bottom)) !important; }
+#settingsModal .modal, #editModal .modal { margin-bottom: 0 !important; }
+#settingsModal .hide-scrollbar, #editModal .hide-scrollbar { padding-bottom: calc(45px + env(safe-area-inset-bottom)) !important; }
 #settingsModal .modal { max-height: min(76vh, calc(var(--app-height) - var(--safe-top) - 20px)) !important; }
 #settingsModal .hide-scrollbar { padding-bottom: calc(20px + var(--safe-bottom)) !important; }
 #editModal .modal { max-height: min(86vh, calc(var(--app-height) - var(--safe-top) - 12px)) !important; background: rgba(255,255,255,0.85) !important; }
@@ -627,9 +676,9 @@ input, textarea, select { font-size: 16px; }
   </div>
 </div>
 
-<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div></div>
-<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div></div>
-<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div></div>
+<div class="screen" id="screen-flower"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Flower</div></div><div class="sub-tabs"><div class="slider-indicator is-first"><span class="indicator-line"></span></div><div class="sub-tab active" onclick="switchSubTab('flower','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('flower','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('flower','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="flower-filters"></div><div class="cat-body" id="flower-body"></div></div></div>
+<div class="screen" id="screen-mushroom"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Mushroom</div></div><div class="sub-tabs"><div class="slider-indicator is-first"><span class="indicator-line"></span></div><div class="sub-tab active" onclick="switchSubTab('mushroom','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('mushroom','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('mushroom','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="mushroom-filters"></div><div class="cat-body" id="mushroom-body"></div></div></div>
+<div class="screen" id="screen-hidden"><div class="cat-screen-header"><div class="cat-topbar"><button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg></button><div class="cat-topbar-title">Hidden</div></div><div class="sub-tabs"><div class="slider-indicator is-first"><span class="indicator-line"></span></div><div class="sub-tab active" onclick="switchSubTab('hidden','country', this)">國家</div><div class="sub-tab" onclick="switchSubTab('hidden','theme', this)">主題</div><div class="sub-tab" onclick="switchSubTab('hidden','favorite', this)">最愛</div></div></div><div class="scroll-view cat-content-panel"><div class="quick-filter-wrapper tabs-container" id="hidden-filters"></div><div class="cat-body" id="hidden-body"></div></div></div>
 
 <div class="screen" id="screen-map">
   <div class="map-body-wrapper">
@@ -737,7 +786,7 @@ input, textarea, select { font-size: 16px; }
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.77 (更新時間: 05/03)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.2.89 (更新時間: 05/03)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -877,14 +926,6 @@ let selectedEmojis = ['🏞️','🏛️','⛩️','⛪','🌌','🗼','🌸','�
 let currentNewThemeEmoji = '✨';
 
 let autocompleteTimer = null;
-
-function syncViewportMetrics() {
-    const viewport = window.visualViewport;
-    const visualHeight = viewport ? Math.round(viewport.height + viewport.offsetTop) : 0;
-    const layoutHeight = Math.round(window.innerHeight);
-    const height = Math.max(layoutHeight, visualHeight);
-    document.documentElement.style.setProperty('--app-height', `${height}px`);
-}
 
 function hasBlockingOverlayOpen() {
     return !!document.querySelector('.modal-overlay.open, .route-panel-overlay.open, .map-detail-overlay.open, .lightbox-overlay.open, .crop-modal-overlay.open');
@@ -1267,7 +1308,43 @@ function normalizeCountryLabel(value) {
 }
 function showDropzone() { const el = document.getElementById('global-dropzone'); if(el) el.classList.add('active'); }
 function closeDropzone(e) { if (e && e.target && e.target.id === 'global-dropzone') { document.getElementById('global-dropzone').classList.remove('active'); dragCounter = 0; } }
-function switchSubTab(cat, tab, el) { const s = document.getElementById('screen-'+cat); if(s) { s.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active')); } if(el) el.classList.add('active'); activeSubTabs[cat] = tab; activeFilters[cat] = '全部'; refreshCurrentView(); }
+function updateMainTabSlider(container) {
+  if (!container) return;
+  const indicator = container.querySelector(':scope > .slider-indicator');
+  const tabs = Array.from(container.querySelectorAll(':scope > .sub-tab'));
+  const activeTab = container.querySelector(':scope > .sub-tab.active');
+  if (!indicator || !activeTab) {
+    if (indicator) {
+      indicator.style.width = '0px';
+      indicator.style.left = '0px';
+      indicator.classList.remove('is-first', 'is-last');
+    }
+    return;
+  }
+  const activeIndex = tabs.indexOf(activeTab);
+  indicator.style.width = `${activeTab.offsetWidth}px`;
+  indicator.style.left = `${activeTab.offsetLeft}px`;
+  indicator.classList.toggle('is-first', activeIndex === 0);
+  indicator.classList.toggle('is-last', activeIndex === tabs.length - 1);
+}
+
+function refreshMainTabSliders() {
+  document.querySelectorAll('.sub-tabs').forEach(updateMainTabSlider);
+}
+
+function switchSubTab(cat, tab, el) {
+  const s = document.getElementById('screen-' + cat);
+  if (s) {
+    s.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    if (el) {
+      el.classList.add('active');
+      requestAnimationFrame(() => updateMainTabSlider(s.querySelector('.sub-tabs')));
+    }
+  }
+  activeSubTabs[cat] = tab;
+  activeFilters[cat] = '全部';
+  refreshCurrentView();
+}
 
 function applyFilter(cat, mode, val) { 
     const fw = document.getElementById(cat + '-filters');
@@ -1632,6 +1709,7 @@ function refreshCurrentView() {
   updateFolderPhotos(); 
   enableDragScroll(); 
   requestAnimationFrame(refreshQuickFilterSliders);
+  requestAnimationFrame(refreshMainTabSliders);
 }
 
 function initModalDrag() {
@@ -2137,7 +2215,8 @@ function confirmBatchItem(index) { tempBatchList[index].status = 'confirmed'; re
 function toggleBatchFav(index) { tempBatchList[index].favorite = !tempBatchList[index].favorite; renderBatchItems(); }
 function handleBatchSave() { 
     tempBatchList.forEach(item => { 
-        const theme = normalizeThemeLabel(item.theme || '未分類'); 
+        const cleanedThemes = [normalizeThemeLabel(item.theme || '未分類')].filter(t => t && t !== '未分類');
+        const normalizedThemes = cleanedThemes.length > 0 ? cleanedThemes : ['未分類'];
         const normalizedLoc = cleanLocText(item.loc || '未設定地點');
         const locParts = normalizedLoc.split(/[,，]/); 
         const country = normalizeCountryLabel(locParts.length > 1 ? locParts[locParts.length - 1].trim() : normalizedLoc); 
@@ -2147,7 +2226,7 @@ function handleBatchSave() {
             name: s2t(item.name || '未命名'), 
             loc: normalizedLoc, 
             country: country || '未設定國家', 
-            themes: [theme], 
+            themes: normalizedThemes, 
             coord: item.coord || '', 
             icon: '', 
             tz: item.tz || Intl.DateTimeFormat().resolvedOptions().timeZone, 
@@ -2335,7 +2414,7 @@ const editCoordInputEl = document.getElementById('edit-coord-input');
 if(editCoordInputEl) {
     editCoordInputEl.addEventListener('input', function() { this.value = this.value.replace(/[^0-9.,\- ]/g, ''); clearTimeout(coordDebounceTimer); const val = this.value; coordDebounceTimer = setTimeout(() => { const parts = val.split(',').map(s => s.trim()); if (parts.length === 2 && parts[0] && parts[1]) { const lat = parseFloat(parts[0]); const lon = parseFloat(parts[1]); if (!isNaN(lat) && !isNaN(lon)) { document.getElementById('edit-loc-input').value = '🔍 偵測中...'; fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-TW,en`).then(r => r.json()).then(d => { if(d && d.address) { const locationMeta = buildTraditionalLocation(d.address, d.display_name || ''); document.getElementById('edit-loc-input').value = locationMeta.loc || '⚠️ 無法辨識'; currentEditCountry = locationMeta.country || ''; } else document.getElementById('edit-loc-input').value = '⚠️ 無法辨識'; }).catch(() => document.getElementById('edit-loc-input').value = '⚠️ 網路錯誤'); } } }, 800); });
 }
-function saveEdit() { const nc = document.getElementById('edit-coord-input').value; const nn = document.getElementById('edit-name-input').value.trim(); const nl = document.getElementById('edit-loc-input').value.trim(); if (!nc || !nn || !nl) { showToast('⚠️ 請填寫完整資訊'); return; } const oldList = currentEditCat === 'flower' ? flowerCards : (currentEditCat === 'hidden' ? hiddenCards : mushroomCards); const idx = oldList.findIndex(x => x.id == currentEditId); if(idx > -1){ const c = oldList[idx]; c.coord = nc; c.name = s2t(nn); c.loc = cleanLocText(nl); c.tz = currentEditTz; if (isEditImgDeleted) { c.img = null; c.originalImg = null; c.cropData = null; } else { if (tempEditImg) c.img = tempEditImg; if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; if (tempEditCropData) c.cropData = tempEditCropData; } const locParts = c.loc.split(/[,，]/); c.country = normalizeCountryLabel(currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : c.loc)); c.themes = tempEditThemes.length > 0 ? [...tempEditThemes.map(normalizeThemeLabel)] : ['未分類']; c.type = currentEditType; if (currentEditCat !== currentEditType) { oldList.splice(idx, 1); const newList = currentEditType === 'flower' ? flowerCards : (currentEditType === 'hidden' ? hiddenCards : mushroomCards); newList.push(c); } refreshCurrentView(); } closeModal('editModal'); showToast('✅ 明信片已更新'); saveDataToLocal(); const sm = document.getElementById('screen-map'); if(sm && sm.classList.contains('active')) { const p = nc.split(','); if(globalMap) { globalMap.flyTo([parseFloat(p[0]), parseFloat(p[1])], 16, {duration: 1.5}); setTimeout(() => { renderMapMarkers(); updateMapBottomSheet(); persistAppViewState(); }, 300); } } }
+function saveEdit() { const nc = document.getElementById('edit-coord-input').value; const nn = document.getElementById('edit-name-input').value.trim(); const nl = document.getElementById('edit-loc-input').value.trim(); if (!nc || !nn || !nl) { showToast('⚠️ 請填寫完整資訊'); return; } const oldList = currentEditCat === 'flower' ? flowerCards : (currentEditCat === 'hidden' ? hiddenCards : mushroomCards); const idx = oldList.findIndex(x => x.id == currentEditId); if(idx > -1){ const c = oldList[idx]; c.coord = nc; c.name = s2t(nn); c.loc = cleanLocText(nl); c.tz = currentEditTz; if (isEditImgDeleted) { c.img = null; c.originalImg = null; c.cropData = null; } else { if (tempEditImg) c.img = tempEditImg; if (tempEditOriginalImg) c.originalImg = tempEditOriginalImg; if (tempEditCropData) c.cropData = tempEditCropData; } const locParts = c.loc.split(/[,，]/); c.country = normalizeCountryLabel(currentEditCountry || (locParts.length > 1 ? locParts[locParts.length - 1].trim() : c.loc)); const cleanedThemes = tempEditThemes.map(normalizeThemeLabel).filter(t => t && t !== '未分類'); c.themes = cleanedThemes.length > 0 ? [...cleanedThemes] : ['未分類']; c.type = currentEditType; if (currentEditCat !== currentEditType) { oldList.splice(idx, 1); const newList = currentEditType === 'flower' ? flowerCards : (currentEditType === 'hidden' ? hiddenCards : mushroomCards); newList.push(c); } refreshCurrentView(); } closeModal('editModal'); showToast('✅ 明信片已更新'); saveDataToLocal(); const sm = document.getElementById('screen-map'); if(sm && sm.classList.contains('active')) { const p = nc.split(','); if(globalMap) { globalMap.flyTo([parseFloat(p[0]), parseFloat(p[1])], 16, {duration: 1.5}); setTimeout(() => { renderMapMarkers(); updateMapBottomSheet(); persistAppViewState(); }, 300); } } }
 
 // 🌟 4. 解決多層彈出視窗的 Enter 衝突
 document.addEventListener('keydown', (e) => { 
@@ -3283,7 +3362,6 @@ document.addEventListener('drop', (e) => {
 
 // 🌟 系統初始化 (已補上 await loadDataFromLocal() 以確保資料不丟失)
 document.addEventListener('DOMContentLoaded', async () => { 
-    syncViewportMetrics();
     await ensureLocalDataLoaded();
     restoreRouteState();
     restoreAppViewState();
@@ -3291,12 +3369,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     initModalDrag(); 
     initSwipeToBack();
     requestAnimationFrame(refreshQuickFilterSliders);
+    requestAnimationFrame(refreshMainTabSliders);
 });
-window.addEventListener('resize', () => { syncViewportMetrics(); refreshQuickFilterSliders(); });
-window.addEventListener('orientationchange', () => setTimeout(syncViewportMetrics, 150));
-if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', syncViewportMetrics);
-}
+window.addEventListener('resize', () => { refreshQuickFilterSliders(); refreshMainTabSliders(); });
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
         pendingMapResumeRetry = true;
