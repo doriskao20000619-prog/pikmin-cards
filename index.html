@@ -8,7 +8,7 @@
 <title>Pikmin Bloom 明信片記錄</title>
 
 <link rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Pikmin%20Postcards%22%2C%22short_name%22%3A%22Pikmin%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ecfef3%22%2C%22theme_color%22%3A%22%234caf6e%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdib3g9IjAgMCAyNCAyNCIgZmlsbD0iIzRjYWY2ZSI%2BPHBhdGggZD0iTTIxIDEwYzAgNy05IDEzLTkgMTNzLTktNi05LTEzYTkgOSAwIDAgMSAxOCAwem0tOSAwYTMgMyAwIDEgMC02IDAgMyAzIDAgMCAwIDYgMHoiLz48L3N2Zz4%3D%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D'>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -156,24 +156,24 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
   background: #f0f2f5;
   opacity: 0.96;
 }
-.folder-photo:nth-child(1) { transform: rotate(-11deg) translate(-16%, -15%) scale(0.92); z-index: 1; }
-.folder-photo:nth-child(2) { transform: rotate(11deg) translate(16%, -15%) scale(0.92); z-index: 2; }
-.folder-photo:nth-child(3) { transform: rotate(0deg) translate(0%, -18%) scale(1); z-index: 3; }
+.folder-photo:nth-child(1) { transform: rotate(-11deg) translate(-16%, 12%) scale(0.92); z-index: 1; }
+.folder-photo:nth-child(2) { transform: rotate(11deg) translate(16%, 12%) scale(0.92); z-index: 2; }
+.folder-photo:nth-child(3) { transform: rotate(0deg) translate(0%, 8%) scale(1); z-index: 3; }
 .folder-wrapper:hover .folder-content,
 .folder-wrapper.is-opening .folder-content {
-  transform: translateY(-10px) translateZ(-20px);
+  transform: translateY(-4px) translateZ(-12px);
 }
 .folder-wrapper:hover .folder-photo:nth-child(1),
 .folder-wrapper.is-opening .folder-photo:nth-child(1) {
-  transform: rotate(-18deg) translate(-22%, -28%) scale(0.94);
+  transform: rotate(-18deg) translate(-20%, -4%) scale(0.94);
 }
 .folder-wrapper:hover .folder-photo:nth-child(2),
 .folder-wrapper.is-opening .folder-photo:nth-child(2) {
-  transform: rotate(18deg) translate(22%, -28%) scale(0.94);
+  transform: rotate(18deg) translate(20%, -4%) scale(0.94);
 }
 .folder-wrapper:hover .folder-photo:nth-child(3),
 .folder-wrapper.is-opening .folder-photo:nth-child(3) {
-  transform: rotate(0deg) translate(0%, -38%) scale(1.03);
+  transform: rotate(0deg) translate(0%, -10%) scale(1.03);
 }
 .folder-front {
   position: absolute;
@@ -189,9 +189,9 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 .folder-glass-panel {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(40px) saturate(120%);
+  -webkit-backdrop-filter: blur(40px) saturate(120%);
   -webkit-mask-image: var(--folder-shape-mask);
   mask-image: var(--folder-shape-mask);
   -webkit-mask-repeat: no-repeat;
@@ -217,7 +217,7 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
   z-index: 2;
 }
 .folder-shell-main {
-  fill: rgba(255,255,255,0.65);
+  fill: rgba(255,255,255,0.85);
   stroke: #DFDFDF;
   stroke-width: 0.959372;
 }
@@ -262,11 +262,103 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 }
 
 /* ── SEARCH BAR ── */
-.search-wrapper { position: relative; width: 100%; margin-bottom: 20px; display: flex; align-items: center; }
-.search-input { width: 100%; padding: 16px 16px 16px 48px; border-radius: 20px; border: 1.5px solid #fff; background: rgba(240, 247, 242, 0.8); font-size: 0.95rem; font-weight: 700; color: var(--text); outline: none; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); transition: background 0.2s; }
-.search-input::placeholder { color: #8e9a92; font-weight: 600; }
-.search-input:focus { background: #fff; }
-.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--sub); pointer-events: none; width: 20px; height: 20px;}
+.search-wrapper,
+.search-bar-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  height: 48px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  box-shadow:
+    0px 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0px 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0px -1px 2px rgba(255, 255, 255, 0.4),
+    inset 0px 4px 8px rgba(0, 0, 0, 0.015);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  outline: none;
+  transition: all 0.3s ease;
+}
+.search-wrapper:focus-within,
+.search-bar-container:focus-within {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.42) 100%);
+  box-shadow:
+    0px 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0px 2px 4px rgba(255, 255, 255, 0.95),
+    inset 0px -1px 2px rgba(255, 255, 255, 0.45),
+    inset 0px 4px 8px rgba(0, 0, 0, 0.012),
+    0 0 0 1px rgba(0, 122, 255, 0.18),
+    0 0 0 4px rgba(0, 122, 255, 0.06);
+}
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #303846;
+  outline: none;
+  padding: 0;
+  caret-color: #007AFF;
+  transition: all 0.3s ease;
+}
+.search-input::placeholder {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #7F8999;
+}
+.search-icon {
+  width: 24px;
+  height: 24px;
+  color: #666F7F;
+  flex-shrink: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+.search-icon * {
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.search-clear-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(102, 111, 127, 0.12);
+  color: #666F7F;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.search-wrapper.has-value .search-clear-btn,
+.search-bar-container.has-value .search-clear-btn {
+  display: flex;
+}
+.search-clear-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
 /* ── CATEGORY & FILTERS ── */
 .cat-screen-header { position: relative; z-index: 50; background: transparent; padding-top: calc(var(--safe-top) + 6px); flex-shrink: 0; }
@@ -911,9 +1003,12 @@ body::before, .screen::after {
       <div class="folder-container" onclick="goTo('mushroom')"><div class="folder-wrapper"><div class="folder-content"><div class="folder-photos" id="folder-photos-mushroom"></div></div><div class="folder-front"><div class="folder-glass-panel" aria-hidden="true"></div><svg class="folder-shell-svg" viewBox="0 0 272 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path class="folder-shell-main" d="M115.167 0.479889C121.133 0.479951 126.824 2.98595 130.853 7.38614L144.476 22.267C148.322 26.4685 153.757 28.8606 159.453 28.8607H248.939C261.341 28.8607 271.111 39.4293 270.141 51.7924L259.813 183.306C258.945 194.371 249.712 202.908 238.613 202.908H33.4316C22.2384 202.907 12.9617 194.23 12.2139 183.062L1.12109 17.3949C0.237028 8.33119 7.36004 0.480064 16.4668 0.479889H115.167Z"/><line x1="41.5729" y1="170.448" x2="230.249" y2="170.448" stroke="white" stroke-width="1.59895" stroke-linecap="round" opacity="0.98"/><line x1="41.5729" y1="181.641" x2="230.249" y2="181.641" stroke="white" stroke-width="1.59895" stroke-linecap="round" opacity="0.92"/></svg><div class="folder-stickers" id="folder-icon-mushroom"></div></div></div><div class="folder-info"><span class="folder-title">Mushroom</span><span class="folder-badge" id="stat-m-total">0</span></div></div>
       <div class="folder-container" onclick="goTo('hidden')"><div class="folder-wrapper"><div class="folder-content"><div class="folder-photos" id="folder-photos-hidden"></div></div><div class="folder-front"><div class="folder-glass-panel" aria-hidden="true"></div><svg class="folder-shell-svg" viewBox="0 0 272 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path class="folder-shell-main" d="M115.167 0.479889C121.133 0.479951 126.824 2.98595 130.853 7.38614L144.476 22.267C148.322 26.4685 153.757 28.8606 159.453 28.8607H248.939C261.341 28.8607 271.111 39.4293 270.141 51.7924L259.813 183.306C258.945 194.371 249.712 202.908 238.613 202.908H33.4316C22.2384 202.907 12.9617 194.23 12.2139 183.062L1.12109 17.3949C0.237028 8.33119 7.36004 0.480064 16.4668 0.479889H115.167Z"/><line x1="41.5729" y1="170.448" x2="230.249" y2="170.448" stroke="white" stroke-width="1.59895" stroke-linecap="round" opacity="0.98"/><line x1="41.5729" y1="181.641" x2="230.249" y2="181.641" stroke="white" stroke-width="1.59895" stroke-linecap="round" opacity="0.92"/></svg><div class="folder-stickers" id="folder-icon-hidden"></div></div></div><div class="folder-info"><span class="folder-title">Hidden</span><span class="folder-badge" id="stat-h-total">0</span></div></div>
     </div>
-    <div class="search-wrapper animate-stagger-3">
+    <div class="search-wrapper search-bar-container animate-stagger-3" id="global-search-wrapper">
         <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" class="search-input" id="global-search" placeholder="搜尋地點或主題..." oninput="handleGlobalSearch(this.value)">
+        <input type="text" class="search-input" id="global-search" placeholder="Search postcards..." oninput="handleGlobalSearch(this.value); updateGlobalSearchState();">
+        <button type="button" class="search-clear-btn" id="global-search-clear" onclick="clearGlobalSearch()" aria-label="Clear search">
+          <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+        </button>
     </div>
     <div id="search-results-section" style="display:none;" class="animate-stagger-3"></div>
   </div>
@@ -1031,7 +1126,7 @@ body::before, .screen::after {
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.3.16 (更新時間: 05/04)</div></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 45px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><button class="btn-primary" style="margin-bottom:16px;" onclick="saveSettings()">儲存修改</button><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin-top:8px;">版本: v1.3.21 (更新時間: 05/04)</div></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -2237,6 +2332,27 @@ function handleGlobalSearch(val) {
   if(!q){ res.style.display='none'; return; }
   const all = [...flowerCards, ...mushroomCards, ...hiddenCards]; const filter = all.filter(c => (c.name || '').toLowerCase().includes(q) || (c.loc || '').toLowerCase().includes(q) || (c.themes || []).some(t => t.toLowerCase().includes(q)));
   res.style.display='block'; res.innerHTML = filter.length > 0 ? filter.map(c => cardHTML(c, flowerCards.includes(c)?'':'mushroom-thumb', flowerCards.includes(c)?'flower':(hiddenCards.includes(c)?'hidden':'mushroom'))).join('') : '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
+}
+
+function updateGlobalSearchState() {
+  const input = document.getElementById('global-search');
+  const wrapper = document.getElementById('global-search-wrapper');
+  const clearBtn = document.getElementById('global-search-clear');
+  if (!input || !wrapper || !clearBtn) return;
+  const hasValue = input.value.trim().length > 0;
+  wrapper.classList.toggle('has-value', hasValue);
+  clearBtn.style.display = hasValue ? 'flex' : 'none';
+}
+
+function clearGlobalSearch() {
+  const input = document.getElementById('global-search');
+  const res = document.getElementById('search-results-section');
+  if (!input) return;
+  input.value = '';
+  if (res) res.style.display = 'none';
+  updateGlobalSearchState();
+  handleGlobalSearch('');
+  input.focus();
 }
 
 function renderCat(cat, mode) {
