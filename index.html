@@ -1093,6 +1093,23 @@ html.pwa-standalone .pwa-bottom-fill {
   display: block;
 }
 
+/* 🔴 修復電腦版巨無霸資料夾 */
+
+/* 1. 限制資料夾的絕對最大寬度，並保持置中 */
+.folder-wrapper {
+    max-width: 170px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 2. 電腦大螢幕優化：解除 2 欄限制，改為自動換行排列並置中 */
+@media (min-width: 768px) {
+    .category-grid, .folder-list-container {
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
+        justify-content: center;
+        gap: 30px !important;
+    }
+}
 </style>
 </head>
 <body onclick="resetSwipes()">
