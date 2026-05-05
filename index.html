@@ -53,7 +53,7 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 .screen { display: none; min-height: 100vh !important; width: 100% !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; background: var(--bg) !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important; isolation: isolate !important; }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: flex !important; flex-direction: column; animation: screenFadeIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
-.screen.swipe-back-current { will-change: transform; }
+.screen.swipe-back-current { will-change: auto; }
 .screen.swipe-back-previous { display: flex !important; flex-direction: column; pointer-events: none; }
 .scroll-view { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; position: relative; width: 100%; padding-top: 0; padding-bottom: var(--dock-clearance); box-sizing: border-box; overscroll-behavior-y: contain; }
 .scroll-view::-webkit-scrollbar { display: none; }
@@ -1119,6 +1119,17 @@ html.pwa-standalone .edit-modal-footer {
 html.pwa-standalone .pwa-bottom-fill,
 html.pwa-standalone #pwa-bottom-fill {
     display: none !important;
+}
+
+/* 🔴 解決 iOS 右滑返回導致記憶體爆滿閃退 (重複發生問題) */
+.screen.swipe-back-current {
+    will-change: auto !important;
+}
+
+.scroll-view {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    contain: paint;
 }
 </style>
 </head>
@@ -3861,6 +3872,7 @@ function initSwipeToBack() {
     let swipeBackStartTime = 0;
     let isSwipingBack = false;
     let slidingScreen = null;
+    let slidingScrollView = null;
     let bgScreenEl = null;
     let isHorizontalSwipe = false;
 
@@ -3872,8 +3884,11 @@ function initSwipeToBack() {
             slidingScreen.style.boxShadow = '';
             slidingScreen.style.zIndex = '';
             slidingScreen.style.animation = '';
-            slidingScreen.style.overflowY = '';
             slidingScreen.style.pointerEvents = '';
+        }
+        if (slidingScrollView) {
+            slidingScrollView.style.overflowY = '';
+            slidingScrollView = null;
         }
         if (bgScreenEl) {
             bgScreenEl.classList.remove('swipe-back-previous');
@@ -3909,6 +3924,7 @@ function initSwipeToBack() {
                     swipeBackStartX = firstTouch.clientX;
                     swipeBackStartY = firstTouch.clientY;
                     slidingScreen = activeScreens[0];
+                    slidingScrollView = slidingScreen.querySelector('.scroll-view');
                     
                     slidingScreen.classList.add('swipe-back-current');
                     slidingScreen.style.transition = 'none';
@@ -3947,7 +3963,7 @@ function initSwipeToBack() {
         
         if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 0) {
             isHorizontalSwipe = true;
-            slidingScreen.style.overflowY = 'hidden';
+            if (slidingScrollView) slidingScrollView.style.overflowY = 'hidden';
             if (e.cancelable) e.preventDefault();
         } else if (!isHorizontalSwipe) {
             return;
@@ -3970,7 +3986,7 @@ function initSwipeToBack() {
         if (!isSwipingBack || !slidingScreen) return;
         isSwipingBack = false;
         
-        slidingScreen.style.overflowY = '';
+        if (slidingScrollView) slidingScrollView.style.overflowY = '';
         
         let deltaX = Math.max(0, swipeBackCurrentX - swipeBackStartX);
         deltaX = Math.min(deltaX, window.innerWidth);
