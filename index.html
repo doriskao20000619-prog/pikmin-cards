@@ -1180,23 +1180,6 @@ html.pwa-standalone #pwa-bottom-fill {
         margin-top: 0 !important;
     }
 }
-
-/* 4. 修復管理主題列表的滑動問題 */
-#manageThemeModal .modal {
-    max-height: 85vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-.custom-theme-list {
-    flex: 1 1 auto !important;
-    max-height: 45vh !important;
-    overflow-y: auto !important;
-    overscroll-behavior-y: contain !important;
-    padding-bottom: 24px !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
-}
-
 </style>
 </head>
 <body onclick="resetSwipes()">
@@ -2392,37 +2375,19 @@ function initModalDrag() {
 }
 
 function enableDragScroll() {
-  const sliders = document.querySelectorAll('.quick-filter-wrapper, .theme-selector, .sheet-cards-scroll, .custom-theme-list');
+  const sliders = document.querySelectorAll('.quick-filter-wrapper, .theme-selector, .sheet-cards-scroll');
   sliders.forEach(slider => {
     if (slider.dataset.dragBound === 'true') return;
     slider.dataset.dragBound = 'true';
-    let isDown = false; let startX; let startY; let scrollLeft; let scrollTop; let isDragging = false; 
-    let isVertical = slider.classList.contains('custom-theme-list');
-    slider.addEventListener('mousedown', (e) => { 
-        isDown = true; isDragging = false; slider.style.cursor = 'grabbing'; 
-        startX = e.pageX - slider.offsetLeft; startY = e.pageY - slider.offsetTop;
-        scrollLeft = slider.scrollLeft; scrollTop = slider.scrollTop;
-    });
-    slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = ''; });
-    slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = ''; setTimeout(() => { isDragging = false; }, 0); });
-    slider.addEventListener('mousemove', (e) => { 
-        if (!isDown) return; 
-        e.preventDefault(); 
-        if (isVertical) {
-            const y = e.pageY - slider.offsetTop; const walk = (y - startY) * 1.5; 
-            if (Math.abs(walk) > 3) isDragging = true; 
-            slider.scrollTop = scrollTop - walk;
-        } else {
-            const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 1.5; 
-            if (Math.abs(walk) > 3) isDragging = true; 
-            slider.scrollLeft = scrollLeft - walk; 
-        }
-    });
+    let isDown = false; let startX; let scrollLeft; let isDragging = false; 
+    slider.addEventListener('mousedown', (e) => { isDown = true; isDragging = false; slider.style.cursor = 'grabbing'; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+    slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+    slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; setTimeout(() => { isDragging = false; }, 0); });
+    slider.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 1.5; if (Math.abs(walk) > 3) isDragging = true; slider.scrollLeft = scrollLeft - walk; });
     slider.addEventListener('click', (e) => { if (isDragging) { e.preventDefault(); e.stopPropagation(); } }, true);
     slider.addEventListener('wheel', (e) => { 
-        if (!isVertical && e.deltaY !== 0) { 
-            e.preventDefault(); slider.scrollLeft += e.deltaY > 0 ? 40 : -40; 
-        } 
+      if (slider.classList.contains('theme-selector')) return;
+      if (e.deltaY !== 0) { e.preventDefault(); slider.scrollLeft += e.deltaY > 0 ? 40 : -40; } 
     }, { passive: false });
     if (slider.classList.contains('quick-filter-wrapper')) {
       slider.addEventListener('scroll', () => updateQuickFilterSlider(slider), { passive: true });
@@ -3098,7 +3063,6 @@ function openManageThemeModal() {
     list.innerHTML = customThemes.map(theme => buildThemeItemHTML(theme)).join('');
   }
   openModal('manageThemeModal');
-  enableDragScroll();
 }
 function openEditCustomTheme(idx) { editingThemeIndex = idx; const themeStr = customThemes[idx]; const spaceIdx = themeStr.indexOf(' '); const emoji = spaceIdx > -1 ? themeStr.substring(0, spaceIdx) : ''; const name = spaceIdx > -1 ? themeStr.substring(spaceIdx + 1) : themeStr; const tTitle = document.getElementById('addThemeModalTitle'); if(tTitle) tTitle.innerHTML = '修改主題'; const tBtn = document.getElementById('addThemeModalBtn'); if(tBtn) tBtn.textContent = '儲存修改'; const nInput = document.getElementById('new-theme-name'); if(nInput) nInput.value = name; currentNewThemeEmoji = emoji; const eGrid = document.getElementById('emoji-grid'); if(eGrid) eGrid.innerHTML = selectedEmojis.map(e => `<div class="emoji-item ${e===emoji?'selected':''}" onclick="selectEmoji(this, '${e}')">${e}</div>`).join(''); closeModal('manageThemeModal'); openModal('addThemeModal'); }
 function deleteCustomTheme(idx) { const t = customThemes[idx]; customThemes.splice(idx, 1); [...flowerCards, ...mushroomCards, ...hiddenCards].forEach(c => { const i = (c.themes || []).indexOf(t); if (i > -1) c.themes.splice(i, 1); if (!c.themes || c.themes.length === 0) c.themes = ['未分類']; }); showToast(`已移除 ${t}`); openManageThemeModal(); refreshCurrentView(); saveDataToLocal(); }
