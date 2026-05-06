@@ -712,6 +712,12 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 .batch-results-container { display: none; max-height: 450px; overflow-y: auto; padding: 4px; margin-bottom: 20px; scrollbar-width: none; }
 .batch-item { margin-bottom: 14px; }
 .batch-confirm-box { background: rgba(255,255,255,0.6); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+.batch-dup-warning { color: var(--danger); font-size: 0.68rem; font-weight: 800; margin-top: 8px; padding: 6px 10px; background: rgba(255, 59, 48, 0.1); border-radius: 8px; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
+.batch-dup-warning svg { flex-shrink: 0; }
+.modal-sticky-footer { flex-shrink: 0; padding: 12px 20px calc(16px + env(safe-area-inset-bottom)); background: transparent; }
+#uploadModal .modal { padding: 0 !important; max-height: min(86vh, calc(var(--app-height) - var(--safe-top) - 12px)) !important; }
+#uploadModal .batch-results-container { display: block; flex: 1; min-height: 0; max-height: none; overflow-y: auto; padding: 4px 20px 8px; margin-bottom: 0; }
+#uploadModal .modal-sticky-footer { padding-top: 10px; }
 .batch-preview-box { background: rgba(245, 253, 248, 0.7); border: 1.5px solid var(--green-light); border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
 .edit-label { font-size: 0.85rem; font-weight: 800; color: var(--sub); margin-bottom: 8px; margin-left: 4px; text-align: left; display: block;}
@@ -1364,14 +1370,16 @@ html.pwa-standalone .edit-modal-footer {
     <div class="modal bottom-sheet">
         <div class="modal-header"><div class="modal-handle"></div><div class="modal-title">批次匯入</div></div>
         <div class="batch-results-container" id="batch-container" style="display:block;"></div>
-        <button id="btn-batch-save" class="btn-primary" style="display:none;" onclick="handleBatchSave()">儲存入庫</button>
+        <div class="modal-sticky-footer" id="upload-modal-footer" style="display:none;">
+          <button id="btn-batch-save" class="btn-primary" style="display:none;" onclick="handleBatchSave()">儲存入庫</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 16px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><div class="edit-label">進階設定</div><div class="edit-input-wrapper"><input type="url" id="settings-ocr-proxy" class="edit-text-input no-icon" placeholder="填入 Cloudflare Worker 網址" style="padding-right: 70px;"><button id="btn-test-proxy" class="reset-input-btn" style="width: auto; padding: 0 12px; right: 6px; background: rgba(76, 175, 110, 0.15); color: var(--green-dark); font-weight: 800;" onclick="testOcrProxy()" type="button">測試</button></div><div style="font-size: 0.75rem; color: var(--sub); margin-top: -12px; margin-bottom: 24px; padding-left: 4px;">留空則停用自動 OCR。若有自建代理端點請在此填寫。</div><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin: 0 0 16px;">版本: v1.3.49 (更新時間: 05/06)</div><button class="btn-primary" onclick="saveSettings()">儲存修改</button></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 16px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><div class="edit-label">進階設定</div><div class="edit-input-wrapper"><input type="url" id="settings-ocr-proxy" class="edit-text-input no-icon" placeholder="填入 Cloudflare Worker 網址" style="padding-right: 70px;"><button id="btn-test-proxy" class="reset-input-btn" style="width: auto; padding: 0 12px; right: 6px; background: rgba(76, 175, 110, 0.15); color: var(--green-dark); font-weight: 800;" onclick="testOcrProxy()" type="button">測試</button></div><div style="font-size: 0.75rem; color: var(--sub); margin-top: -12px; margin-bottom: 24px; padding-left: 4px;">留空則停用自動 OCR。若有自建代理端點請在此填寫。</div><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin: 0 0 16px;">版本: v1.3.50 (更新時間: 05/07)</div><button class="btn-primary" onclick="saveSettings()">儲存修改</button></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -1929,6 +1937,25 @@ function refreshMainTabSliders() {
   document.querySelectorAll('.sub-tabs').forEach(updateMainTabSlider);
 }
 
+function resolveHeaderScrollTarget(header) {
+  const screen = header.closest('.screen');
+  if (screen) return screen.querySelector(':scope > .scroll-view') || screen.querySelector('.scroll-view');
+  return header.closest('.scroll-view');
+}
+
+function initTapToScrollTop() {
+  document.querySelectorAll('.home-header, .cat-screen-header').forEach(header => {
+    if (header.dataset.tapTopBound === '1') return;
+    header.dataset.tapTopBound = '1';
+    header.addEventListener('click', (e) => {
+      if (e.target.closest('button, a, input, textarea, select, label, .sub-tab, .home-avatar-container, .sync-indicator, .back-btn')) return;
+      const scrollTarget = resolveHeaderScrollTarget(header);
+      if (!scrollTarget) return;
+      scrollTarget.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+}
+
 function syncPwaBottomFill() {
   return;
 }
@@ -2237,6 +2264,25 @@ function forceSync() {
     }
     closeModal('settingsModal'); checkAndSyncDriveFile(); 
 }
+function resolveCloudTimestampValue(value) {
+    const parsed = parseInt(value || '0', 10);
+    if (!Number.isNaN(parsed) && parsed > 0) return parsed;
+    if (typeof value === 'string') {
+        const asDate = new Date(value).getTime();
+        if (!Number.isNaN(asDate) && asDate > 0) return asDate;
+    }
+    return 0;
+}
+async function fetchCloudLastUpdateMeta() {
+    if (!driveFileId || !currentAccessToken) return 0;
+    const response = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${driveFileId}?fields=id,modifiedTime,appProperties`,
+        { headers: { 'Authorization': 'Bearer ' + currentAccessToken } }
+    );
+    if (!response.ok) throw new Error(`cloud-meta-${response.status}`);
+    const meta = await response.json();
+    return resolveCloudTimestampValue(meta?.appProperties?.lastUpdate) || resolveCloudTimestampValue(meta?.modifiedTime);
+}
 async function checkAndSyncDriveFile() { 
     if (isPreviewMode) return;
     await ensureLocalDataLoaded();
@@ -2286,8 +2332,95 @@ function repairThemes() {
     customThemes = customThemes.filter(t => !defaultThemes.includes(t) && t !== '自然景觀');
 }
 
-async function uploadToCloud() { if (isPreviewMode || !driveFileId || !currentAccessToken) return; showSyncing(true); let localTime = localStorage.getItem('pikmin_lastUpdate'); if (!localTime) { localTime = Date.now().toString(); localStorage.setItem('pikmin_lastUpdate', localTime); } const fileContent = JSON.stringify({ flowerCards, mushroomCards, hiddenCards, customThemes, userProfile: { customNickname: userProfile.customNickname, customAvatar: userProfile.customAvatar }, appSettings, lastUpdate: localTime }); const file = new Blob([fileContent], {type: 'application/json'}); const form = new FormData(); form.append('metadata', new Blob([JSON.stringify({mimeType: 'application/json'})], {type: 'application/json'})); form.append('file', file); try { await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`, { method: 'PATCH', headers: new Headers({ 'Authorization': 'Bearer ' + currentAccessToken }), body: form }); showSyncing(false); } catch (err) { showSyncing(false); } }
-async function createInDrive() { if (isPreviewMode || !currentAccessToken) return; showSyncing(true); let localTime = localStorage.getItem('pikmin_lastUpdate'); if (!localTime) { localTime = Date.now().toString(); localStorage.setItem('pikmin_lastUpdate', localTime); } const fileContent = JSON.stringify({ flowerCards, mushroomCards, hiddenCards, customThemes, userProfile: { customNickname: '', customAvatar: '' }, appSettings: { ocrProxyUrl: normalizeProxyUrl(appSettings.ocrProxyUrl || '') }, lastUpdate: localTime }); const file = new Blob([fileContent], {type: 'application/json'}); const metadata = { name: 'pikmin_data_v1.json', parents: ['appDataFolder'], mimeType: 'application/json' }; const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'})); form.append('file', file); try { const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: new Headers({ 'Authorization': 'Bearer ' + currentAccessToken }), body: form }); const data = await res.json(); driveFileId = data.id; localStorage.setItem('pikmin_driveFileId', driveFileId); showSyncing(false); } catch (err) { showSyncing(false); } }
+async function uploadToCloud() {
+    if (isPreviewMode || !driveFileId || !currentAccessToken) return;
+    showSyncing(true);
+    let localTime = localStorage.getItem('pikmin_lastUpdate');
+    if (!localTime) {
+        localTime = Date.now().toString();
+        localStorage.setItem('pikmin_lastUpdate', localTime);
+    }
+    const localTimestamp = resolveCloudTimestampValue(localTime);
+    try {
+        const cloudTimestamp = await fetchCloudLastUpdateMeta();
+        if (cloudTimestamp > localTimestamp) {
+            showSyncing(false);
+            showToast('⚠️ 雲端已有新版本，請先手動同步更新資料');
+            return;
+        }
+    } catch (err) {
+        showSyncing(false);
+        showToast('⚠️ 無法驗證雲端版本，已取消覆蓋');
+        return;
+    }
+    const fileContent = JSON.stringify({
+        flowerCards,
+        mushroomCards,
+        hiddenCards,
+        customThemes,
+        userProfile: { customNickname: userProfile.customNickname, customAvatar: userProfile.customAvatar },
+        appSettings,
+        lastUpdate: localTime
+    });
+    const file = new Blob([fileContent], { type: 'application/json' });
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify({
+        mimeType: 'application/json',
+        appProperties: { lastUpdate: String(localTime) }
+    })], { type: 'application/json' }));
+    form.append('file', file);
+    try {
+        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`, {
+            method: 'PATCH',
+            headers: new Headers({ 'Authorization': 'Bearer ' + currentAccessToken }),
+            body: form
+        });
+        showSyncing(false);
+    } catch (err) {
+        showSyncing(false);
+    }
+}
+async function createInDrive() {
+    if (isPreviewMode || !currentAccessToken) return;
+    showSyncing(true);
+    let localTime = localStorage.getItem('pikmin_lastUpdate');
+    if (!localTime) {
+        localTime = Date.now().toString();
+        localStorage.setItem('pikmin_lastUpdate', localTime);
+    }
+    const fileContent = JSON.stringify({
+        flowerCards,
+        mushroomCards,
+        hiddenCards,
+        customThemes,
+        userProfile: { customNickname: '', customAvatar: '' },
+        appSettings: { ocrProxyUrl: normalizeProxyUrl(appSettings.ocrProxyUrl || '') },
+        lastUpdate: localTime
+    });
+    const file = new Blob([fileContent], { type: 'application/json' });
+    const metadata = {
+        name: 'pikmin_data_v1.json',
+        parents: ['appDataFolder'],
+        mimeType: 'application/json',
+        appProperties: { lastUpdate: String(localTime) }
+    };
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', file);
+    try {
+        const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: new Headers({ 'Authorization': 'Bearer ' + currentAccessToken }),
+            body: form
+        });
+        const data = await res.json();
+        driveFileId = data.id;
+        localStorage.setItem('pikmin_driveFileId', driveFileId);
+        showSyncing(false);
+    } catch (err) {
+        showSyncing(false);
+    }
+}
 
 // 🌟 4. 畫面切換與導覽列互動
 let screenHistory = [];
@@ -2964,7 +3097,7 @@ function renderBatchItems() {
             // 檢查是否與現有明信片重複 (僅依據名稱，容許同座標存在多張不同明信片)
             const allExistingCards = [...flowerCards, ...mushroomCards, ...hiddenCards];
             const isNameDup = item.name && item.name !== '未命名明信片' && item.name !== '未命名' && allExistingCards.some(c => c.name === item.name);
-            const dupWarning = isNameDup ? `<div style="color: var(--danger); font-size: 0.75rem; font-weight: 700; margin-top: 8px; padding: 6px 10px; background: rgba(255, 59, 48, 0.1); border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> 系統內已有相同名稱的明信片</div>` : '';
+            const dupWarning = isNameDup ? `<div class="batch-dup-warning" title="系統已有同名明信片"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span style="overflow:hidden;text-overflow:ellipsis;">系統已有同名明信片</span></div>` : '';
 
             return `
             <div class="batch-item">
@@ -3022,8 +3155,11 @@ function renderBatchItems() {
       tempBatchList.forEach((_, index) => updateBatchPointTypeIndicator(index));
     });
     
-    const bbs = document.getElementById('btn-batch-save'); 
-    if(bbs) bbs.style.display = tempBatchList.every(item => item.status === 'confirmed') && tempBatchList.length > 0 ? 'block' : 'none'; 
+    const bbs = document.getElementById('btn-batch-save');
+    const uploadFooter = document.getElementById('upload-modal-footer');
+    const canSaveBatch = tempBatchList.every(item => item.status === 'confirmed') && tempBatchList.length > 0;
+    if (bbs) bbs.style.display = canSaveBatch ? 'block' : 'none';
+    if (uploadFooter) uploadFooter.style.display = canSaveBatch ? 'block' : 'none';
 }
 
 function confirmBatchItem(index) { tempBatchList[index].status = 'confirmed'; renderBatchItems(); }
@@ -4243,6 +4379,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupFolderInteractions();
     initModalDrag(); 
     initSwipeToBack();
+    initTapToScrollTop();
     requestAnimationFrame(refreshQuickFilterSliders);
     requestAnimationFrame(refreshMainTabSliders);
 });
