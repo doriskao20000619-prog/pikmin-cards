@@ -1132,6 +1132,27 @@ html.pwa-standalone #pwa-bottom-fill {
     contain: paint;
 }
 
+/* 🔴 Modal 底部空白與雙重 safe-area 疊加修復 */
+.modal {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+#settingsModal .hide-scrollbar,
+html.pwa-standalone #settingsModal .hide-scrollbar {
+    padding: 0 20px calc(16px + env(safe-area-inset-bottom)) !important;
+}
+
+#editModal .hide-scrollbar,
+html.pwa-standalone #editModal .hide-scrollbar {
+    padding: 0 20px 12px !important;
+}
+
+.edit-modal-footer,
+html.pwa-standalone .edit-modal-footer {
+    padding: 8px 20px calc(8px + env(safe-area-inset-bottom)) !important;
+}
+
 /* 🔴 網頁版優化與底部遮擋修復 */
 
 /* 1. 確保電腦版滑鼠滾輪可正常滾動 (限制高度，逼出內部滾動) */
@@ -1343,7 +1364,7 @@ html.pwa-standalone #pwa-bottom-fill {
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 16px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><div class="edit-label">進階設定</div><div class="edit-input-wrapper"><input type="url" id="settings-ocr-proxy" class="edit-text-input no-icon" placeholder="填入 Cloudflare Worker 網址" style="padding-right: 70px;"><button id="btn-test-proxy" class="reset-input-btn" style="width: auto; padding: 0 12px; right: 6px; background: rgba(76, 175, 110, 0.15); color: var(--green-dark); font-weight: 800;" onclick="testOcrProxy()" type="button">測試</button></div><div style="font-size: 0.75rem; color: var(--sub); margin-top: -12px; margin-bottom: 24px; padding-left: 4px;">留空則停用自動 OCR。若有自建代理端點請在此填寫。</div><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin: 0 0 16px;">版本: v1.3.46 (更新時間: 05/06)</div><button class="btn-primary" onclick="saveSettings()">儲存修改</button></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 16px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><div class="edit-label">進階設定</div><div class="edit-input-wrapper"><input type="url" id="settings-ocr-proxy" class="edit-text-input no-icon" placeholder="填入 Cloudflare Worker 網址" style="padding-right: 70px;"><button id="btn-test-proxy" class="reset-input-btn" style="width: auto; padding: 0 12px; right: 6px; background: rgba(76, 175, 110, 0.15); color: var(--green-dark); font-weight: 800;" onclick="testOcrProxy()" type="button">測試</button></div><div style="font-size: 0.75rem; color: var(--sub); margin-top: -12px; margin-bottom: 24px; padding-left: 4px;">留空則停用自動 OCR。若有自建代理端點請在此填寫。</div><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin: 0 0 16px;">版本: v1.3.47 (更新時間: 05/06)</div><button class="btn-primary" onclick="saveSettings()">儲存修改</button></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -2560,7 +2581,7 @@ function updateFolderPhotos() {
         if(photos.length > 2) sortedForRender[1] = photos[2]; 
         for(let i = 0; i < 3; i++) {
             const p = sortedForRender[i];
-            if (p) html += `<img src="${p.img || p.originalImg}" class="folder-photo">`;
+            if (p) html += `<img src="${p.img || p.originalImg}" class="folder-photo" loading="lazy" decoding="async">`;
             else html += `<div class="folder-photo empty-photo"></div>`;
         }
         container.innerHTML = html;
@@ -2584,7 +2605,7 @@ function setupFolderInteractions() {
 }
 
 function cardHTML(c, thumbClass, cat) {
-  const starFill = c.favorite ? 'var(--star-gold)' : 'none'; const thumbContent = c.img ? `<img src="${c.img}" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : `<div style="display:flex;align-items:center;justify-content:center;color:var(--sub);">${cat==='flower'?ICON_FLOWER:(cat==='mushroom'?ICON_MUSHROOM:ICON_HIDDEN)}</div>`; const isOwnedClass = c.owned ? 'is-owned' : '';
+  const starFill = c.favorite ? 'var(--star-gold)' : 'none'; const thumbContent = c.img ? `<img src="${c.img}" loading="lazy" decoding="async" onclick="event.stopPropagation(); showLightbox('${c.img}')">` : `<div style="display:flex;align-items:center;justify-content:center;color:var(--sub);">${cat==='flower'?ICON_FLOWER:(cat==='mushroom'?ICON_MUSHROOM:ICON_HIDDEN)}</div>`; const isOwnedClass = c.owned ? 'is-owned' : '';
   const themes = Array.isArray(c.themes) ? c.themes : ['未分類'];
   return `<div class="postcard-wrapper animate-stagger-2"><div class="delete-action" onclick="promptHardDelete(event, '${cat}', '${c.id}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>刪除</div><div class="postcard ${isOwnedClass}" onclick="toggleOwned(event, '${cat}', '${c.id}')" onmousedown="handleDragStart(event)" onmouseup="handleDragEnd(event, this)" ontouchstart="handleDragStart(event)" ontouchmove="handleDragMove(event)" ontouchend="handleDragEnd(event, this)"><div class="postcard-thumb ${thumbClass}">${thumbContent}<div class="image-time-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${getLocalTime(c.tz)}</div></div><div class="postcard-info"><div class="mac-btns-container"><button class="mac-btn star-btn ${c.favorite?'is-favorite':''}" onclick="toggleFavorite(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="${starFill}" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></button><button class="mac-btn del-btn" onclick="promptHardDelete(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button><button class="mac-btn edit-btn" onclick="promptEdit(event,'${cat}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button></div><div class="postcard-name-row"><div class="postcard-name" title="${(c.name || '').replace(/"/g, '"')}">${c.name || '未命名'}</div></div><div class="postcard-loc-row"><div class="postcard-loc"><svg viewBox="0 0 24 24" width="14" height="14" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg><span class="postcard-loc-text">${c.loc || '未知地點'}</span></div></div><div class="postcard-tags">${themes.map(t => `<span class="tag">${t}</span>`).join('')}</div><div class="postcard-footer"><div class="coord-btn" onclick="copyCoord(event,'${c.coord || ''}')">${c.coord || ''}</div>${c.owned ? '<div class="owned-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' : ''}</div></div></div></div>`;
 }
@@ -2849,7 +2870,7 @@ function renderBatchItems() {
     
     container.innerHTML = tempBatchList.map((item, index) => { 
         if (item.status === 'ocr_detecting') { 
-            return `<div class="batch-item"><div class="batch-confirm-box" style="display:flex; align-items:center; gap:16px; padding: 16px;"><img src="${item.img}" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><div style="flex:1; text-align:left;"><div style="font-weight: 800; font-size: 0.95rem;">雲端 AI 視覺辨識中...</div><div style="font-size: 0.75rem; color: var(--sub);">請稍後...</div></div></div></div>`; 
+            return `<div class="batch-item"><div class="batch-confirm-box" style="display:flex; align-items:center; gap:16px; padding: 16px;"><img src="${item.img}" loading="lazy" decoding="async" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><div style="flex:1; text-align:left;"><div style="font-weight: 800; font-size: 0.95rem;">雲端 AI 視覺辨識中...</div><div style="font-size: 0.75rem; color: var(--sub);">請稍後...</div></div></div></div>`; 
         } 
         if (item.status === 'detecting') { 
             const allThemes = [...defaultThemes, ...customThemes];
@@ -2864,7 +2885,7 @@ function renderBatchItems() {
             <div class="batch-item">
                 <div class="batch-confirm-box" style="padding: 20px;">
                     <div style="display:flex; align-items:flex-start; gap:16px; margin-bottom: 20px; text-align: left;">
-                        <img src="${item.img}" style="width: 72px; height: 72px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;">
+                        <img src="${item.img}" loading="lazy" decoding="async" style="width: 72px; height: 72px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;">
                         <div style="flex:1; overflow:hidden;">
                             <input type="text" value="${(item.name || '').replace(/"/g, '"')}" oninput="tempBatchList[${index}].name = this.value" class="edit-text-input no-icon" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.95rem; margin-bottom: 8px; border-radius: 12px;" placeholder="明信片名稱">
                             <div style="display:flex; align-items:center; gap:4px; font-size: 0.75rem; color: var(--sub); margin-left: 4px; font-weight:600;">
@@ -2902,7 +2923,7 @@ function renderBatchItems() {
         return `
         <div class="batch-item">
             <div class="batch-preview-box" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 16px;">
-                <img src="${item.img}" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                <img src="${item.img}" loading="lazy" decoding="async" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
                 <div style="flex:1;">
                     <div class="res-main-title" style="font-size:1.05rem;font-weight:900; margin-bottom:4px;">${item.name || '未命名'}</div>
                     <div style="font-family:monospace;color:var(--sub);font-size:0.8rem; font-weight:700;">${item.coord || ''}</div>
@@ -3617,7 +3638,7 @@ function renderRouteList() {
         return; 
     } 
     listEl.innerHTML = routeDestinations.map((c, i) => {
-        const imgHTML = (c.img || c.originalImg) ? `<img src="${c.img || c.originalImg}" class="route-item-img" onerror="this.style.display='none'">` : `<div class="route-item-icon" style="background:#fde0a0; color:#b8710a;"><svg viewBox="0 0 24 24" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>`;
+        const imgHTML = (c.img || c.originalImg) ? `<img src="${c.img || c.originalImg}" loading="lazy" decoding="async" class="route-item-img" onerror="this.style.display='none'">` : `<div class="route-item-icon" style="background:#fde0a0; color:#b8710a;"><svg viewBox="0 0 24 24" fill="#d93025" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>`;
         return `<div class="route-item">${imgHTML}<div class="route-item-content"><div class="route-item-title">${c.name || '未命名'}</div><div class="route-item-sub">${c.loc || ''}</div></div><button class="route-item-del" onclick="removeRouteItem(${i})"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>`;
     }).join(''); 
     persistRouteState();
