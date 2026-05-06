@@ -443,7 +443,7 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 }
 .sub-tab { flex: 1; min-height: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 18px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.95rem; color: #444; cursor: pointer; transition: color 0.22s ease; line-height: 1; position: relative; z-index: 1; background: #f0f1ef; border-radius: 20px 20px 0 0; }
 .sub-tab.active { background: transparent; color: #111; box-shadow: none; z-index: 3; }
-.quick-filter-wrapper { --capsule-pad: 4px; display: flex; gap: 0; margin: 20px 24px 0; padding: var(--capsule-pad); width: calc(100% - 48px); min-height: 48px; height: 48px; box-sizing: border-box; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; overscroll-behavior-y: none; touch-action: pan-x; scrollbar-width: none; scroll-padding-left: var(--capsule-pad); scroll-padding-right: var(--capsule-pad); border-bottom: none; border-radius: 999px; background: linear-gradient(180deg, rgba(240,240,240,0.99) 0%, rgba(230,230,230,0.97) 100%); border: 1px solid rgba(255,255,255,0.62); box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.62), inset 0 -1px 1px rgba(214,214,214,0.48); position: relative; }
+.quick-filter-wrapper { --capsule-pad: 4px; display: flex; gap: 0; margin: 20px 24px 0; padding: var(--capsule-pad); width: calc(100% - 48px); min-height: 48px; height: 48px; box-sizing: border-box; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; overscroll-behavior-y: none; touch-action: pan-x; scrollbar-width: none; scroll-padding-left: var(--capsule-pad); scroll-padding-right: var(--capsule-pad); border-bottom: none; border-radius: 999px; background: linear-gradient(180deg, rgba(240,240,240,0.99) 0%, rgba(230,230,230,0.97) 100%); border: 1px solid rgba(255,255,255,0.62); box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.62), inset 0 -1px 1px rgba(214,214,214,0.48); position: sticky; top: 0; z-index: 40; }
 .quick-filter-wrapper::-webkit-scrollbar { display: none; }
 .quick-filter-wrapper > .slider-indicator { position: absolute; top: 4px; left: 0; height: calc(100% - 8px); border-radius: 999px; background: #FFFFFF; box-shadow: 0px 2px 8px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.04); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease; z-index: 0; pointer-events: none; will-change: left, width; }
 .filter-pill { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 0 18px; border-radius: 999px; border: none; background: transparent; color: #1A1A1A; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: color 0.22s ease; box-shadow: none; flex-shrink: 0; position: relative; z-index: 2; }
@@ -485,21 +485,20 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 .postcard-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: 10% center; }
 .image-time-badge { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); color: var(--green-dark); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; z-index: 5; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
 
-.postcard-info { flex: 1; padding: 16px 14px 16px 16px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.postcard-info { flex: 1; padding: 16px 88px 16px 16px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 .mac-btns-container { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 10; flex-shrink: 0; }
 .mac-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(142, 142, 147, 0.1); border: none; border-radius: 50%; color: #8E8E93; cursor: pointer; transition: transform 0.2s; }
 .mac-btn svg { width: 15px; height: 15px; stroke-width: 2.5; pointer-events: none; }
 .mac-btn.star-btn.is-favorite { background: #FFF9E5; color: var(--star-gold); }
 .postcard-name { font-weight: 600; font-size: 17px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; display: block; flex: 1 1 auto; flex-grow: 1; flex-shrink: 1; min-width: 0; max-width: none; padding-right: 0; }
 .postcard-name-row,
-.postcard-loc-row { display: flex; align-items: center; min-width: 0; margin-right: 104px; }
+.postcard-loc-row { display: flex; align-items: center; min-width: 0; margin-right: 0; }
 @media (max-width: 768px) {
-  .postcard-name-row,
-  .postcard-loc-row { margin-right: 80px; }
+  .postcard-info { padding-right: 76px; }
 }
 .postcard-loc { font-weight: 500; font-size: 13px; color: var(--sub); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; flex: 1 1 auto; min-width: 0; }
 .postcard-loc svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0;}
-.postcard-loc-text { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 10px; }
+.postcard-loc-text { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 0; }
 .postcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .tag { background: #f3f7f4; color: var(--green-dark); font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.06); box-shadow: inset 0 2px 4px rgba(0,0,0,0.04); display: inline-flex; width: max-content; align-items: center; gap: 4px; }
 .postcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
@@ -549,7 +548,7 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 
 /* ── 🗺️ NEW MAP SCREEN ── */
 #screen-map { background: var(--bg); }
-.map-body-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: var(--dock-clearance); display: flex; flex-direction: column; scrollbar-width: none; overscroll-behavior-y: contain; }
+.map-body-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 0; display: flex; flex-direction: column; scrollbar-width: none; overscroll-behavior-y: contain; }
 .map-body-wrapper::-webkit-scrollbar { display: none; }
 .map-box { position: relative !important; width: calc(100% - 32px) !important; height: clamp(360px, calc(var(--app-height) * 0.58), 560px) !important; margin: calc(var(--safe-top) + 12px) auto 0 !important; flex-shrink: 0; border-radius: 32px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 10; background: #eef2ef; }
 #map-container { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
@@ -585,7 +584,7 @@ button, .sub-tab, .filter-pill, .tab, .map-filter-pill, .add-theme-btn, .manage-
 
 .map-bottom-section { padding: 24px 0 0; display: flex; flex-direction: column; }
 .sheet-title { padding: 0 24px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #111; margin-bottom: 16px; }
-.sheet-cards-scroll { display: flex; gap: 16px; padding: 12px 24px calc(var(--dock-clearance) + 20px); overflow-x: auto; scrollbar-width: none; }
+.sheet-cards-scroll { display: flex; gap: 16px; padding: 12px 24px calc(var(--dock-height) + var(--dock-bottom-gap) + 8px); overflow-x: auto; scrollbar-width: none; }
 .sheet-cards-scroll::-webkit-scrollbar { display: none; }
 .sheet-card { position: relative; width: 140px; height: 180px; border-radius: 20px; overflow: visible; flex-shrink: 0; background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,250,248,0.96) 100%); border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 14px 30px rgba(28, 36, 32, 0.08), inset 0 1px 0 rgba(255,255,255,0.98), inset 0 10px 24px rgba(255,255,255,0.32); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, z-index 0.2s; z-index: 1; isolation: isolate; }
 .sheet-card:active { transform: scale(0.96); }
@@ -1132,6 +1131,14 @@ html.pwa-standalone #pwa-bottom-fill {
     contain: paint;
 }
 
+html.pwa-standalone .map-body-wrapper {
+    padding-bottom: 0 !important;
+}
+
+html.pwa-standalone .sheet-cards-scroll {
+    padding-bottom: calc(var(--dock-height) + var(--dock-bottom-gap) + 8px) !important;
+}
+
 /* 🔴 Modal 底部空白與雙重 safe-area 疊加修復 */
 .modal {
     padding-bottom: 0 !important;
@@ -1364,7 +1371,7 @@ html.pwa-standalone .edit-modal-footer {
 <div class="modal-overlay" id="addThemeModal" onclick="closeModalOutside(event, 'addThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title" id="addThemeModalTitle">新增主題</div></div><div class="emoji-picker-grid" id="emoji-grid"></div><input type="text" id="new-theme-name" class="edit-text-input no-icon" placeholder="主題名稱"><button class="btn-primary" id="addThemeModalBtn" style="margin-top:20px;" onclick="saveThemeAction()">確認</button></div></div>
 <div class="modal-overlay" id="manageThemeModal" onclick="closeModalOutside(event, 'manageThemeModal')"><div class="modal bottom-sheet"><div class="modal-header"><div class="modal-handle"></div><div class="modal-title">管理主題</div></div><div class="custom-theme-list theme-list" id="custom-theme-list"></div><button class="add-theme-btn btn-add-theme" onclick="openAddThemeModal()"><span class="btn-add-theme-icon">＋</span><span>新增主題</span></button><button class="btn-primary" onclick="closeModal('manageThemeModal')">完成</button></div></div>
 
-<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 16px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><div class="edit-label">進階設定</div><div class="edit-input-wrapper"><input type="url" id="settings-ocr-proxy" class="edit-text-input no-icon" placeholder="填入 Cloudflare Worker 網址" style="padding-right: 70px;"><button id="btn-test-proxy" class="reset-input-btn" style="width: auto; padding: 0 12px; right: 6px; background: rgba(76, 175, 110, 0.15); color: var(--green-dark); font-weight: 800;" onclick="testOcrProxy()" type="button">測試</button></div><div style="font-size: 0.75rem; color: var(--sub); margin-top: -12px; margin-bottom: 24px; padding-left: 4px;">留空則停用自動 OCR。若有自建代理端點請在此填寫。</div><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin: 0 0 16px;">版本: v1.3.47 (更新時間: 05/06)</div><button class="btn-primary" onclick="saveSettings()">儲存修改</button></div></div></div>
+<div class="modal-overlay" id="settingsModal" onclick="closeModalOutside(event, 'settingsModal')"><div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;"><div class="modal-header" style="flex-shrink: 0; padding: 24px 20px 0;"><div class="modal-handle"></div><div class="modal-title"></div></div><div class="hide-scrollbar" style="overflow-y: auto; flex: 1; padding: 0 20px 16px;"><div style="position:relative; width:80px; height:80px; margin: 0 auto 24px;"><img id="settings-avatar-preview" src="" style="width:100%;height:100%;border-radius:50%;background:#eee;object-fit:cover; display:block;"><button onclick="document.getElementById('settings-avatar-input').click()" style="position:absolute; bottom:-4px; right:-4px; width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button><input type="file" id="settings-avatar-input" accept="image/*" style="display:none;" onchange="handleSettingsAvatarUpload(this.files)"></div><div class="edit-label">暱稱</div><div class="edit-input-wrapper"><input type="text" id="settings-nickname" class="edit-text-input no-icon" placeholder="暱稱"></div><div class="edit-label">綁定帳號</div><div id="settings-email-display" style="padding:16px;background:rgba(255,255,255,0.6);border-radius:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.8);font-family:monospace;font-size:0.95rem;font-weight:700;color:var(--sub);"></div><div class="edit-label">進階設定</div><div class="edit-input-wrapper"><input type="url" id="settings-ocr-proxy" class="edit-text-input no-icon" placeholder="填入 Cloudflare Worker 網址" style="padding-right: 70px;"><button id="btn-test-proxy" class="reset-input-btn" style="width: auto; padding: 0 12px; right: 6px; background: rgba(76, 175, 110, 0.15); color: var(--green-dark); font-weight: 800;" onclick="testOcrProxy()" type="button">測試</button></div><div style="font-size: 0.75rem; color: var(--sub); margin-top: -12px; margin-bottom: 24px; padding-left: 4px;">留空則停用自動 OCR。若有自建代理端點請在此填寫。</div><div style="display: flex; gap: 12px; margin-bottom: 24px;"><button class="btn-secondary" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="forceSync()">手動同步備份</button><button class="btn-danger-ghost" style="margin-bottom: 0; padding: 14px 8px; font-size: 0.95rem; flex: 1;" onclick="handleLogout()">登出帳號</button></div><div style="text-align:center; color:var(--sub); font-size:0.75rem; margin: 0 0 16px;">版本: v1.3.49 (更新時間: 05/06)</div><button class="btn-primary" onclick="saveSettings()">儲存修改</button></div></div></div>
 
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
   <div class="modal bottom-sheet" style="padding: 0; max-height: 85vh;">
@@ -2646,11 +2653,89 @@ function stackCardHTML(c, cat) {
     </div>`;
 }
 
+let globalSearchMatches = [];
+let globalSearchRenderedCount = 0;
+const GLOBAL_SEARCH_BATCH_SIZE = 30;
+
+function getSearchCardCategory(card) {
+  if (card.type === 'flower' || card.type === 'mushroom' || card.type === 'hidden') return card.type;
+  if (hiddenCards.includes(card)) return 'hidden';
+  if (flowerCards.includes(card)) return 'flower';
+  return 'mushroom';
+}
+
+function renderGlobalSearchBatch(reset = false) {
+  const res = document.getElementById('search-results-section');
+  if (!res) return;
+
+  if (reset) {
+    globalSearchRenderedCount = 0;
+    res.innerHTML = '';
+  }
+
+  const nextBatch = globalSearchMatches.slice(
+    globalSearchRenderedCount,
+    globalSearchRenderedCount + GLOBAL_SEARCH_BATCH_SIZE
+  );
+
+  if (nextBatch.length > 0) {
+    const html = nextBatch.map(card => {
+      const cat = getSearchCardCategory(card);
+      const thumbClass = cat === 'flower' ? '' : 'mushroom-thumb';
+      return cardHTML(card, thumbClass, cat);
+    }).join('');
+    res.insertAdjacentHTML('beforeend', html);
+    globalSearchRenderedCount += nextBatch.length;
+  }
+
+  const existingLoadMore = document.getElementById('global-search-load-more-wrap');
+  if (existingLoadMore) existingLoadMore.remove();
+
+  const remaining = globalSearchMatches.length - globalSearchRenderedCount;
+  if (remaining > 0) {
+    res.insertAdjacentHTML(
+      'beforeend',
+      `<div id="global-search-load-more-wrap" style="padding: 4px 0 16px; display:flex; justify-content:center;">
+        <button type="button" class="btn-secondary" style="width:auto; padding:12px 20px; border-radius:99px; font-size:0.92rem;" onclick="loadMoreGlobalSearchResults()">載入更多結果（剩餘 ${remaining} 筆）</button>
+      </div>`
+    );
+  }
+}
+
+function loadMoreGlobalSearchResults() {
+  renderGlobalSearchBatch(false);
+}
+
 function handleGlobalSearch(val) {
-  const q = val ? val.toLowerCase() : ''; const res = document.getElementById('search-results-section');
-  if(!q){ res.style.display='none'; return; }
-  const all = [...flowerCards, ...mushroomCards, ...hiddenCards]; const filter = all.filter(c => (c.name || '').toLowerCase().includes(q) || (c.loc || '').toLowerCase().includes(q) || (c.themes || []).some(t => t.toLowerCase().includes(q)));
-  res.style.display='block'; res.innerHTML = filter.length > 0 ? filter.map(c => cardHTML(c, flowerCards.includes(c)?'':'mushroom-thumb', flowerCards.includes(c)?'flower':(hiddenCards.includes(c)?'hidden':'mushroom'))).join('') : '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
+  const q = val ? val.toLowerCase().trim() : '';
+  const res = document.getElementById('search-results-section');
+  if (!res) return;
+
+  if (!q) {
+    globalSearchMatches = [];
+    globalSearchRenderedCount = 0;
+    res.style.display = 'none';
+    res.innerHTML = '';
+    return;
+  }
+
+  const all = [...flowerCards, ...mushroomCards, ...hiddenCards];
+  globalSearchMatches = all.filter(c =>
+    (c.name || '').toLowerCase().includes(q) ||
+    (c.loc || '').toLowerCase().includes(q) ||
+    (c.themes || []).some(t => t.toLowerCase().includes(q))
+  );
+
+  res.style.display = 'block';
+
+  if (globalSearchMatches.length === 0) {
+    globalSearchRenderedCount = 0;
+    res.innerHTML = '<p style="text-align:center;color:var(--sub);font-size:0.85rem;padding:20px;">無搜尋結果</p>';
+    return;
+  }
+
+  res.innerHTML = '';
+  requestAnimationFrame(() => renderGlobalSearchBatch(true));
 }
 
 function updateGlobalSearchState() {
@@ -3950,9 +4035,30 @@ function initSwipeToBack() {
     let slidingScreen = null;
     let slidingScrollView = null;
     let bgScreenEl = null;
+    let bgDimEl = null;
     let isHorizontalSwipe = false;
+    let swipeAnimFrame = 0;
+    let pendingSwipeDeltaX = 0;
+
+    function applySwipeProgress() {
+        swipeAnimFrame = 0;
+        if (!slidingScreen) return;
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1;
+        const deltaX = Math.max(0, Math.min(pendingSwipeDeltaX, viewportWidth));
+        slidingScreen.style.transform = `translateX(${deltaX}px)`;
+        if (bgScreenEl) {
+            const progress = Math.min(deltaX / viewportWidth, 1);
+            const bgOffset = -18 + (18 * progress);
+            bgScreenEl.style.transform = `translateX(${bgOffset}px)`;
+            if (bgDimEl) bgDimEl.style.opacity = String(0.3 * (1 - progress));
+        }
+    }
 
     function cleanupSwipeBackStyles() {
+        if (swipeAnimFrame) {
+            cancelAnimationFrame(swipeAnimFrame);
+            swipeAnimFrame = 0;
+        }
         if (slidingScreen) {
             slidingScreen.classList.remove('swipe-back-current');
             slidingScreen.style.transform = '';
@@ -3972,12 +4078,13 @@ function initSwipeToBack() {
             bgScreenEl.style.transform = '';
             bgScreenEl.style.transition = '';
             bgScreenEl.style.zIndex = '';
-            let dim = bgScreenEl.querySelector('.dim-overlay');
-            if (dim) {
-                dim.style.opacity = '0';
-                dim.style.transition = 'none';
+            if (bgDimEl) {
+                bgDimEl.style.opacity = '0';
+                bgDimEl.style.transition = 'none';
             }
         }
+        bgDimEl = null;
+        pendingSwipeDeltaX = 0;
         isHorizontalSwipe = false;
         slidingScreen = null;
         bgScreenEl = null;
@@ -4017,12 +4124,17 @@ function initSwipeToBack() {
                     if (bgScreenEl) {
                         bgScreenEl.classList.add('swipe-back-previous');
                         bgScreenEl.style.display = 'flex';
-                        bgScreenEl.style.transform = 'translate3d(-18px, 0, 0)';
+                        bgScreenEl.style.transform = 'translateX(-18px)';
                         bgScreenEl.style.zIndex = 10;
-                        let dim = bgScreenEl.querySelector('.dim-overlay');
-                        if (!dim) { dim = document.createElement('div'); dim.className = 'dim-overlay'; dim.style.cssText = 'position:absolute; inset:0; background:#000; z-index:9000; pointer-events:none; opacity:0;'; bgScreenEl.appendChild(dim); }
-                        dim.style.transition = 'none';
-                        dim.style.opacity = '0.3';
+                        bgDimEl = bgScreenEl.querySelector('.dim-overlay');
+                        if (!bgDimEl) {
+                            bgDimEl = document.createElement('div');
+                            bgDimEl.className = 'dim-overlay';
+                            bgDimEl.style.cssText = 'position:absolute; inset:0; background:#000; z-index:9000; pointer-events:none; opacity:0;';
+                            bgScreenEl.appendChild(bgDimEl);
+                        }
+                        bgDimEl.style.transition = 'none';
+                        bgDimEl.style.opacity = '0.3';
                     }
                 }
             }
@@ -4047,14 +4159,10 @@ function initSwipeToBack() {
         
         deltaX = Math.max(0, deltaX);
         deltaX = Math.min(deltaX, window.innerWidth);
-        
-        slidingScreen.style.transform = `translate3d(${deltaX}px, 0, 0)`;
-        if (bgScreenEl) {
-            const progress = Math.min(deltaX / window.innerWidth, 1);
-            const bgOffset = -18 + (18 * progress);
-            bgScreenEl.style.transform = `translate3d(${bgOffset}px, 0, 0)`;
-            const dim = bgScreenEl.querySelector('.dim-overlay');
-            if(dim) dim.style.opacity = 0.3 * (1 - progress);
+
+        pendingSwipeDeltaX = deltaX;
+        if (!swipeAnimFrame) {
+            swipeAnimFrame = requestAnimationFrame(applySwipeProgress);
         }
     }, {passive: false});
 
@@ -4073,12 +4181,11 @@ function initSwipeToBack() {
         
         if (isHorizontalSwipe && (deltaX > swipeThreshold || fastSwipe)) {
             slidingScreen.style.transition = 'transform 0.3s ease-out';
-            slidingScreen.style.transform = `translate3d(${window.innerWidth}px, 0, 0)`;
+            slidingScreen.style.transform = `translateX(${window.innerWidth}px)`;
             if (bgScreenEl) {
                 bgScreenEl.style.transition = 'transform 0.3s ease-out';
-                bgScreenEl.style.transform = 'translate3d(0, 0, 0)';
-                const dim = bgScreenEl.querySelector('.dim-overlay');
-                if(dim) { dim.style.transition = 'opacity 0.3s ease-out'; dim.style.opacity = '0'; }
+                bgScreenEl.style.transform = 'translateX(0)';
+                if(bgDimEl) { bgDimEl.style.transition = 'opacity 0.3s ease-out'; bgDimEl.style.opacity = '0'; }
             }
             
             setTimeout(() => {
@@ -4087,12 +4194,11 @@ function initSwipeToBack() {
             }, 300);
         } else {
             slidingScreen.style.transition = 'transform 0.2s ease-out';
-            slidingScreen.style.transform = 'translate3d(0, 0, 0)';
+            slidingScreen.style.transform = 'translateX(0)';
             if (bgScreenEl) {
                 bgScreenEl.style.transition = 'transform 0.2s ease-out';
-                bgScreenEl.style.transform = 'translate3d(-18px, 0, 0)';
-                const dim = bgScreenEl.querySelector('.dim-overlay');
-                if(dim) { dim.style.transition = 'opacity 0.2s ease-out'; dim.style.opacity = '0.3'; }
+                bgScreenEl.style.transform = 'translateX(-18px)';
+                if(bgDimEl) { bgDimEl.style.transition = 'opacity 0.2s ease-out'; bgDimEl.style.opacity = '0.3'; }
             }
             
             setTimeout(() => {
